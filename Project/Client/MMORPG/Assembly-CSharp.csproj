@@ -19,7 +19,7 @@
 	<DebugType>full</DebugType>
 	<Optimize>false</Optimize>
 	<OutputPath>Temp\bin\Debug\</OutputPath>
-	<DefineConstants>DEBUG;TRACE;UNITY_5_2_3;UNITY_5_2;UNITY_5;ENABLE_NEW_BUGREPORTER;ENABLE_2D_PHYSICS;ENABLE_4_6_FEATURES;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_FRAME_DEBUGGER;ENABLE_GENERICS;ENABLE_HOME_SCREEN;ENABLE_IMAGEEFFECTS;ENABLE_LIGHT_PROBES_LEGACY;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_PLUGIN_INSPECTOR;ENABLE_SHADOWS;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_RAKNET;ENABLE_UNET;ENABLE_UNITYEVENTS;ENABLE_VR;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_HUB;ENABLE_CLOUD_PROJECT_ID;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_METRICS;ENABLE_REFLECTION_BUFFERS;INCLUDE_DYNAMIC_GI;INCLUDE_GI;INCLUDE_IL2CPP;INCLUDE_DIRECTX12;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;ENABLE_LOCALIZATION;ENABLE_ANDROID_ATLAS_ETC1_COMPRESSION;UNITY_ANDROID;UNITY_ANDROID_API;ENABLE_SUBSTANCE;ENABLE_TEXTUREID_MAP;ENABLE_EGL;ENABLE_NETWORK;ENABLE_RUNTIME_GI;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_LOG_MIXED_STACKTRACE;ENABLE_UNITYADS_RUNTIME;UNITY_UNITYADS_API;ENABLE_MONO;ENABLE_PROFILER;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;UNITY_TEAM_LICENSE;UNITY_PRO_LICENSE</DefineConstants>
+	<DefineConstants>DEBUG;TRACE;UNITY_5_2_3;UNITY_5_2;UNITY_5;ENABLE_NEW_BUGREPORTER;ENABLE_2D_PHYSICS;ENABLE_4_6_FEATURES;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_FRAME_DEBUGGER;ENABLE_GENERICS;ENABLE_HOME_SCREEN;ENABLE_IMAGEEFFECTS;ENABLE_LIGHT_PROBES_LEGACY;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_PLUGIN_INSPECTOR;ENABLE_SHADOWS;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_RAKNET;ENABLE_UNET;ENABLE_UNITYEVENTS;ENABLE_VR;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_HUB;ENABLE_CLOUD_PROJECT_ID;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_METRICS;ENABLE_REFLECTION_BUFFERS;INCLUDE_DYNAMIC_GI;INCLUDE_GI;INCLUDE_IL2CPP;INCLUDE_DIRECTX12;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;ENABLE_LOCALIZATION;ENABLE_ANDROID_ATLAS_ETC1_COMPRESSION;UNITY_ANDROID;UNITY_ANDROID_API;ENABLE_SUBSTANCE;ENABLE_TEXTUREID_MAP;ENABLE_EGL;ENABLE_NETWORK;ENABLE_RUNTIME_GI;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_LOG_MIXED_STACKTRACE;ENABLE_UNITYADS_RUNTIME;UNITY_UNITYADS_API;ENABLE_MONO;ENABLE_PROFILER;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;UNITY_TEAM_LICENSE</DefineConstants>
 	<ErrorReport>prompt</ErrorReport>
 	<WarningLevel>4</WarningLevel>
 	<NoWarn>0169</NoWarn>
@@ -38,10 +38,10 @@
 	<Reference Include="System.Core" />
 	<Reference Include="System.Xml.Linq" />
 	<Reference Include="UnityEngine">
-	  <HintPath>D:/Program Files/Unity5.2.3/Editor/Data/Managed/UnityEngine.dll</HintPath>
+	  <HintPath>D:/Unity/Unity5.2.3f1/Editor/Data/Managed/UnityEngine.dll</HintPath>
 	</Reference>
 	<Reference Include="UnityEditor">
-	  <HintPath>D:/Program Files/Unity5.2.3/Editor/Data/Managed/UnityEditor.dll</HintPath>
+	  <HintPath>D:/Unity/Unity5.2.3f1/Editor/Data/Managed/UnityEditor.dll</HintPath>
 	</Reference>
   </ItemGroup>
   <ItemGroup>
@@ -77,6 +77,8 @@
      <Compile Include="Assets\FingerGestures\Toolbox\TBTap.cs" />
      <Compile Include="Assets\FingerGestures\Utils\GestureStateTracker.cs" />
      <Compile Include="Assets\FingerGestures\Utils\MoveToFinger.cs" />
+     <Compile Include="Assets\HUD Text\Scripts\HUDText.cs" />
+     <Compile Include="Assets\HUD Text\Scripts\UIFollowTarget.cs" />
      <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\Game\EquipItems.cs" />
      <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\Game\EquipRandomItem.cs" />
      <Compile Include="Assets\NGUI\Examples\Scripts\InventorySystem\Game\UICursor.cs" />
@@ -98,10 +100,8 @@
      <Compile Include="Assets\NGUI\Examples\Scripts\Other\LagPosition.cs" />
      <Compile Include="Assets\NGUI\Examples\Scripts\Other\LagRotation.cs" />
      <Compile Include="Assets\NGUI\Examples\Scripts\Other\LoadLevelOnClick.cs" />
-     <Compile Include="Assets\NGUI\Examples\Scripts\Other\LookAtTarget.cs" />
      <Compile Include="Assets\NGUI\Examples\Scripts\Other\OpenURLOnClick.cs" />
      <Compile Include="Assets\NGUI\Examples\Scripts\Other\PanWithMouse.cs" />
-     <Compile Include="Assets\NGUI\Examples\Scripts\Other\PlayIdleAnimations.cs" />
      <Compile Include="Assets\NGUI\Examples\Scripts\Other\SetColorPickerColor.cs" />
      <Compile Include="Assets\NGUI\Examples\Scripts\Other\Spin.cs" />
      <Compile Include="Assets\NGUI\Examples\Scripts\Other\SpinWithMouse.cs" />
@@ -215,24 +215,53 @@
      <Compile Include="Assets\NGUI\Scripts\UI\UITooltip.cs" />
      <Compile Include="Assets\NGUI\Scripts\UI\UIViewport.cs" />
      <Compile Include="Assets\Script\Camera\CameraCtrl.cs" />
+     <Compile Include="Assets\Script\Common\EnumDefine.cs" />
      <Compile Include="Assets\Script\Common\FingerEvent.cs" />
-     <Compile Include="Assets\Script\Common\LogOnSceneCtrl.cs" />
+     <Compile Include="Assets\Script\Common\GlobalInit.cs" />
      <Compile Include="Assets\Script\Common\ResourcesMgr.cs" />
      <Compile Include="Assets\Script\Common\SceneMgr.cs" />
      <Compile Include="Assets\Script\Core\Singleton.cs" />
+     <Compile Include="Assets\Script\Core\UIBase.cs" />
      <Compile Include="Assets\Script\Core\UISceneBase.cs" />
+     <Compile Include="Assets\Script\Core\UIWindowBase.cs" />
+     <Compile Include="Assets\Script\Role\AI\IRoleAI.cs" />
+     <Compile Include="Assets\Script\Role\AI\RoleMainPlayerCityAI.cs" />
+     <Compile Include="Assets\Script\Role\AI\RoleMonsterAI.cs" />
+     <Compile Include="Assets\Script\Role\FSM\RoleFSMMgr.cs" />
+     <Compile Include="Assets\Script\Role\FSM\State\RoleStateAbstract.cs" />
+     <Compile Include="Assets\Script\Role\FSM\State\RoleStateAttack.cs" />
+     <Compile Include="Assets\Script\Role\FSM\State\RoleStateDie.cs" />
+     <Compile Include="Assets\Script\Role\FSM\State\RoleStateHurt.cs" />
+     <Compile Include="Assets\Script\Role\FSM\State\RoleStateIdle.cs" />
+     <Compile Include="Assets\Script\Role\FSM\State\RoleStateRun.cs" />
      <Compile Include="Assets\Script\Role\RoleCtrl.cs" />
+     <Compile Include="Assets\Script\Role\RoleHeadBarCtrl.cs" />
+     <Compile Include="Assets\Script\Role\RoleInfo\RoleInfoBase.cs" />
+     <Compile Include="Assets\Script\Role\RoleInfo\RoleInfoMainPlayer.cs" />
+     <Compile Include="Assets\Script\Role\RoleInfo\RoleInfoMonster.cs" />
+     <Compile Include="Assets\Script\Role\RoleMgr.cs" />
+     <Compile Include="Assets\Script\SceneCtrl\CitySceneCtrl.cs" />
+     <Compile Include="Assets\Script\SceneCtrl\InitSceneCtrl.cs" />
+     <Compile Include="Assets\Script\SceneCtrl\LoadingSceneCtrl.cs" />
+     <Compile Include="Assets\Script\SceneCtrl\LogOnSceneCtrl.cs" />
+     <Compile Include="Assets\Script\SceneCtrl\MonsterAbout\MonsterCreatPoint.cs" />
      <Compile Include="Assets\Script\Test\Box2Entity.cs" />
      <Compile Include="Assets\Script\Test\BoxCtrl.cs" />
      <Compile Include="Assets\Script\Test\BoxEntity.cs" />
-     <Compile Include="Assets\Script\Test\GroundCtrl.cs" />
      <Compile Include="Assets\Script\Test\TestScene.cs" />
      <Compile Include="Assets\Script\Test\TestSceneCtrl.cs" />
+     <Compile Include="Assets\Script\UI\LayerUIMgr.cs" />
+     <Compile Include="Assets\Script\UI\Other\RoleHeadBarRoot.cs" />
+     <Compile Include="Assets\Script\UI\Other\UIPlayerInfo.cs" />
+     <Compile Include="Assets\Script\UI\SceneUICtrl\UISceneCityCtrl.cs" />
+     <Compile Include="Assets\Script\UI\SceneUICtrl\UISceneLoadingCtrl.cs" />
      <Compile Include="Assets\Script\UI\SceneUICtrl\UISceneLogonCtrl.cs" />
      <Compile Include="Assets\Script\UI\SceneUIMgr.cs" />
      <Compile Include="Assets\Script\UI\WindowUICtrl\UILogOnCtrl.cs" />
      <Compile Include="Assets\Script\UI\WindowUICtrl\UIRegCtrl.cs" />
+     <Compile Include="Assets\Script\UI\WindowUICtrl\UIRoleInfoCtrl.cs" />
      <Compile Include="Assets\Script\UI\WindowUIMgr.cs" />
+     <Compile Include="Assets\Script\Utils\GameObjectUtil.cs" />
      <Compile Include="Assets\Script\Utils\StringUtil.cs" />
      <Compile Include="Assets\T4M\Scripts\T4MBillBObjSC.cs" />
      <Compile Include="Assets\T4M\Scripts\T4MLodObjSC.cs" />
@@ -340,22 +369,22 @@
      <None Include="Assets\T4M\Shaders\ShaderModel2\Diffuse\T4M 5 Textures.shader" />
      <None Include="Assets\T4M\Shaders\ShaderModel2\BumpSpec\T4M 2 TexturesBumpSpec.shader" />
  <Reference Include="UnityEngine.Advertisements">
- <HintPath>D:/Program Files/Unity5.2.3/Editor/Data/UnityExtensions/Unity/Advertisements/UnityEngine.Advertisements.dll</HintPath>
+ <HintPath>D:/Unity/Unity5.2.3f1/Editor/Data/UnityExtensions/Unity/Advertisements/UnityEngine.Advertisements.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.UI">
- <HintPath>D:/Program Files/Unity5.2.3/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
+ <HintPath>D:/Unity/Unity5.2.3f1/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Networking">
- <HintPath>D:/Program Files/Unity5.2.3/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
+ <HintPath>D:/Unity/Unity5.2.3f1/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Analytics">
- <HintPath>D:/Program Files/Unity5.2.3/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
+ <HintPath>D:/Unity/Unity5.2.3f1/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
  </Reference>
  <Reference Include="Mono.Cecil">
- <HintPath>D:/Program Files/Unity5.2.3/Editor/Data/Managed/Mono.Cecil.dll</HintPath>
+ <HintPath>D:/Unity/Unity5.2.3f1/Editor/Data/Managed/Mono.Cecil.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.iOS.Extensions.Xcode">
- <HintPath>D:/Program Files/Unity5.2.3/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
+ <HintPath>D:/Unity/Unity5.2.3f1/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>
