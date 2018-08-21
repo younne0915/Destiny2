@@ -38,10 +38,10 @@
 	<Reference Include="System.Core" />
 	<Reference Include="System.Xml.Linq" />
 	<Reference Include="UnityEngine">
-	  <HintPath>D:/Unity/Unity5.2.3f1/Editor/Data/Managed/UnityEngine.dll</HintPath>
+	  <HintPath>G:/Unity/Util/Unity/Editor/Data/Managed/UnityEngine.dll</HintPath>
 	</Reference>
 	<Reference Include="UnityEditor">
-	  <HintPath>D:/Unity/Unity5.2.3f1/Editor/Data/Managed/UnityEditor.dll</HintPath>
+	  <HintPath>G:/Unity/Util/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
 	</Reference>
   </ItemGroup>
   <ItemGroup>
@@ -218,6 +218,7 @@
      <Compile Include="Assets\Script\Common\EnumDefine.cs" />
      <Compile Include="Assets\Script\Common\FingerEvent.cs" />
      <Compile Include="Assets\Script\Common\GlobalInit.cs" />
+     <Compile Include="Assets\Script\Common\MMO_MemoryStream.cs" />
      <Compile Include="Assets\Script\Common\ResourcesMgr.cs" />
      <Compile Include="Assets\Script\Common\SceneMgr.cs" />
      <Compile Include="Assets\Script\Core\Singleton.cs" />
@@ -248,6 +249,7 @@
      <Compile Include="Assets\Script\Test\Box2Entity.cs" />
      <Compile Include="Assets\Script\Test\BoxCtrl.cs" />
      <Compile Include="Assets\Script\Test\BoxEntity.cs" />
+     <Compile Include="Assets\Script\Test\TestMMOMemory.cs" />
      <Compile Include="Assets\Script\Test\TestScene.cs" />
      <Compile Include="Assets\Script\Test\TestSceneCtrl.cs" />
      <Compile Include="Assets\Script\UI\LayerUIMgr.cs" />
@@ -368,23 +370,17 @@
      <None Include="Assets\T4M\Shaders\ShaderModel2\DirectionLM\T4M 2 TexturesBumped DLM mobile.shader" />
      <None Include="Assets\T4M\Shaders\ShaderModel2\Diffuse\T4M 5 Textures.shader" />
      <None Include="Assets\T4M\Shaders\ShaderModel2\BumpSpec\T4M 2 TexturesBumpSpec.shader" />
- <Reference Include="UnityEngine.Advertisements">
- <HintPath>D:/Unity/Unity5.2.3f1/Editor/Data/UnityExtensions/Unity/Advertisements/UnityEngine.Advertisements.dll</HintPath>
- </Reference>
  <Reference Include="UnityEngine.UI">
- <HintPath>D:/Unity/Unity5.2.3f1/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
+ <HintPath>G:/Unity/Util/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Networking">
- <HintPath>D:/Unity/Unity5.2.3f1/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
- </Reference>
- <Reference Include="UnityEngine.Analytics">
- <HintPath>D:/Unity/Unity5.2.3f1/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
+ <HintPath>G:/Unity/Util/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
  </Reference>
  <Reference Include="Mono.Cecil">
- <HintPath>D:/Unity/Unity5.2.3f1/Editor/Data/Managed/Mono.Cecil.dll</HintPath>
+ <HintPath>G:/Unity/Util/Unity/Editor/Data/Managed/Mono.Cecil.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.iOS.Extensions.Xcode">
- <HintPath>D:/Unity/Unity5.2.3f1/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
+ <HintPath>G:/Unity/Util/Unity/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>
