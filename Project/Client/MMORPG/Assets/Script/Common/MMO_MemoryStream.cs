@@ -2,9 +2,20 @@ using UnityEngine;
 using System.Collections;
 using System.IO;
 using System;
+using System.Text;
 
 public class MMO_MemoryStream : MemoryStream
 {
+    public MMO_MemoryStream()
+    {
+
+    }
+
+    public MMO_MemoryStream(byte[] arr):base(arr)
+    {
+
+    }
+
     #region Short
     /// <summary>
     /// 从流中读取一个short数据
@@ -209,6 +220,32 @@ public class MMO_MemoryStream : MemoryStream
     public void WriteBool(bool value)
     {
         base.WriteByte((byte)(value?1:0));
+    }
+    #endregion
+
+
+    #region UTF8String
+    /// <summary>
+    /// 从流中读取一个string数组
+    /// </summary>
+    /// <returns></returns>
+    public string ReadUTF8String()
+    {
+        ushort len = this.ReadUShort();
+        byte[] arr = new byte[len];
+        base.Read(arr, 0, len);
+        return Encoding.UTF8.GetString(arr);
+    }
+
+    public void WriteUTF8String(string str)
+    {
+        byte[] arr = Encoding.UTF8.GetBytes(str);
+        if(arr.Length > 65535)
+        {
+            throw new InvalidCastException("字符串超出范围");
+        }
+        WriteUShort((ushort)arr.Length);
+        base.Write(arr, 0, arr.Length);
     }
     #endregion
 }
