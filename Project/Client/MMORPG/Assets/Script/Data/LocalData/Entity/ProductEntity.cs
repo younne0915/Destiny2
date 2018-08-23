@@ -7,14 +7,6 @@ using System.Collections;
 public class ProductEntity : AbstractEntity
 {
     /// <summary>
-    /// 商品编号
-    /// </summary>
-    public int Id
-    {
-        get;set;
-    }
-
-    /// <summary>
     /// 商品名称
     /// </summary>
     public string Name

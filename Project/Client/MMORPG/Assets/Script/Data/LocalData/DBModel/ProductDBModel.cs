@@ -5,59 +5,18 @@ using System.Collections.Generic;
 /// <summary>
 /// 商品数据管理
 /// </summary>
-public class ProductDBModel : System.IDisposable
+public class ProductDBModel : AbstractDBModel<ProductDBModel, ProductEntity>
 {
-    private List<ProductEntity> lst;
+    protected override string FileName => "Product.data";
 
-    public ProductDBModel()
+    protected override ProductEntity MakeEntity(GameDataTableParser parser)
     {
-        lst = new List<ProductEntity>();
-        Load();
-    }
-
-    private static ProductDBModel _instance;
-
-    public static ProductDBModel instance
-    {
-        get
-        {
-            if(_instance == null)
-            {
-                _instance = new ProductDBModel();
-            }
-            return _instance;
-        }
-    }
-
-    private void Load()
-    {
-        using (GameDataTableParser paser = new GameDataTableParser(@"E:\Destiny2\Project\Client\MMORPG\www\Data\Product.data"))
-        {
-            while (!paser.Eof)
-            {
-                ProductEntity entity = new ProductEntity();
-                entity.Id = paser.GetFieldValue("Id").ToInt();
-                entity.Name = paser.GetFieldValue("Name");
-                entity.Price = paser.GetFieldValue("Price").ToFloat();
-                entity.PicName = paser.GetFieldValue("PicName");
-                entity.Desc = paser.GetFieldValue("Desc");
-
-                lst.Add(entity);
-                paser.Next();
-            }
-        }
-    }
-
-    public List<ProductEntity> GetList()
-    {
-        return lst;
-    }
-
-
-
-    public void Dispose()
-    {
-        lst.Clear();
-        lst = null;
+        ProductEntity entity = new ProductEntity();
+        entity.Id = parser.GetFieldValue("Id").ToInt();
+        entity.Name = parser.GetFieldValue("Name");
+        entity.Price = parser.GetFieldValue("Price").ToFloat();
+        entity.PicName = parser.GetFieldValue("PicName");
+        entity.Desc = parser.GetFieldValue("Desc");
+        return entity;
     }
 }

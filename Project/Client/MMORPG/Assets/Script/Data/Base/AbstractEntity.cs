@@ -6,4 +6,11 @@ using System.Collections;
 /// </summary>
 public abstract class AbstractEntity
 {
+    /// <summary>
+    /// ±àºÅ
+    /// </summary>
+    public int Id
+    {
+        get; set;
+    }
 }
