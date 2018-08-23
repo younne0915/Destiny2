@@ -6,5 +6,4 @@ using System.Collections;
 /// </summary>
 public abstract class AbstractEntity
 {
-	
 }
