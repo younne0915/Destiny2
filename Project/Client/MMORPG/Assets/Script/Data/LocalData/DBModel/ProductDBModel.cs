@@ -7,11 +7,12 @@ using System.Collections.Generic;
 /// </summary>
 public class ProductDBModel : System.IDisposable
 {
-    public List<ProductEntity> lst;
+    private List<ProductEntity> lst;
 
     public ProductDBModel()
     {
         lst = new List<ProductEntity>();
+        Load();
     }
 
     private static ProductDBModel _instance;
@@ -27,6 +28,32 @@ public class ProductDBModel : System.IDisposable
             return _instance;
         }
     }
+
+    private void Load()
+    {
+        using (GameDataTableParser paser = new GameDataTableParser(@"E:\Destiny2\Project\Client\MMORPG\www\Data\Product.data"))
+        {
+            while (!paser.Eof)
+            {
+                ProductEntity entity = new ProductEntity();
+                entity.Id = paser.GetFieldValue("Id").ToInt();
+                entity.Name = paser.GetFieldValue("Name");
+                entity.Price = paser.GetFieldValue("Price").ToFloat();
+                entity.PicName = paser.GetFieldValue("PicName");
+                entity.Desc = paser.GetFieldValue("Desc");
+
+                lst.Add(entity);
+                paser.Next();
+            }
+        }
+    }
+
+    public List<ProductEntity> GetList()
+    {
+        return lst;
+    }
+
+
 
     public void Dispose()
     {

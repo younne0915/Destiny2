@@ -12,7 +12,7 @@ using System.Collections;
 public static class StringUtil 
 {
     /// <summary>
-    /// 扩展方法
+    /// 把string类型转化成int 扩展方法
     /// </summary>
     /// <param name="str"></param>
     /// <returns></returns>
@@ -20,6 +20,18 @@ public static class StringUtil
     {
         int temp = 0;
         int.TryParse(str, out temp);
+        return temp;
+    }
+
+    /// <summary>
+    /// 把string类型转化成float
+    /// </summary>
+    /// <param name="str"></param>
+    /// <returns></returns>
+    public static float ToFloat(this string str)
+    {
+        float temp = 0;
+        float.TryParse(str, out temp);
         return temp;
     }
 }
