@@ -13,6 +13,7 @@ public abstract class AbstractDBModel <T, P>
     {
         m_List = new List<P>();
         m_Dic = new Dictionary<int, P>();
+        LoadData();
     }
 
     #region µ¥Àý
@@ -53,7 +54,7 @@ public abstract class AbstractDBModel <T, P>
 
     private void LoadData()
     {
-        using (GameDataTableParser paser = new GameDataTableParser(@"E:\Destiny2\Project\Client\MMORPG\www\Data\Product.data"))
+        using (GameDataTableParser paser = new GameDataTableParser(string.Format(@"www\Data\{0}", FileName)))
         {
             while (!paser.Eof)
             {

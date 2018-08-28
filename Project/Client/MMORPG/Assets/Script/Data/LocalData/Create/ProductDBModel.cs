@@ -3,11 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 
 /// <summary>
-/// 商品数据管理
+/// Product数据管理
 /// </summary>
 public class ProductDBModel : AbstractDBModel<ProductDBModel, ProductEntity>
 {
-    protected override string FileName => "Product.data";
+    protected override string FileName
+    {
+        get { return "Product.data"; }
+    }
 
     protected override ProductEntity MakeEntity(GameDataTableParser parser)
     {
