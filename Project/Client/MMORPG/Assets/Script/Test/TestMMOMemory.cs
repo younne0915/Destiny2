@@ -10,23 +10,20 @@ public class TestMMOMemory : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
     {
-        List<JobEntity> lst = JobDBModel.instance.GetList();
-
-        for (int i = 0; i < lst.Count; i++)
-        {
-            Debug.Log("name = " + lst[i].Name);
-        }
-
-        //List<ProductEntity> lst = ProductDBModel.instance.GetList();
-
-        //for (int i = 0; i < lst.Count; i++)
-        //{
-        //    Debug.Log("name = " + lst[i].Name);
-        //}
+        NetWorkHttp.Instance.SendData(GlobalInit.WebAccountUrl + "api/account?id=3", callback);
     }
 
-    // Update is called once per frame
-    void Update () {
-	
-	}
+    private void callback(NetWorkHttp.CallBackArgs obj)
+    {
+        if (obj.IsError)
+        {
+            Debug.Log(obj.Error);
+        }
+        else
+        {
+            AccountEntity entity = LitJson.JsonMapper.ToObject<AccountEntity>(obj.Json);
+            Debug.Log("callback Json: " + entity.UserName);
+        }
+
+    }
 }
