@@ -1,64 +1,47 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.IO;
 using LitJson;
+using System.Text;
 
 public class TestMMOMemory : MonoBehaviour {
 
 	// Use this for initialization
 	void Start ()
     {
-        //if (!NetWorkHttp.Instance.IsBusy)
-        //{
-        //    NetWorkHttp.Instance.SendData(GlobalInit.WebAccountUrl + "api/account?id=3", GetCallback);
-        //}
+        NetWorkSocket.Instance.Connect("169.254.116.88", 1011);
 
-        if (!NetWorkHttp.Instance.IsBusy)
+         
+    }
+
+    void Send(string msg)
+    {
+        using (MMO_MemoryStream ms = new MMO_MemoryStream())
         {
-            JsonData jsonData = new JsonData();
-            jsonData["Type"] = 0;       //0:ע�ᣬ1:��¼
-            jsonData["UserName"] = "xxx";
-            jsonData["Pwd"] = "";
-            NetWorkHttp.Instance.SendData(GlobalInit.WebAccountUrl + "api/account", PostCallback, isPost:true, json : jsonData.ToJson());
+            ms.WriteUTF8String(msg);
+            NetWorkSocket.Instance.SendMsg(ms.ToArray());
         }
     }
 
-    private void GetCallback(NetWorkHttp.CallBackArgs obj)
+    private void Update()
     {
-        if (obj.HasError)
+        if (Input.GetKeyDown(KeyCode.Q))
         {
-            Debug.Log(obj.ErrorMsg);
+            Send("你好Q");
         }
-        else
+        else if (Input.GetKeyDown(KeyCode.W))
         {
-            AccountEntity entity = LitJson.JsonMapper.ToObject<AccountEntity>(obj.Json);
-            if (entity != null)
+            Send("你好W");
+        }
+        else if (Input.GetKeyDown(KeyCode.E))
+        {
+            for (int i = 0; i < 10; i++)
             {
-                Debug.Log("callback Json: " + entity.UserName);
-            }
-            else
-            {
-                Debug.Log("entity == null ");
+                Send("你好循环 " + i);
             }
         }
-
-    }
-
-    private void PostCallback(NetWorkHttp.CallBackArgs obj)
-    {
-        if (obj.HasError)
-        {
-            Debug.Log(obj.ErrorMsg);
-        }
-        else
-        {
-            Debug.Log("callback Json: " + obj.Json);
-
-            RetValue ret = JsonMapper.ToObject<RetValue>(obj.Json);
-        }
-
     }
 }
