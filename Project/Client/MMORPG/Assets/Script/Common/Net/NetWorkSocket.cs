@@ -27,13 +27,27 @@ public class NetWorkSocket : MonoBehaviour {
 
     #endregion
 
-    private byte[] buffer = new byte[10240];
+    // private byte[] buffer = new byte[10240];
 
+    private Socket m_Client;
+
+    #region 发送消息所需变量
     private Queue<byte[]> m_SendQueue = new Queue<byte[]>();
 
     private Action m_CheckSendQueue;
+    #endregion
 
-    private Socket m_Client;
+    #region 接收消息所需变量
+    //接受数据包的字节数组缓冲区
+    private byte[] m_ReceiveBuffer = new byte[10240];
+
+    //接收数据包的缓冲数据流
+    private MMO_MemoryStream m_ReceiveMS = new MMO_MemoryStream();
+
+    private Queue<byte[]> m_ReceiveQueue = new Queue<byte[]>();
+
+    private int m_ReceiveCount = 0;
+    #endregion
 
     void OnDestroy()
     {
@@ -41,6 +55,44 @@ public class NetWorkSocket : MonoBehaviour {
         {
             m_Client.Shutdown(SocketShutdown.Both);
             m_Client.Close();
+        }
+    }
+
+    private void Update()
+    {
+        if(m_ReceiveQueue.Count > 0)
+        {
+            while (true)
+            {
+                if (m_ReceiveQueue.Count == 0) break;
+                if (m_ReceiveCount <= 5)
+                {
+                    m_ReceiveCount++;
+
+                    lock (m_ReceiveQueue)
+                    {
+                        byte[] buffer = m_ReceiveQueue.Dequeue();
+
+                        using (MMO_MemoryStream ms = new MMO_MemoryStream(buffer))
+                        {
+                            string msg = ms.ReadUTF8String();
+                            Debug.Log(string.Format("recv msg : {0}", msg));
+                        }
+
+
+                        using (MMO_MemoryStream ms = new MMO_MemoryStream())
+                        {
+                            ms.WriteUTF8String(string.Format("发送 : " + DateTime.Now.ToString()));
+                            SendMsg(ms.ToArray());
+                        }
+                    }
+                }
+                else
+                {
+                    m_ReceiveCount = 0;
+                    break;
+                }
+            }
         }
     }
 
@@ -55,6 +107,8 @@ public class NetWorkSocket : MonoBehaviour {
             m_Client.Connect(new IPEndPoint(IPAddress.Parse(ip), port));
             m_CheckSendQueue = OnCheckSendQueueCallback;
             Debug.LogError("连接成功");
+
+            ReceieveMsg();
         }
         catch (Exception ex)
         {
@@ -62,6 +116,7 @@ public class NetWorkSocket : MonoBehaviour {
         }
     }
 
+    #region 发送消息所需方法
     private void OnCheckSendQueueCallback()
     {
         lock (m_SendQueue)
@@ -106,7 +161,6 @@ public class NetWorkSocket : MonoBehaviour {
 
     private void Send(byte[] buffer)
     {
-        Debug.LogError("send length = " + buffer.Length);
         m_Client.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, SendCallback, m_Client);
     }
 
@@ -119,4 +173,116 @@ public class NetWorkSocket : MonoBehaviour {
             m_CheckSendQueue.Invoke();
         }
     }
+    #endregion
+
+
+    //======================================
+
+    #region 接收消息方法
+    /// <summary>
+    /// 接收数据
+    /// </summary>
+    private void ReceieveMsg()
+    {
+        //异步接收数据
+        m_Client.BeginReceive(m_ReceiveBuffer, 0, m_ReceiveBuffer.Length, SocketFlags.None, ReceiveCallBack, m_Client);
+    }
+
+    //接收数据回调
+    private void ReceiveCallBack(IAsyncResult ar)
+    {
+        try
+        {
+            int len = m_Client.EndReceive(ar);
+
+            Console.WriteLine("recv length = " + len);
+
+            if (len > 0)
+            {
+                //已经接收到数据
+
+                //把接收到数据 写入缓冲数据流的尾部
+                m_ReceiveMS.Position = m_ReceiveMS.Length;
+
+                //把制定长度的字节 写入数据流
+                m_ReceiveMS.Write(m_ReceiveBuffer, 0, len);
+
+                //如果缓存数据流的长度 > 2,说明至少有不完整的包过来了
+                //为什么是2？因为客户端进行封包的时候，用的ushort， 长度就是2
+                if (m_ReceiveMS.Length > 2)
+                {
+                    while (true)
+                    {
+                        m_ReceiveMS.Position = 0;
+                        //currMsgLen 包体的长度
+                        int currMsgLen = m_ReceiveMS.ReadUShort();
+                        //currFulMsgLen 总包的长度 = 包头的长度 + 包体的长度
+                        int currFulMsgLen = 2 + currMsgLen;
+
+                        //如果数据流的长度>=整包的长度，说明至少收到一个完整包
+                        if (m_ReceiveMS.Length >= currFulMsgLen)
+                        {
+                            //至少收到一个完整包
+
+                            //定义包体的byte[]数组
+                            byte[] buffer = new byte[currMsgLen];
+
+                            //把数据流指针放到2的位置, 也就是包体的位置
+                            m_ReceiveMS.Position = 2;
+
+                            //把包体读到byte[]数组
+                            m_ReceiveMS.Read(buffer, 0, currMsgLen);
+
+                            lock (m_ReceiveQueue)
+                            {
+                                m_ReceiveQueue.Enqueue(buffer);
+                            }
+
+                            //================处理剩余字节数组===================
+
+                            //剩余字节长度
+                            int remainLen = (int)(m_ReceiveMS.Length - currFulMsgLen);
+                            if (remainLen > 0)
+                            {
+                                m_ReceiveMS.Position = currFulMsgLen;
+                                byte[] remainBuffer = new byte[remainLen];
+                                m_ReceiveMS.Read(remainBuffer, 0, remainLen);
+
+                                m_ReceiveMS.Position = 0;
+                                m_ReceiveMS.SetLength(0);
+
+                                m_ReceiveMS.Write(remainBuffer, 0, remainBuffer.Length);
+
+                                remainBuffer = null;
+                            }
+                            else
+                            {
+                                m_ReceiveMS.Position = 0;
+                                m_ReceiveMS.SetLength(0);
+
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            //还没有收到完整包
+                            break;
+                        }
+                    }
+                }
+                ReceieveMsg();
+            }
+            else
+            {
+                //客户端断开连接
+                Debug.LogError(string.Format("服务器{0}断开连接", m_Client.RemoteEndPoint.ToString()));
+            }
+        }
+        catch
+        {
+            //客户端断开连接
+            Debug.LogError(string.Format("服务器{0}断开连接", m_Client.RemoteEndPoint.ToString()));
+        }
+    }
+    #endregion
 }
