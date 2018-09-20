@@ -35,6 +35,8 @@ public class NetWorkSocket : MonoBehaviour {
     private Queue<byte[]> m_SendQueue = new Queue<byte[]>();
 
     private Action m_CheckSendQueue;
+
+    private const int m_CompressLen = 200;
     #endregion
 
     #region 接收消息所需变量
@@ -73,15 +75,41 @@ public class NetWorkSocket : MonoBehaviour {
                     {
                         byte[] buffer = m_ReceiveQueue.Dequeue();
 
-                        ushort protoCode = 0;
-                        byte[] protoContent = new byte[buffer.Length - 2];
+                        byte[] bufferNew = new byte[buffer.Length - 3];
+                        ushort crc = 0;
+                        bool isCompress = false;
                         using (MMO_MemoryStream ms = new MMO_MemoryStream(buffer))
                         {
-                            //协议编号
-                            protoCode = ms.ReadUShort();
-                            ms.Read(protoContent, 0, protoContent.Length);
+                            isCompress = ms.ReadBool();
+                            crc = ms.ReadUShort();
 
-                            EventDispatcher.Instance.Dispatch(protoCode, protoContent);
+                            ms.Read(bufferNew, 0, bufferNew.Length);
+                        }
+
+                        ushort calculateCRC = Crc16.CalculateCrc16(bufferNew);
+
+                        if(calculateCRC == crc)
+                        {
+                            bufferNew = SecurityUtil.Xor(bufferNew);
+                            if (isCompress)
+                            {
+                                bufferNew = ZlibHelper.DeCompressBytes(bufferNew);
+                            }
+
+                            ushort protoCode = 0;
+                            byte[] protoContent = new byte[bufferNew.Length - 2];
+                            using (MMO_MemoryStream ms = new MMO_MemoryStream(bufferNew))
+                            {
+                                //协议编号
+                                protoCode = ms.ReadUShort();
+                                ms.Read(protoContent, 0, protoContent.Length);
+
+                                EventDispatcher.Instance.Dispatch(protoCode, protoContent);
+                            }
+                        }
+                        else
+                        {
+
                         }
                     }
                 }
@@ -129,10 +157,27 @@ public class NetWorkSocket : MonoBehaviour {
     private byte[] MakeData(byte[] data)
     {
         byte[] retBuffer = null;
-        using(MMO_MemoryStream ms = new MMO_MemoryStream())
+        //1.压缩
+        bool isCompress = false;
+        if (data.Length > m_CompressLen)
         {
-            ms.WriteUShort((ushort)data.Length);
+            isCompress = true;
+            data = ZlibHelper.CompressBytes(data);
+        }
+
+        //2.异或
+        data = SecurityUtil.Xor(data);
+
+        //3.CRC校验
+        ushort crc = Crc16.CalculateCrc16(data);
+
+        using (MMO_MemoryStream ms = new MMO_MemoryStream())
+        {
+            ms.WriteUShort((ushort)(data.Length + 3));
+            ms.WriteBool(isCompress);
+            ms.WriteUShort(crc);
             ms.Write(data, 0, data.Length);
+
             retBuffer = ms.ToArray();
         }
         return retBuffer; 
