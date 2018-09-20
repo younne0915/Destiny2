@@ -8,6 +8,10 @@ using System.Collections;
 
 public class GlobalInit : MonoBehaviour 
 {
+    public delegate void OnReceiveProtoHandler(ushort protoCode, byte[] buffer);
+
+    //定义委托
+    public OnReceiveProtoHandler OnReceiveProto;
     #region 常量
     /// <summary>
     /// 昵称KEY
@@ -23,6 +27,10 @@ public class GlobalInit : MonoBehaviour
     /// 账户服务器地址
     /// </summary>
     public const string WebAccountUrl = "http://169.254.116.88:8090/";
+
+    public const string SocketIP = "169.254.116.88";
+
+    public const ushort Port = 1011;
 
     #endregion
 
