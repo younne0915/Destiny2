@@ -30,4 +30,10 @@ public class SceneMgr : Singleton<SceneMgr>
         CurrentSceneType = SceneType.City;
         Application.LoadLevel("Scene_Loading");
     }
+
+    public void LoadToShamo()
+    {
+        CurrentSceneType = SceneType.Shamo;
+        Application.LoadLevel("Scene_Loading");
+    }
 }

@@ -6,27 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-public class NetWorkSocket : MonoBehaviour {
-
-    #region 单例
-    private static NetWorkSocket instance;
-
-    public static NetWorkSocket Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                GameObject obj = new GameObject("NetWorkSocket");
-                DontDestroyOnLoad(obj);
-                instance = obj.GetOrCreatComponent<NetWorkSocket>();
-            }
-            return instance;
-        }
-    }
-
-    #endregion
-
+public class NetWorkSocket : SingletonMono<NetWorkSocket>
+{
     // private byte[] buffer = new byte[10240];
 
     private Socket m_Client;
@@ -51,17 +32,20 @@ public class NetWorkSocket : MonoBehaviour {
     private int m_ReceiveCount = 0;
     #endregion
 
-    void OnDestroy()
+    protected override void BeforeOnDestroy()
     {
-        if(m_Client != null && m_Client.Connected)
+        base.BeforeOnDestroy();
+        if (m_Client != null && m_Client.Connected)
         {
             m_Client.Shutdown(SocketShutdown.Both);
             m_Client.Close();
         }
     }
 
-    private void Update()
+    protected override void OnUpdate()
     {
+        base.OnUpdate();
+
         if(m_ReceiveQueue.Count > 0)
         {
             while (true)
@@ -90,6 +74,8 @@ public class NetWorkSocket : MonoBehaviour {
 
                         if(calculateCRC == crc)
                         {
+                            Debug.LogError("calculateCRC = " + calculateCRC);
+
                             bufferNew = SecurityUtil.Xor(bufferNew);
                             if (isCompress)
                             {
@@ -109,7 +95,7 @@ public class NetWorkSocket : MonoBehaviour {
                         }
                         else
                         {
-
+                            break;
                         }
                     }
                 }

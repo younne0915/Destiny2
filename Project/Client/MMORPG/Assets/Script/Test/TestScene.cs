@@ -43,7 +43,7 @@ public class TestScene : MonoBehaviour
     {
         if (Input.GetKeyUp(KeyCode.A))
         {
-            Debug.Log("m_Ret=" + m_Ret);
+            SceneMgr.Instance.LoadToCity();
         }
         else if (Input.GetKeyUp(KeyCode.B))
         {

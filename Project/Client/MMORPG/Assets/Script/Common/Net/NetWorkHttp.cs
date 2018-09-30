@@ -5,28 +5,8 @@ using System;
 /// <summary>
 /// Http通讯管理
 /// </summary>
-public class NetWorkHttp : MonoBehaviour {
-
-    #region 单例
-    private static NetWorkHttp instance;
-
-    public static NetWorkHttp Instance
-    {
-        get
-        {
-            if(instance == null)
-            {
-                GameObject obj = new GameObject("NetWorkHttp");
-                DontDestroyOnLoad(obj);
-                instance = obj.GetOrCreatComponent<NetWorkHttp>();
-                instance.m_CallBackArgs = new CallBackArgs();
-            }
-            return instance;
-        }
-    }
-
-    #endregion
-
+public class NetWorkHttp : SingletonMono<NetWorkHttp>
+{
     #region 属性
     /// <summary>
     /// Web请求回调

@@ -38,6 +38,12 @@ public class CitySceneCtrl : MonoBehaviour
         GlobalInit.Instance.CurrPlayer.Init(RoleType.MainPlayer, new RoleInfoBase() { NickName = GlobalInit.Instance.CurrRoleNickName, CurrHP=10000, MaxHP=10000 }, new RoleMainPlayerCityAI(GlobalInit.Instance.CurrPlayer));
 
         UIPlayerInfo.Instance.SetPlayerInfo();
+
+        //加载完毕
+        if(DelegateDefine.Instance.OnSceneLoadOK != null)
+        {
+            DelegateDefine.Instance.OnSceneLoadOK();
+        }
     }
 
     #region OnZoom 摄像机缩放
@@ -134,4 +140,12 @@ public class CitySceneCtrl : MonoBehaviour
         }
     }
     #endregion
+
+    private void Update()
+    {
+        if (Input.GetKeyUp(KeyCode.A))
+        {
+            SceneMgr.Instance.LoadToShamo();
+        }
+    }
 }

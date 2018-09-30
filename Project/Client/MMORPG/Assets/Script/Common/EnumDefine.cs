@@ -13,7 +13,8 @@ using System.Collections;
 public enum SceneType
 {
     LogOn,
-    City
+    City,
+    Shamo,
 }
 #endregion
 

@@ -5,8 +5,9 @@
 //===================================================
 using UnityEngine;
 using System.Collections;
+using System;
 
-public class LoadingSceneCtrl : MonoBehaviour 
+public class SceneLoadingCtrl : MonoBehaviour 
 {
     /// <summary>
     /// UI场景控制器
@@ -23,8 +24,24 @@ public class LoadingSceneCtrl : MonoBehaviour
 
 	void Start ()
 	{
+        DelegateDefine.Instance.OnSceneLoadOK += OnSceneLoadOK;
         LayerUIMgr.Instance.Reset();
         StartCoroutine(LoadingScene());
+    }
+
+    private void OnDestroy()
+    {
+        DelegateDefine.Instance.OnSceneLoadOK -= OnSceneLoadOK;
+    }
+
+    private void OnSceneLoadOK()
+    {
+        if(m_UILoadingCtrl != null)
+        {
+            Destroy(m_UILoadingCtrl.gameObject);
+        }
+
+        Destroy(gameObject);
     }
 
     private IEnumerator LoadingScene()
@@ -38,9 +55,12 @@ public class LoadingSceneCtrl : MonoBehaviour
             case SceneType.City:
                 strSceneName = "GameScene_CunZhuang";
                 break;
+            case SceneType.Shamo:
+                strSceneName = "GameScene_Shamo";
+                break;
         }
 
-        m_Async = Application.LoadLevelAsync(strSceneName);
+        m_Async = Application.LoadLevelAdditiveAsync(strSceneName);
         m_Async.allowSceneActivation = false;
         yield return m_Async;
     }

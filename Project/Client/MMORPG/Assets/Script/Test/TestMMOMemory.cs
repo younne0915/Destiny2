@@ -11,11 +11,15 @@ public class TestMMOMemory : MonoBehaviour {
 
 	void Start ()
     {
-        NetWorkSocket.Instance.Connect("169.254.116.88", 1011);
+        //NetWorkSocket.Instance.Connect("169.254.116.88", 1011);
 
-        //GlobalInit.Instance.OnReceiveProto += OnReceiveProtoCallback;
+        ////GlobalInit.Instance.OnReceiveProto += OnReceiveProtoCallback;
 
-        EventDispatcher.Instance.AddEventHandler(ProtoCodeDef.TestProtocolResponse, OnRecvTestProtocolCallback);
+        //EventDispatcher.Instance.AddEventHandler(ProtoCodeDef.TestProtocolResponse, OnRecvTestProtocolCallback);
+
+        NetWorkSocket n1 =  NetWorkSocket.Instance;
+        NetWorkHttp n2 = NetWorkHttp.Instance;
+
     }
 
     private void OnRecvTestProtocolCallback(byte[] buffer)
