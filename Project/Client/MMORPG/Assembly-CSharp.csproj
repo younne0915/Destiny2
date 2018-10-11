@@ -19,7 +19,7 @@
 	<DebugType>full</DebugType>
 	<Optimize>false</Optimize>
 	<OutputPath>Temp\bin\Debug\</OutputPath>
-	<DefineConstants>DEBUG;TRACE;UNITY_5_2_3;UNITY_5_2;UNITY_5;ENABLE_NEW_BUGREPORTER;ENABLE_2D_PHYSICS;ENABLE_4_6_FEATURES;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_FRAME_DEBUGGER;ENABLE_GENERICS;ENABLE_HOME_SCREEN;ENABLE_IMAGEEFFECTS;ENABLE_LIGHT_PROBES_LEGACY;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_PLUGIN_INSPECTOR;ENABLE_SHADOWS;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_RAKNET;ENABLE_UNET;ENABLE_UNITYEVENTS;ENABLE_VR;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_HUB;ENABLE_CLOUD_PROJECT_ID;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_METRICS;ENABLE_REFLECTION_BUFFERS;INCLUDE_DYNAMIC_GI;INCLUDE_GI;INCLUDE_IL2CPP;INCLUDE_DIRECTX12;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;ENABLE_LOCALIZATION;ENABLE_ANDROID_ATLAS_ETC1_COMPRESSION;UNITY_ANDROID;UNITY_ANDROID_API;ENABLE_SUBSTANCE;ENABLE_TEXTUREID_MAP;ENABLE_EGL;ENABLE_NETWORK;ENABLE_RUNTIME_GI;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_LOG_MIXED_STACKTRACE;ENABLE_UNITYADS_RUNTIME;UNITY_UNITYADS_API;ENABLE_MONO;ENABLE_PROFILER;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;UNITY_TEAM_LICENSE</DefineConstants>
+	<DefineConstants>DEBUG;TRACE;UNITY_5_2_3;UNITY_5_2;UNITY_5;ENABLE_NEW_BUGREPORTER;ENABLE_2D_PHYSICS;ENABLE_4_6_FEATURES;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_FRAME_DEBUGGER;ENABLE_GENERICS;ENABLE_HOME_SCREEN;ENABLE_IMAGEEFFECTS;ENABLE_LIGHT_PROBES_LEGACY;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_PLUGIN_INSPECTOR;ENABLE_SHADOWS;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;ENABLE_SPRITES;ENABLE_TERRAIN;ENABLE_RAKNET;ENABLE_UNET;ENABLE_UNITYEVENTS;ENABLE_VR;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_HUB;ENABLE_CLOUD_PROJECT_ID;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_METRICS;ENABLE_REFLECTION_BUFFERS;INCLUDE_DYNAMIC_GI;INCLUDE_GI;INCLUDE_IL2CPP;INCLUDE_DIRECTX12;PLATFORM_SUPPORTS_MONO;RENDER_SOFTWARE_CURSOR;ENABLE_LOCALIZATION;ENABLE_ANDROID_ATLAS_ETC1_COMPRESSION;UNITY_ANDROID;UNITY_ANDROID_API;ENABLE_SUBSTANCE;ENABLE_TEXTUREID_MAP;ENABLE_EGL;ENABLE_NETWORK;ENABLE_RUNTIME_GI;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_LOG_MIXED_STACKTRACE;ENABLE_UNITYADS_RUNTIME;UNITY_UNITYADS_API;ENABLE_MONO;ENABLE_PROFILER;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;UNITY_TEAM_LICENSE;UNITY_PRO_LICENSE</DefineConstants>
 	<ErrorReport>prompt</ErrorReport>
 	<WarningLevel>4</WarningLevel>
 	<NoWarn>0169</NoWarn>
@@ -38,10 +38,10 @@
 	<Reference Include="System.Core" />
 	<Reference Include="System.Xml.Linq" />
 	<Reference Include="UnityEngine">
-	  <HintPath>G:/Unity/Util/Unity/Editor/Data/Managed/UnityEngine.dll</HintPath>
+	  <HintPath>D:/Unity/Unity5.2.3f1/Editor/Data/Managed/UnityEngine.dll</HintPath>
 	</Reference>
 	<Reference Include="UnityEditor">
-	  <HintPath>G:/Unity/Util/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
+	  <HintPath>D:/Unity/Unity5.2.3f1/Editor/Data/Managed/UnityEditor.dll</HintPath>
 	</Reference>
   </ItemGroup>
   <ItemGroup>
@@ -215,16 +215,53 @@
      <Compile Include="Assets\NGUI\Scripts\UI\UITooltip.cs" />
      <Compile Include="Assets\NGUI\Scripts\UI\UIViewport.cs" />
      <Compile Include="Assets\Script\Camera\CameraCtrl.cs" />
+     <Compile Include="Assets\Script\Common\Core\Crc16.cs" />
+     <Compile Include="Assets\Script\Common\Core\EventDispatcher.cs" />
+     <Compile Include="Assets\Script\Common\Core\GameDataTableParser.cs" />
+     <Compile Include="Assets\Script\Common\Core\IProto.cs" />
+     <Compile Include="Assets\Script\Common\Core\SecurityUtil.cs" />
+     <Compile Include="Assets\Script\Common\Core\ZlibHelper.cs" />
+     <Compile Include="Assets\Script\Common\Core\zlib_NET_104\Adler32.cs" />
+     <Compile Include="Assets\Script\Common\Core\zlib_NET_104\Deflate.cs" />
+     <Compile Include="Assets\Script\Common\Core\zlib_NET_104\InfBlocks.cs" />
+     <Compile Include="Assets\Script\Common\Core\zlib_NET_104\InfCodes.cs" />
+     <Compile Include="Assets\Script\Common\Core\zlib_NET_104\InfTree.cs" />
+     <Compile Include="Assets\Script\Common\Core\zlib_NET_104\Inflate.cs" />
+     <Compile Include="Assets\Script\Common\Core\zlib_NET_104\StaticTree.cs" />
+     <Compile Include="Assets\Script\Common\Core\zlib_NET_104\SupportClass.cs" />
+     <Compile Include="Assets\Script\Common\Core\zlib_NET_104\Tree.cs" />
+     <Compile Include="Assets\Script\Common\Core\zlib_NET_104\ZInputStream.cs" />
+     <Compile Include="Assets\Script\Common\Core\zlib_NET_104\ZOutputStream.cs" />
+     <Compile Include="Assets\Script\Common\Core\zlib_NET_104\ZStream.cs" />
+     <Compile Include="Assets\Script\Common\Core\zlib_NET_104\ZStreamException.cs" />
+     <Compile Include="Assets\Script\Common\Core\zlib_NET_104\Zlib.cs" />
+     <Compile Include="Assets\Script\Common\DelegateDefine.cs" />
      <Compile Include="Assets\Script\Common\EnumDefine.cs" />
      <Compile Include="Assets\Script\Common\FingerEvent.cs" />
      <Compile Include="Assets\Script\Common\GlobalInit.cs" />
      <Compile Include="Assets\Script\Common\MMO_MemoryStream.cs" />
+     <Compile Include="Assets\Script\Common\MeshRender\MeshLightmapSetting.cs" />
+     <Compile Include="Assets\Script\Common\MeshRender\SerializedLightmapSetting.cs" />
+     <Compile Include="Assets\Script\Common\Net\NetWorkHttp.cs" />
+     <Compile Include="Assets\Script\Common\Net\NetWorkSocket.cs" />
      <Compile Include="Assets\Script\Common\ResourcesMgr.cs" />
+     <Compile Include="Assets\Script\Common\RetValue.cs" />
      <Compile Include="Assets\Script\Common\SceneMgr.cs" />
      <Compile Include="Assets\Script\Core\Singleton.cs" />
+     <Compile Include="Assets\Script\Core\SingletonMono.cs" />
      <Compile Include="Assets\Script\Core\UIBase.cs" />
      <Compile Include="Assets\Script\Core\UISceneBase.cs" />
      <Compile Include="Assets\Script\Core\UIWindowBase.cs" />
+     <Compile Include="Assets\Script\Data\Base\AbstractDBModel.cs" />
+     <Compile Include="Assets\Script\Data\Base\AbstractEntity.cs" />
+     <Compile Include="Assets\Script\Data\LocalData\Create\JobDBModel.cs" />
+     <Compile Include="Assets\Script\Data\LocalData\Create\ProductDBModel.cs" />
+     <Compile Include="Assets\Script\Data\LocalData\Entity\JobEntity.cs" />
+     <Compile Include="Assets\Script\Data\LocalData\Entity\ProductEntity.cs" />
+     <Compile Include="Assets\Script\Data\NetData\Entity\AccountEntity.cs" />
+     <Compile Include="Assets\Script\Data\Proto\ProtoCodeDef.cs" />
+     <Compile Include="Assets\Script\Data\Proto\TestProtocolRequestProto.cs" />
+     <Compile Include="Assets\Script\Data\Proto\TestProtocolResponseProto.cs" />
      <Compile Include="Assets\Script\Role\AI\IRoleAI.cs" />
      <Compile Include="Assets\Script\Role\AI\RoleMainPlayerCityAI.cs" />
      <Compile Include="Assets\Script\Role\AI\RoleMonsterAI.cs" />
@@ -243,9 +280,9 @@
      <Compile Include="Assets\Script\Role\RoleMgr.cs" />
      <Compile Include="Assets\Script\SceneCtrl\CitySceneCtrl.cs" />
      <Compile Include="Assets\Script\SceneCtrl\InitSceneCtrl.cs" />
-     <Compile Include="Assets\Script\SceneCtrl\LoadingSceneCtrl.cs" />
      <Compile Include="Assets\Script\SceneCtrl\LogOnSceneCtrl.cs" />
      <Compile Include="Assets\Script\SceneCtrl\MonsterAbout\MonsterCreatPoint.cs" />
+     <Compile Include="Assets\Script\SceneCtrl\SceneLoadingCtrl.cs" />
      <Compile Include="Assets\Script\Test\Box2Entity.cs" />
      <Compile Include="Assets\Script\Test\BoxCtrl.cs" />
      <Compile Include="Assets\Script\Test\BoxEntity.cs" />
@@ -370,17 +407,26 @@
      <None Include="Assets\T4M\Shaders\ShaderModel2\DirectionLM\T4M 2 TexturesBumped DLM mobile.shader" />
      <None Include="Assets\T4M\Shaders\ShaderModel2\Diffuse\T4M 5 Textures.shader" />
      <None Include="Assets\T4M\Shaders\ShaderModel2\BumpSpec\T4M 2 TexturesBumpSpec.shader" />
+ <Reference Include="UnityEngine.Advertisements">
+ <HintPath>D:/Unity/Unity5.2.3f1/Editor/Data/UnityExtensions/Unity/Advertisements/UnityEngine.Advertisements.dll</HintPath>
+ </Reference>
  <Reference Include="UnityEngine.UI">
- <HintPath>G:/Unity/Util/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
+ <HintPath>D:/Unity/Unity5.2.3f1/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Networking">
- <HintPath>G:/Unity/Util/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
+ <HintPath>D:/Unity/Unity5.2.3f1/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEngine.Analytics">
+ <HintPath>D:/Unity/Unity5.2.3f1/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
+ </Reference>
+ <Reference Include="LitJson">
+ <HintPath>E:/Destiny2/Project/Client/MMORPG/Assets/Plugins/LitJson.dll</HintPath>
  </Reference>
  <Reference Include="Mono.Cecil">
- <HintPath>G:/Unity/Util/Unity/Editor/Data/Managed/Mono.Cecil.dll</HintPath>
+ <HintPath>D:/Unity/Unity5.2.3f1/Editor/Data/Managed/Mono.Cecil.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.iOS.Extensions.Xcode">
- <HintPath>G:/Unity/Util/Unity/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
+ <HintPath>D:/Unity/Unity5.2.3f1/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>
