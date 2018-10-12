@@ -34,4 +34,11 @@ public static class StringUtil
         float.TryParse(str, out temp);
         return temp;
     }
+
+    public static long ToLong(this string str)
+    {
+        long temp = 0;
+        long.TryParse(str, out temp);
+        return temp;
+    }
 }

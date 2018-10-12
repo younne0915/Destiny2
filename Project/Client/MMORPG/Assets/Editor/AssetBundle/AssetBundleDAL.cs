@@ -33,6 +33,17 @@ public class AssetBundleDAL
             AssetBundleEntity entity = new AssetBundleEntity();
             entity.Key = "key" + ++index;
             entity.Name = item.Attribute("Name").Value;
+            entity.Tag = item.Attribute("Tag").Value;
+            entity.Version = item.Attribute("Version").Value.ToInt();
+            entity.Size = item.Attribute("Size").Value.ToLong();
+            entity.ToPath = item.Attribute("ToPath").Value;
+
+            IEnumerable<XElement> pathList = item.Elements("Path");
+            foreach (XElement path in pathList)
+            {
+                entity.PathList.Add(string.Format("Assets/{0}", path.Attribute("Value").Value));
+            }
+            m_List.Add(entity);
         }
 
         return m_List;
