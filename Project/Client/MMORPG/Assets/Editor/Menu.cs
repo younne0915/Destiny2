@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEditor;
 using System.IO;
+using System.Collections.Generic;
 
 public class Menu
 {
@@ -16,13 +17,9 @@ public class Menu
     [MenuItem("YouyouTools/AssetBundleCreate")]
     public static void AssetBundleCreate()
     {
-        string path = Application.dataPath + "/../AssetBundle";
-
-        if (!Directory.Exists(path))
-        {
-            Directory.CreateDirectory(path);
-        }
-
+        AssetBundleWindow win = EditorWindow.GetWindow<AssetBundleWindow>();
+        win.titleContent = new GUIContent("资源打包");
+        win.Show();
 
     }
 }
