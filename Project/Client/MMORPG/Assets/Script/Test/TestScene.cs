@@ -18,7 +18,8 @@ public class TestScene : MonoBehaviour
     void Awake()
     {
         Instance = this;
-        //Debug.Log("Awake" + gameObject.name);
+
+        AssetBundleMgr.Instance.LoadClone(@"Role\role_mainplayer.assetbundle", "Role_MainPlayer");
     }
 
     private int m_Ret = 0;
