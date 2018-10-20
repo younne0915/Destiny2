@@ -6,6 +6,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 /// <summary>
 /// 
@@ -19,7 +20,16 @@ public class TestScene : MonoBehaviour
     {
         Instance = this;
 
-        AssetBundleMgr.Instance.LoadClone(@"Role\role_mainplayer.assetbundle", "Role_MainPlayer");
+        //AssetBundleMgr.Instance.LoadClone(@"Role\role_mainplayer.assetbundle", "Role_MainPlayer");
+
+        AssetBundleLoaderAsync async = AssetBundleMgr.Instance.LoadAsync(@"Role\role_mainplayer.assetbundle", "Role_MainPlayer");
+        async.OnLoadComplete = OnLoadComplete;
+    }
+
+    private void OnLoadComplete(UnityEngine.Object obj)
+    {
+        Debug.Log("OnLoadComplete");
+        Instantiate((GameObject)obj);
     }
 
     private int m_Ret = 0;
@@ -29,7 +39,7 @@ public class TestScene : MonoBehaviour
     {
         //Debug.Log("Start" + gameObject.name);
 
-        StartCoroutine(Test1(5, 8));
+       // StartCoroutine(Test1(5, 8));
     }
 
     private IEnumerator Test1(int x, int y)

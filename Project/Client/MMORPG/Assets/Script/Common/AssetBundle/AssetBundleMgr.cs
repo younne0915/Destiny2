@@ -25,4 +25,12 @@ public class AssetBundleMgr : Singleton<AssetBundleMgr>
             }
         }
     }
+
+    public AssetBundleLoaderAsync LoadAsync(string path, string name)
+    {
+        GameObject obj = new GameObject("AssetBundleLoaderAsync");
+        AssetBundleLoaderAsync async = obj.GetOrCreatComponent<AssetBundleLoaderAsync>();
+        async.Init(path, name);
+        return async;
+    }
 }

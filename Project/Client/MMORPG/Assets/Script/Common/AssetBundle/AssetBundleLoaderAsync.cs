@@ -9,7 +9,7 @@ public class AssetBundleLoaderAsync : MonoBehaviour
     private AssetBundleCreateRequest request;
     private AssetBundle bundle;
 
-
+    public System.Action<Object> OnLoadComplete;
 
     public void Init(string path, string name)
     {
@@ -27,6 +27,11 @@ public class AssetBundleLoaderAsync : MonoBehaviour
         request = AssetBundle.CreateFromMemory(LocalFileMgr.Instance.GetBuffer(m_FullPath));
         yield return request;
         bundle = request.assetBundle;
+        if(OnLoadComplete != null)
+        {
+            OnLoadComplete(bundle.LoadAsset(m_Name));
+            Destroy(gameObject);
+        }
     }
 
     void OnDestroy()
