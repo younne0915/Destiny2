@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class UIRegView : MonoBehaviour {
+public class UIRegView : UIWindowViewBase {
 
 	// Use this for initialization
 	void Start () {

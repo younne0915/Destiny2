@@ -32,12 +32,21 @@ public class UIWindowViewBase : UIViewBase
     /// </summary>
     protected WindowUIType NextOpenWindow = WindowUIType.None;
 
+    protected override void OnBtnClick(GameObject go)
+    {
+        base.OnBtnClick(go);
+        if(go.name.Equals("btn_Close", System.StringComparison.CurrentCultureIgnoreCase))
+        {
+            Close();
+        }
+    }
+
     /// <summary>
     /// ¹Ø±Õ´°¿Ú
     /// </summary>
     protected virtual void Close()
     {
-        //WindowUIMgr.Instance.CloseWindow(CurrentUIType);
+        WindowUIMgr.Instance.CloseWindow(CurrentUIType);
     }
 
     /// <summary>
