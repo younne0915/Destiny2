@@ -148,7 +148,11 @@ public class WindowUIMgr : Singleton<WindowUIMgr>
     {
         windowBase.gameObject.SetActive(true);
         windowBase.transform.localScale = Vector3.zero;
-        windowBase.transform.DOScale(Vector3.one, windowBase.duration).SetAutoKill(false).Pause().OnRewind(()=> 
+        windowBase.transform.DOScale(Vector3.one, windowBase.duration)
+            .SetAutoKill(false)
+            .SetEase(GlobalInit.Instance.UIAnimationCurve)
+            .Pause()
+            .OnRewind(()=> 
         {
             DestroyWindow(windowBase);
         });
@@ -185,7 +189,11 @@ public class WindowUIMgr : Singleton<WindowUIMgr>
                 break;
         }
         windowBase.transform.localPosition = from;
-        windowBase.transform.DOLocalMove(Vector3.zero, windowBase.duration).SetAutoKill(false).Pause().OnRewind(() =>
+        windowBase.transform.DOLocalMove(Vector3.zero, windowBase.duration)
+            .SetAutoKill(false)
+            .SetEase(GlobalInit.Instance.UIAnimationCurve)
+            .Pause()
+            .OnRewind(() =>
         {
             DestroyWindow(windowBase);
         });

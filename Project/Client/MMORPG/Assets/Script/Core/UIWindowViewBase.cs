@@ -35,7 +35,7 @@ public class UIWindowViewBase : UIViewBase
     protected override void OnBtnClick(GameObject go)
     {
         base.OnBtnClick(go);
-        if(go.name.Equals("btn_Close", System.StringComparison.CurrentCultureIgnoreCase))
+        if(go.name.Equals("btnClose", System.StringComparison.CurrentCultureIgnoreCase))
         {
             Close();
         }
