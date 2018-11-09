@@ -1,4 +1,3 @@
-using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
@@ -41,7 +40,7 @@ public class EventDispatcher : Singleton<EventDispatcher>
             }
             else
             {
-                Debug.LogError("list don't contains OnActionHandler : " + handler);
+                UnityEngine.Debug.LogError("list don't contains OnActionHandler : " + handler);
             }
         }
     }
@@ -63,4 +62,67 @@ public class EventDispatcher : Singleton<EventDispatcher>
             }
         }
     }
+
+
+    //-------------------------------------------------------------
+    public delegate void OnButtonClickHandler(params object[] param);
+
+    private Dictionary<string, List<OnButtonClickHandler>> dic_ButtonClick = new Dictionary<string, List<OnButtonClickHandler>>();
+
+    public void AddBtnEventHandler(string btnKey, OnButtonClickHandler handler)
+    {
+        if (dic_ButtonClick.ContainsKey(btnKey))
+        {
+            if (!dic_ButtonClick[btnKey].Contains(handler))
+            {
+                dic_ButtonClick[btnKey].Add(handler);
+            }
+        }
+        else
+        {
+            List<OnButtonClickHandler> list = new List<OnButtonClickHandler>();
+            list.Add(handler);
+            dic_ButtonClick[btnKey] = list;
+        }
+    }
+
+    public void RemoveBtnEventHandler(string btnKey, OnButtonClickHandler handler)
+    {
+        if (dic_ButtonClick.ContainsKey(btnKey))
+        {
+            List<OnButtonClickHandler> list = dic_ButtonClick[btnKey];
+            if (list.Contains(handler))
+            {
+                list.Remove(handler);
+                if (list.Count == 0)
+                {
+                    dic_ButtonClick.Remove(btnKey);
+                }
+            }
+            else
+            {
+                UnityEngine.Debug.LogErrorFormat("list don't contains OnButtonClickHandler : {0}", handler);
+            }
+        }
+    }
+
+    public void DispatchBtn(string btnKey, params object[] param)
+    {
+        if (dic_ButtonClick.ContainsKey(btnKey))
+        {
+            List<OnButtonClickHandler> list = dic_ButtonClick[btnKey];
+            if (list != null && list.Count > 0)
+            {
+                for (int i = 0; i < list.Count; i++)
+                {
+                    if (list[i] != null)
+                    {
+                        list[i](param);
+                    }
+                }
+            }
+        }
+    }
+
+
 }

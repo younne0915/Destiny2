@@ -43,14 +43,14 @@ public class LayerUIMgr : Singleton<LayerUIMgr>
     {
         m_UIPanelDepth++;
 
-        UIPanel[] panArr = obj.GetComponentsInChildren<UIPanel>();
+        //UIPanel[] panArr = obj.GetComponentsInChildren<UIPanel>();
 
-        if (panArr.Length > 0)
-        {
-            for (int i = 0; i < panArr.Length; i++)
-            {
-                panArr[i].depth += m_UIPanelDepth;
-            }
-        }
+        //if (panArr.Length > 0)
+        //{
+        //    for (int i = 0; i < panArr.Length; i++)
+        //    {
+        //        panArr[i].depth += m_UIPanelDepth;
+        //    }
+        //}
     }
 }
