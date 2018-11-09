@@ -5,6 +5,7 @@ public class UILogOnView : UIWindowViewBase
 {
     protected override void OnBtnClick(GameObject go)
     {
+        base.OnBtnClick(go);
         switch (go.name)
         {
             case "btnLogOn":

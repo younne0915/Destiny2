@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System;
 
 public class UIWindowViewBase : UIViewBase
 {
@@ -27,25 +28,25 @@ public class UIWindowViewBase : UIViewBase
     [HideInInspector]
     public WindowUIType CurrentUIType;
 
-    /// <summary>
-    /// 下一个要打开的窗口
-    /// </summary>
-    public WindowUIType NextOpenWindow = WindowUIType.None;
+    public Action OnViewClose;
+
+    private bool m_OpenNext = false;
 
     protected override void OnBtnClick(GameObject go)
     {
         base.OnBtnClick(go);
         if(go.name.Equals("btnClose", System.StringComparison.CurrentCultureIgnoreCase))
         {
-            Close();
+            Close(false);
         }
     }
 
     /// <summary>
     /// 关闭窗口
     /// </summary>
-    public virtual void Close()
+    public virtual void Close(bool openNext)
     {
+        m_OpenNext = openNext;
         WindowUIMgr.Instance.CloseWindow(CurrentUIType);
     }
 
@@ -55,7 +56,12 @@ public class UIWindowViewBase : UIViewBase
     protected override void BeforeOnDestroy()
     {
         LayerUIMgr.Instance.CheckOpenWindow();
-        if (NextOpenWindow == WindowUIType.None) return;
-        WindowUIMgr.Instance.OpenWindow(NextOpenWindow);
+        if (m_OpenNext)
+        {
+            if (OnViewClose != null)
+            {
+                OnViewClose();
+            }
+        }
     }
 }

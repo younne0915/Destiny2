@@ -5,6 +5,7 @@ using System;
 public class AccountCtrl : Singleton<AccountCtrl>
 {
     private UILogOnView uiLogOnView;
+    private UIRegView uiRegView;
 
     public AccountCtrl()
     {
@@ -17,9 +18,7 @@ public class AccountCtrl : Singleton<AccountCtrl>
 
     private void RegViewToLogOnClick(object[] param)
     {
-        WindowUIMgr.Instance.OpenWindow(WindowUIType.LogOn);
-
-        Debug.LogError("RegViewToLogOnClick");
+        OpenLogOnView();
     }
 
     private void RegViewRegClick(object[] param)
@@ -34,17 +33,27 @@ public class AccountCtrl : Singleton<AccountCtrl>
 
     private void LogOnViewToRegClick(object[] param)
     {
-        //if (uiLogOnView != null)
-        //{
-        //    uiLogOnView.Close();
-        //    uiLogOnView.NextOpenWindow = WindowUIType.Reg;
-        //}
-        WindowUIMgr.Instance.OpenWindow(WindowUIType.Reg);
+        if (uiLogOnView != null)
+        {
+            uiLogOnView.Close(true);
+        }
     }
 
     public void OpenLogOnView()
     {
         uiLogOnView = WindowUIMgr.Instance.OpenWindow(WindowUIType.LogOn).GetComponent<UILogOnView>();
+        if(uiLogOnView != null)
+        {
+            uiLogOnView.OnViewClose += () => 
+            {
+                OpenRegWindow();
+            };
+        }
+    }
+
+    private void OpenRegWindow()
+    {
+        uiRegView = WindowUIMgr.Instance.OpenWindow(WindowUIType.Reg).GetComponent<UIRegView>();
     }
 
     public override void Dispose()

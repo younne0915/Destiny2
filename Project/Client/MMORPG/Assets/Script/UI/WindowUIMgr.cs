@@ -68,7 +68,7 @@ public class WindowUIMgr : Singleton<WindowUIMgr>
         {
             obj = m_DicWindow[type].gameObject;
         }
-        
+        LayerUIMgr.Instance.SetLayer(obj);
         return obj;
     }
     #endregion
