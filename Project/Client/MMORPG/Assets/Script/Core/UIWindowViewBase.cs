@@ -47,7 +47,7 @@ public class UIWindowViewBase : UIViewBase
     public virtual void Close(bool openNext)
     {
         m_OpenNext = openNext;
-        WindowUIMgr.Instance.CloseWindow(CurrentUIType);
+        UIViewUtil.Instance.CloseWindow(CurrentUIType);
     }
 
     /// <summary>

@@ -9,10 +9,10 @@ public class UIRegView : UIWindowViewBase {
         switch (go.name)
         {
             case "btnReg":
-                EventDispatcher.Instance.DispatchBtn(ConstDefine.UIRegView_btnReg);
+                UIDispatcher.Instance.Dispatch(ConstDefine.UIRegView_btnReg);
                 break;
             case "btnToLogOn":
-                EventDispatcher.Instance.DispatchBtn(ConstDefine.UIRegView_btnToLogOn);
+                UIDispatcher.Instance.Dispatch(ConstDefine.UIRegView_btnToLogOn);
                 break;
         }
     }

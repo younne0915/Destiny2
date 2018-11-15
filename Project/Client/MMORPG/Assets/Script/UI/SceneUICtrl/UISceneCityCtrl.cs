@@ -23,6 +23,6 @@ public class UISceneCityCtrl : UISceneBase
 
     private void OpenRoleInfo()
     {
-        WindowUIMgr.Instance.OpenWindow(WindowUIType.RoleInfo);
+        UIViewUtil.Instance.OpenWindow(WindowUIType.RoleInfo);
     }
 }

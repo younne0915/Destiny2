@@ -2,23 +2,26 @@ using UnityEngine;
 using System.Collections;
 using System;
 
-public class AccountCtrl : Singleton<AccountCtrl>
+public class AccountCtrl : Singleton<AccountCtrl>, ISystemCtrl
 {
     private UILogOnView uiLogOnView;
     private UIRegView uiRegView;
 
     public AccountCtrl()
     {
-        EventDispatcher.Instance.AddBtnEventHandler(ConstDefine.UILogOnView_btnLogOn, LogOnViewLogOnClick);
-        EventDispatcher.Instance.AddBtnEventHandler(ConstDefine.UILogOnView_btnToReg, LogOnViewToRegClick);
+        UIDispatcher.Instance.AddEventHandler(ConstDefine.UILogOnView_btnLogOn, LogOnViewLogOnClick);
+        UIDispatcher.Instance.AddEventHandler(ConstDefine.UILogOnView_btnToReg, LogOnViewToRegClick);
 
-        EventDispatcher.Instance.AddBtnEventHandler(ConstDefine.UIRegView_btnReg, RegViewRegClick);
-        EventDispatcher.Instance.AddBtnEventHandler(ConstDefine.UIRegView_btnToLogOn, RegViewToLogOnClick);
+        UIDispatcher.Instance.AddEventHandler(ConstDefine.UIRegView_btnReg, RegViewRegClick);
+        UIDispatcher.Instance.AddEventHandler(ConstDefine.UIRegView_btnToLogOn, RegViewToLogOnClick);
     }
 
     private void RegViewToLogOnClick(object[] param)
     {
-        OpenLogOnView();
+        if(uiRegView != null)
+        {
+            uiRegView.Close(true);
+        }
     }
 
     private void RegViewRegClick(object[] param)
@@ -41,7 +44,7 @@ public class AccountCtrl : Singleton<AccountCtrl>
 
     public void OpenLogOnView()
     {
-        uiLogOnView = WindowUIMgr.Instance.OpenWindow(WindowUIType.LogOn).GetComponent<UILogOnView>();
+        uiLogOnView = UIViewUtil.Instance.OpenWindow(WindowUIType.LogOn).GetComponent<UILogOnView>();
         if(uiLogOnView != null)
         {
             uiLogOnView.OnViewClose += () => 
@@ -53,17 +56,36 @@ public class AccountCtrl : Singleton<AccountCtrl>
 
     private void OpenRegWindow()
     {
-        uiRegView = WindowUIMgr.Instance.OpenWindow(WindowUIType.Reg).GetComponent<UIRegView>();
+        uiRegView = UIViewUtil.Instance.OpenWindow(WindowUIType.Reg).GetComponent<UIRegView>();
+        if(uiRegView != null)
+        {
+            uiRegView.OnViewClose += () =>
+            {
+                OpenLogOnView();
+            };
+        }
     }
 
     public override void Dispose()
     {
         base.Dispose();
-        EventDispatcher.Instance.RemoveBtnEventHandler(ConstDefine.UILogOnView_btnLogOn, LogOnViewLogOnClick);
-        EventDispatcher.Instance.RemoveBtnEventHandler(ConstDefine.UILogOnView_btnToReg, LogOnViewToRegClick);
+        UIDispatcher.Instance.RemoveEventHandler(ConstDefine.UILogOnView_btnLogOn, LogOnViewLogOnClick);
+        UIDispatcher.Instance.RemoveEventHandler(ConstDefine.UILogOnView_btnToReg, LogOnViewToRegClick);
 
-        EventDispatcher.Instance.RemoveBtnEventHandler(ConstDefine.UIRegView_btnReg, RegViewRegClick);
-        EventDispatcher.Instance.RemoveBtnEventHandler(ConstDefine.UIRegView_btnToLogOn, RegViewToLogOnClick);
+        UIDispatcher.Instance.RemoveEventHandler(ConstDefine.UIRegView_btnReg, RegViewRegClick);
+        UIDispatcher.Instance.RemoveEventHandler(ConstDefine.UIRegView_btnToLogOn, RegViewToLogOnClick);
     }
 
+    public void OpenView(WindowUIType type)
+    {
+        switch (type)
+        {
+            case WindowUIType.LogOn:
+                OpenLogOnView();
+                break;
+            case WindowUIType.Reg:
+                OpenRegWindow();
+                break;
+        }
+    }
 }

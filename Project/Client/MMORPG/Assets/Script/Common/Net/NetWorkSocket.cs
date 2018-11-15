@@ -90,7 +90,7 @@ public class NetWorkSocket : SingletonMono<NetWorkSocket>
                                 protoCode = ms.ReadUShort();
                                 ms.Read(protoContent, 0, protoContent.Length);
 
-                                EventDispatcher.Instance.Dispatch(protoCode, protoContent);
+                                SocketDispatcher.Instance.Dispatch(protoCode, protoContent);
                             }
                         }
                         else

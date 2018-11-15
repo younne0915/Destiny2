@@ -21,6 +21,6 @@ public class UISceneLogonCtrl : UISceneBase
     private IEnumerator OpenLogOnWindow()
     {
         yield return new WaitForSeconds(.2f);
-        GameObject obj = WindowUIMgr.Instance.OpenWindow(WindowUIType.LogOn);
+        GameObject obj = UIViewUtil.Instance.OpenWindow(WindowUIType.LogOn);
     }
 }
