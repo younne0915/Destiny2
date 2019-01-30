@@ -8,49 +8,34 @@ using LitJson;
 using System.Text;
 
 public class TestMMOMemory : MonoBehaviour {
+    string str;
 
-	void Start ()
+    void Start ()
     {
-        //NetWorkSocket.Instance.Connect("169.254.116.88", 1011);
+        NetWorkSocket.Instance.Connect("172.17.154.205", 4025);
 
-        ////GlobalInit.Instance.OnReceiveProto += OnReceiveProtoCallback;
-
-        //EventDispatcher.Instance.AddEventHandler(ProtoCodeDef.TestProtocolResponse, OnRecvTestProtocolCallback);
-
-        NetWorkSocket n1 =  NetWorkSocket.Instance;
-        NetWorkHttp n2 = NetWorkHttp.Instance;
-
+        SocketDispatcher.Instance.AddEventHandler(ProtoCodeDef.GameLevel_EnterReturn, TestProtocolRequestCallback);
     }
 
-    private void OnRecvTestProtocolCallback(byte[] buffer)
+    private void TestProtocolRequestCallback(byte[] p)
     {
-        TestProtocolResponseProto response = TestProtocolResponseProto.GetProto(buffer);
-        Debug.LogError("error = " + response.ErrorCode);
+        GameLevel_EnterReturnProto proto = GameLevel_EnterReturnProto.GetProto(p);
+        Debug.LogErrorFormat("TestProtocolResponseProto.IsSuccess : {0}", proto.IsSuccess);
     }
 
-    private void OnReceiveProtoCallback(ushort protoCode, byte[] buffer)
+    void OnDestroy()
     {
-        if (protoCode == ProtoCodeDef.TestProtocolResponse)
-        {
-            TestProtocolResponseProto response = TestProtocolResponseProto.GetProto(buffer);
-            Debug.LogError("error = " + response.ErrorCode);
-        }
+        SocketDispatcher.Instance.RemoveEventHandler(ProtoCodeDef.GameLevel_EnterReturn, TestProtocolRequestCallback);
     }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            TestProtocolRequestProto proto = new TestProtocolRequestProto();
-            TestProtocolRequestProto.ItemData itemData = new TestProtocolRequestProto.ItemData();
-            itemData.Id = 11;
-            itemData.Name = "张三";
-            itemData.Percent = 0.055d;
-            itemData.Price = 5.6f;
-            proto.ItemDataList = new List<TestProtocolRequestProto.ItemData>();
-            proto.ItemDataList.Add(itemData);
-            proto.ItemCount = 1;
-
+            GameLevel_EnterProto proto = new GameLevel_EnterProto();
+            proto.GameLevelId = 10;
+            proto.Grade = 20;
+            Debug.LogError("Send Length = " + proto.ToArray().Length);
             NetWorkSocket.Instance.SendMsg(proto.ToArray());
         }
     }

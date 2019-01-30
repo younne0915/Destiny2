@@ -10,7 +10,7 @@ public class NetWorkSocket : SingletonMono<NetWorkSocket>
 {
     // private byte[] buffer = new byte[10240];
 
-    private Socket m_Client;
+    private Socket m_Socket;
 
     #region 发送消息所需变量
     private Queue<byte[]> m_SendQueue = new Queue<byte[]>();
@@ -22,7 +22,7 @@ public class NetWorkSocket : SingletonMono<NetWorkSocket>
 
     #region 接收消息所需变量
     //接受数据包的字节数组缓冲区
-    private byte[] m_ReceiveBuffer = new byte[10240];
+    private byte[] m_ReceiveBuffer = new byte[2048];
 
     //接收数据包的缓冲数据流
     private MMO_MemoryStream m_ReceiveMS = new MMO_MemoryStream();
@@ -35,18 +35,84 @@ public class NetWorkSocket : SingletonMono<NetWorkSocket>
     protected override void BeforeOnDestroy()
     {
         base.BeforeOnDestroy();
-        if (m_Client != null && m_Client.Connected)
+        if (m_Socket != null && m_Socket.Connected)
         {
-            m_Client.Shutdown(SocketShutdown.Both);
-            m_Client.Close();
+            m_Socket.Shutdown(SocketShutdown.Both);
+            m_Socket.Close();
         }
     }
+
+    //protected override void OnUpdate()
+    //{
+    //    base.OnUpdate();
+
+    //    if(m_ReceiveQueue.Count > 0)
+    //    {
+    //        while (true)
+    //        {
+    //            if (m_ReceiveQueue.Count == 0) break;
+    //            if (m_ReceiveCount <= 5)
+    //            {
+    //                m_ReceiveCount++;
+
+    //                lock (m_ReceiveQueue)
+    //                {
+    //                    byte[] buffer = m_ReceiveQueue.Dequeue();
+
+    //                    byte[] bufferNew = new byte[buffer.Length - 3];
+    //                    ushort crc = 0;
+    //                    bool isCompress = false;
+    //                    using (MMO_MemoryStream ms = new MMO_MemoryStream(buffer))
+    //                    {
+    //                        isCompress = ms.ReadBool();
+    //                        crc = ms.ReadUShort();
+
+    //                        ms.Read(bufferNew, 0, bufferNew.Length);
+    //                    }
+
+    //                    ushort calculateCRC = Crc16.CalculateCrc16(bufferNew);
+
+    //                    if(calculateCRC == crc)
+    //                    {
+    //                        Debug.LogError("calculateCRC = " + calculateCRC);
+
+    //                        bufferNew = SecurityUtil.Xor(bufferNew);
+    //                        if (isCompress)
+    //                        {
+    //                            bufferNew = ZlibHelper.DeCompressBytes(bufferNew);
+    //                        }
+
+    //                        ushort protoCode = 0;
+    //                        byte[] protoContent = new byte[bufferNew.Length - 2];
+    //                        using (MMO_MemoryStream ms = new MMO_MemoryStream(bufferNew))
+    //                        {
+    //                            //协议编号
+    //                            protoCode = ms.ReadUShort();
+    //                            ms.Read(protoContent, 0, protoContent.Length);
+
+    //                            SocketDispatcher.Instance.Dispatch(protoCode, protoContent);
+    //                        }
+    //                    }
+    //                    else
+    //                    {
+    //                        break;
+    //                    }
+    //                }
+    //            }
+    //            else
+    //            {
+    //                m_ReceiveCount = 0;
+    //                break;
+    //            }
+    //        }
+    //    }
+    //}
 
     protected override void OnUpdate()
     {
         base.OnUpdate();
 
-        if(m_ReceiveQueue.Count > 0)
+        if (m_ReceiveQueue.Count > 0)
         {
             while (true)
             {
@@ -59,43 +125,29 @@ public class NetWorkSocket : SingletonMono<NetWorkSocket>
                     {
                         byte[] buffer = m_ReceiveQueue.Dequeue();
 
-                        byte[] bufferNew = new byte[buffer.Length - 3];
-                        ushort crc = 0;
-                        bool isCompress = false;
                         using (MMO_MemoryStream ms = new MMO_MemoryStream(buffer))
                         {
-                            isCompress = ms.ReadBool();
-                            crc = ms.ReadUShort();
-
-                            ms.Read(bufferNew, 0, bufferNew.Length);
-                        }
-
-                        ushort calculateCRC = Crc16.CalculateCrc16(bufferNew);
-
-                        if(calculateCRC == crc)
-                        {
-                            Debug.LogError("calculateCRC = " + calculateCRC);
-
-                            bufferNew = SecurityUtil.Xor(bufferNew);
-                            if (isCompress)
+                            bool compress = ms.ReadBool();
+                            ushort crc = ms.ReadUShort();
+                            byte[] msgBuffer = new byte[buffer.Length - 3];
+                            ms.Read(msgBuffer, 0, msgBuffer.Length);
+                            ushort calCrc = Crc16.CalculateCrc16(msgBuffer);
+                            if(crc == calCrc)
                             {
-                                bufferNew = ZlibHelper.DeCompressBytes(bufferNew);
-                            }
+                                msgBuffer = SecurityUtil.Xor(msgBuffer);
+                                if (compress)
+                                {
+                                    msgBuffer = ZlibHelper.DeCompressBytes(msgBuffer);
+                                }
 
-                            ushort protoCode = 0;
-                            byte[] protoContent = new byte[bufferNew.Length - 2];
-                            using (MMO_MemoryStream ms = new MMO_MemoryStream(bufferNew))
-                            {
-                                //协议编号
-                                protoCode = ms.ReadUShort();
-                                ms.Read(protoContent, 0, protoContent.Length);
-
-                                SocketDispatcher.Instance.Dispatch(protoCode, protoContent);
+                                ushort protoCode = 0;
+                                using (MMO_MemoryStream ms2 = new MMO_MemoryStream(msgBuffer))
+                                {
+                                    protoCode = ms2.ReadUShort();
+                                }
+                                SocketDispatcher.Instance.Dispatch(protoCode, msgBuffer);
+                                Debug.LogErrorFormat("protoCode = {0}, recv Length = {1}", protoCode, msgBuffer.Length);
                             }
-                        }
-                        else
-                        {
-                            break;
                         }
                     }
                 }
@@ -110,13 +162,13 @@ public class NetWorkSocket : SingletonMono<NetWorkSocket>
 
     public void Connect(string ip, int port)
     {
-        if (m_Client != null && m_Client.Connected) return;
+        if (m_Socket != null && m_Socket.Connected) return;
 
-        m_Client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        m_Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         
         try
         {
-            m_Client.Connect(new IPEndPoint(IPAddress.Parse(ip), port));
+            m_Socket.Connect(new IPEndPoint(IPAddress.Parse(ip), port));
             m_CheckSendQueue = OnCheckSendQueueCallback;
             Debug.LogError("连接成功");
 
@@ -175,7 +227,8 @@ public class NetWorkSocket : SingletonMono<NetWorkSocket>
     /// <param name="buffer"></param>
     public void SendMsg(byte[] buffer)
     {
-        byte[] sendBuffer = MakeData(buffer);
+        //byte[] sendBuffer = MakeData(buffer);
+        byte[] sendBuffer = TestMakeData(buffer);
 
         lock (m_SendQueue)
         {
@@ -188,14 +241,40 @@ public class NetWorkSocket : SingletonMono<NetWorkSocket>
         }
     }
 
+    private byte[] TestMakeData(byte[] data)
+    {
+        byte[] retBuffer;
+        using (MMO_MemoryStream ms = new MMO_MemoryStream())
+        {
+            data = MakeDataContent(data);
+            ms.WriteUShort((ushort)(data.Length + 3));
+            ms.WriteBool(data.Length > m_CompressLen);
+            ms.WriteUShort(Crc16.CalculateCrc16(data));
+            ms.Write(data, 0, data.Length);
+            retBuffer = ms.ToArray();
+        }
+        return retBuffer;
+    }
+
+    private byte[] MakeDataContent(byte[] data)
+    {
+        bool compress = data.Length > m_CompressLen;
+        if (compress)
+        {
+            data = ZlibHelper.CompressBytes(data);
+        }
+        data = SecurityUtil.Xor(data);
+        return data;
+    }
+
     private void Send(byte[] buffer)
     {
-        m_Client.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, SendCallback, m_Client);
+        m_Socket.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, SendCallback, m_Socket);
     }
 
     private void SendCallback(IAsyncResult ar)
     {
-        m_Client.EndSend(ar);
+        m_Socket.EndSend(ar);
 
         if (m_CheckSendQueue != null)
         {
@@ -214,7 +293,7 @@ public class NetWorkSocket : SingletonMono<NetWorkSocket>
     private void ReceieveMsg()
     {
         //异步接收数据
-        m_Client.BeginReceive(m_ReceiveBuffer, 0, m_ReceiveBuffer.Length, SocketFlags.None, ReceiveCallBack, m_Client);
+        m_Socket.BeginReceive(m_ReceiveBuffer, 0, m_ReceiveBuffer.Length, SocketFlags.None, ReceiveCallBack, m_Socket);
     }
 
     //接收数据回调
@@ -222,10 +301,7 @@ public class NetWorkSocket : SingletonMono<NetWorkSocket>
     {
         try
         {
-            int len = m_Client.EndReceive(ar);
-
-            Console.WriteLine("recv length = " + len);
-
+            int len = m_Socket.EndReceive(ar);
             if (len > 0)
             {
                 //已经接收到数据
@@ -304,13 +380,13 @@ public class NetWorkSocket : SingletonMono<NetWorkSocket>
             else
             {
                 //客户端断开连接
-                Debug.LogError(string.Format("服务器{0}断开连接", m_Client.RemoteEndPoint.ToString()));
+                Debug.LogError(string.Format("服务器{0}断开连接", m_Socket.RemoteEndPoint.ToString()));
             }
         }
         catch
         {
             //客户端断开连接
-            Debug.LogError(string.Format("服务器{0}断开连接", m_Client.RemoteEndPoint.ToString()));
+            Debug.LogError(string.Format("服务器{0}断开连接", m_Socket.RemoteEndPoint.ToString()));
         }
     }
     #endregion

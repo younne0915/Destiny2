@@ -11,8 +11,11 @@ public class NetWorkHttp : SingletonMono<NetWorkHttp>
     /// <summary>
     /// Web请求回调
     /// </summary>
-    private Action<CallBackArgs> m_CallBack;
-    private CallBackArgs m_CallBackArgs;
+    //private Action<CallBackArgs> m_CallBack;
+    //private CallBackArgs m_CallBackArgs = new CallBackArgs();
+
+    private Action<RetValue> m_CallBack;
+    private RetValue m_RetValue = new RetValue();
 
     /// <summary>
     /// 是否繁忙
@@ -32,7 +35,7 @@ public class NetWorkHttp : SingletonMono<NetWorkHttp>
     /// <param name="callBack"></param>
     /// <param name="isPost"></param>
     /// <param name="json"></param>
-    public void SendData(string url, Action<CallBackArgs> callBack, bool isPost = false, string json = "")
+    public void SendData(string url, Action<RetValue> callBack, bool isPost = false, string json = "")
     {
         if (m_IsBusy) return;
         m_IsBusy = true;
@@ -99,9 +102,12 @@ public class NetWorkHttp : SingletonMono<NetWorkHttp>
             {
                 if (m_CallBack != null)
                 {
-                    m_CallBackArgs.HasError = true;
-                    m_CallBackArgs.ErrorMsg = "未请求到数据";
-                    m_CallBack(m_CallBackArgs);
+                    //m_CallBackArgs.HasError = true;
+                    //m_CallBackArgs.ErrorMsg = "未请求到数据";
+                    //m_CallBack(m_CallBackArgs);
+                    m_RetValue.HasError = true;
+                    m_RetValue.ErrorMsg = "未请求到数据";
+                    m_CallBack(m_RetValue);
                     m_CallBack = null;
                 }
             }
@@ -109,9 +115,12 @@ public class NetWorkHttp : SingletonMono<NetWorkHttp>
             {
                 if (m_CallBack != null)
                 {
-                    m_CallBackArgs.HasError = false;
-                    m_CallBackArgs.Json = data.text;
-                    m_CallBack(m_CallBackArgs);
+                    //m_CallBackArgs.HasError = false;
+                    //m_CallBackArgs.Json = data.text;
+                    //m_CallBack(m_CallBackArgs);
+
+                    RetValue retValue = LitJson.JsonMapper.ToObject<RetValue>(data.text);
+                    m_CallBack(retValue);
                     m_CallBack = null;
                 }
             }
@@ -120,9 +129,12 @@ public class NetWorkHttp : SingletonMono<NetWorkHttp>
         {
             if (m_CallBack != null)
             {
-                m_CallBackArgs.HasError = true;
-                m_CallBackArgs.ErrorMsg = data.error;
-                m_CallBack(m_CallBackArgs);
+                //m_CallBackArgs.HasError = true;
+                //m_CallBackArgs.ErrorMsg = data.error;
+                //m_CallBack(m_CallBackArgs);
+
+                RetValue retValue = LitJson.JsonMapper.ToObject<RetValue>(data.text);
+                m_CallBack(retValue);
                 m_CallBack = null;
             }
         }

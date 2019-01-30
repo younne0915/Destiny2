@@ -1,6 +1,6 @@
 //===================================================
 //作    者：边涯  http://www.u3dol.com  QQ群：87481002
-//创建时间：2018-09-17 20:24:31
+//创建时间：2019-01-29 11:20:35
 //备    注：
 //===================================================
 using System.Collections;
@@ -294,15 +294,5 @@ public class ProtoCodeDef
     /// 服务器返回穿戴消息
     /// </summary>
     public const ushort Goods_EquipPutReturn = 16013;
-
-    /// <summary>
-    /// 测试协议消息
-    /// </summary>
-    public const ushort TestProtocolRequest = 50001;
-
-    /// <summary>
-    /// 返回测试协议
-    /// </summary>
-    public const ushort TestProtocolResponse = 50002;
 
 }
