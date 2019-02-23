@@ -12,7 +12,7 @@ public class TestMMOMemory : MonoBehaviour {
 
     void Start ()
     {
-        NetWorkSocket.Instance.Connect("172.17.154.205", 4025);
+        NetWorkSocket.Instance.Connect("172.17.129.37", 4025);
 
         SocketDispatcher.Instance.AddEventHandler(ProtoCodeDef.GameLevel_EnterReturn, TestProtocolRequestCallback);
     }

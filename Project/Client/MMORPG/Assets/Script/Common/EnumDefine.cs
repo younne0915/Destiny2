@@ -39,7 +39,9 @@ public enum WindowUIType
     /// <summary>
     /// 角色信息窗口
     /// </summary>
-    RoleInfo
+    RoleInfo,
+    GameServerEnter,
+    GameServerSelect,
 }
 #endregion
 
@@ -181,4 +183,19 @@ public enum ToAnimatorCondition
     ToDie,
     ToPhyAttack,
     CurrState
+}
+
+/// <summary>
+/// 消息类型
+/// </summary>
+public enum MessageViewType
+{
+    Ok,
+    OkAndCancel
+}
+
+public enum Language
+{
+    CN,
+    EN
 }

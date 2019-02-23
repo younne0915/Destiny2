@@ -10,6 +10,9 @@ public class UIViewMgr : Singleton<UIViewMgr>
     {
         m_systemCtrlDic.Add(WindowUIType.LogOn, AccountCtrl.Instance);
         m_systemCtrlDic.Add(WindowUIType.Reg, AccountCtrl.Instance);
+
+        m_systemCtrlDic.Add(WindowUIType.GameServerEnter, GameServerCtrl.Instance);
+        m_systemCtrlDic.Add(WindowUIType.GameServerSelect, GameServerCtrl.Instance);
     }
 
     public void OpenWindow(WindowUIType type)

@@ -28,26 +28,33 @@ public class UIWindowViewBase : UIViewBase
     [HideInInspector]
     public WindowUIType CurrentUIType;
 
-    public Action OnViewClose;
-
-    private bool m_OpenNext = false;
+    /// <summary>
+    /// 下一个打开窗口类型
+    /// </summary>
+    [HideInInspector]
+    public WindowUIType m_OpenNextUIType;
 
     protected override void OnBtnClick(GameObject go)
     {
         base.OnBtnClick(go);
         if(go.name.Equals("btnClose", System.StringComparison.CurrentCultureIgnoreCase))
         {
-            Close(false);
+            Close();
         }
     }
 
     /// <summary>
     /// 关闭窗口
     /// </summary>
-    public virtual void Close(bool openNext)
+    public virtual void Close()
     {
-        m_OpenNext = openNext;
         UIViewUtil.Instance.CloseWindow(CurrentUIType);
+    }
+
+    public virtual void CloseAndOpenNext(WindowUIType nextWindowType)
+    {
+        m_OpenNextUIType = nextWindowType;
+        Close();
     }
 
     /// <summary>
@@ -56,12 +63,9 @@ public class UIWindowViewBase : UIViewBase
     protected override void BeforeOnDestroy()
     {
         LayerUIMgr.Instance.CheckOpenWindow();
-        if (m_OpenNext)
+        if (m_OpenNextUIType != WindowUIType.None)
         {
-            if (OnViewClose != null)
-            {
-                OnViewClose();
-            }
+            UIViewMgr.Instance.OpenWindow(m_OpenNextUIType);
         }
     }
 }

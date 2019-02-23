@@ -14,12 +14,26 @@ public class Menu
         win.Show();
     }
 
+    [MenuItem("YouyouTools/LanguageSetting")]
+    public static void LanguageSetting()
+    {
+        LanguageSettingWindow win = (LanguageSettingWindow)EditorWindow.GetWindow(typeof(LanguageSettingWindow));
+        win.titleContent = new GUIContent("全局设置");
+        win.Show();
+    }
+
     [MenuItem("YouyouTools/AssetBundleCreate")]
     public static void AssetBundleCreate()
     {
         AssetBundleWindow win = EditorWindow.GetWindow<AssetBundleWindow>();
         win.titleContent = new GUIContent("资源打包");
         win.Show();
-
     }
+
+    [MenuItem("YouyouTools/ClearAllPlayerPrefs")]
+    public static void ClearPlayerPrefs()
+    {
+        PlayerPrefs.DeleteAll();
+    }
+
 }

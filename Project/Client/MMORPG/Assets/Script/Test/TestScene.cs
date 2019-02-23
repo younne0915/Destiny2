@@ -22,8 +22,8 @@ public class TestScene : MonoBehaviour
 
         //AssetBundleMgr.Instance.LoadClone(@"Role\role_mainplayer.assetbundle", "Role_MainPlayer");
 
-        AssetBundleLoaderAsync async = AssetBundleMgr.Instance.LoadAsync(@"Role\role_mainplayer.assetbundle", "Role_MainPlayer");
-        async.OnLoadComplete = OnLoadComplete;
+        //AssetBundleLoaderAsync async = AssetBundleMgr.Instance.LoadAsync(@"Role\role_mainplayer.assetbundle", "Role_MainPlayer");
+        //async.OnLoadComplete = OnLoadComplete;
     }
 
     private void OnLoadComplete(UnityEngine.Object obj)
@@ -58,6 +58,7 @@ public class TestScene : MonoBehaviour
         }
         else if (Input.GetKeyUp(KeyCode.B))
         {
+            SceneMgr.Instance.LoadToShamo();
         }
     }
 

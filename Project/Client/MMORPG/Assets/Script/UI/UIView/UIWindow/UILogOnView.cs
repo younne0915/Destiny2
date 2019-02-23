@@ -1,8 +1,12 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class UILogOnView : UIWindowViewBase
 {
+    public InputField txtUserName;
+    public InputField txtPwd;
+
     protected override void OnBtnClick(GameObject go)
     {
         base.OnBtnClick(go);

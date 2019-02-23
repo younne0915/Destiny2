@@ -19,7 +19,7 @@ public abstract class AbstractDBModel <T, P>
     #region µ¥Àý
     private static T _instance;
 
-    public static T instance
+    public static T Instance
     {
         get
         {

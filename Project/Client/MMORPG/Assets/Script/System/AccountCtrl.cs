@@ -1,79 +1,157 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
-public class AccountCtrl : Singleton<AccountCtrl>, ISystemCtrl
+public class AccountCtrl : SystemCtrl<AccountCtrl>, ISystemCtrl
 {
     private UILogOnView uiLogOnView;
     private UIRegView uiRegView;
 
+    private bool m_AutoLogOn = false;
+
     public AccountCtrl()
     {
-        UIDispatcher.Instance.AddEventHandler(ConstDefine.UILogOnView_btnLogOn, LogOnViewLogOnClick);
-        UIDispatcher.Instance.AddEventHandler(ConstDefine.UILogOnView_btnToReg, LogOnViewToRegClick);
+        AddEventHandler(ConstDefine.UILogOnView_btnLogOn, LogOnViewLogOnClick);
+        AddEventHandler(ConstDefine.UILogOnView_btnToReg, LogOnViewToRegClick);
 
-        UIDispatcher.Instance.AddEventHandler(ConstDefine.UIRegView_btnReg, RegViewRegClick);
-        UIDispatcher.Instance.AddEventHandler(ConstDefine.UIRegView_btnToLogOn, RegViewToLogOnClick);
+        AddEventHandler(ConstDefine.UIRegView_btnReg, RegViewRegClick);
+        AddEventHandler(ConstDefine.UIRegView_btnToLogOn, RegViewToLogOnClick);
     }
 
     private void RegViewToLogOnClick(object[] param)
     {
         if(uiRegView != null)
         {
-            uiRegView.Close(true);
+            uiRegView.CloseAndOpenNext(WindowUIType.LogOn);
         }
     }
 
     private void RegViewRegClick(object[] param)
     {
-        
+        if (string.IsNullOrEmpty(uiRegView.txtUserName.text))
+        {
+            //AppDebug.LogError("请输入用户名");
+            ShowMessage("注册提示", "请输入用户名");
+            return;
+        }
+
+        if (string.IsNullOrEmpty(uiRegView.txtPwd.text))
+        {
+            //AppDebug.LogError("请输入密码");
+            ShowMessage("注册提示", "请输入密码", MessageViewType.OkAndCancel,okAction:()=> 
+            {
+                LogError("请输入密码");
+            });
+            return;
+        }
+
+        Dictionary<string, object> dic = new Dictionary<string, object>();
+        dic["Type"] = 0;
+        dic["UserName"] = uiRegView.txtUserName.text;
+        dic["Pwd"] = uiRegView.txtPwd.text;
+        dic["ChannelId"] = 0;
+
+        NetWorkHttp.Instance.SendData(GlobalInit.WebAccountUrl + "api/Account", OnRegCallBack, isPost: true, dic : dic);
+    }
+
+    private void OnRegCallBack(RetValue obj)
+    {
+        if (obj.HasError)
+        {
+            //AppDebug.LogError("注册失败！" + obj.ErrorMsg);
+            ShowMessage("注册提示", "注册失败！");
+        }
+        else
+        {
+            //AppDebug.Log("注册成功: " + obj.Value);
+            //ShowMessage("注册提示", "注册成功！");
+
+            if (uiRegView != null)
+            {
+                PlayerPrefs.SetString(ConstDefine.LogOn_AccountUserName, uiRegView.txtUserName.text);
+                PlayerPrefs.SetString(ConstDefine.LogOn_AccountPwd, uiRegView.txtPwd.text);
+                PlayerPrefs.SetInt(ConstDefine.LogOn_AccountID, (int)obj.Value);
+
+                uiRegView.CloseAndOpenNext(WindowUIType.GameServerEnter);
+            }
+        }
     }
 
     private void LogOnViewLogOnClick(object[] param)
     {
-        Debug.LogError("on btn logOn click");
+        if (string.IsNullOrEmpty(uiLogOnView.txtUserName.text))
+        {
+            //AppDebug.LogError("请输入用户名");
+            ShowMessage("登录提示", "请输入用户名！");
+            return;
+        }
+
+        if (string.IsNullOrEmpty(uiLogOnView.txtPwd.text))
+        {
+            //AppDebug.LogError("请输入密码");
+            ShowMessage("登录提示", "请输入密码！");
+            return;
+        }
+
+        Dictionary<string, object> dic = new Dictionary<string, object>();
+        dic["Type"] = 1;
+        dic["UserName"] = uiLogOnView.txtUserName.text;
+        dic["Pwd"] = uiLogOnView.txtPwd.text;
+
+        NetWorkHttp.Instance.SendData(GlobalInit.WebAccountUrl + "api/Account", OnLogOnCallBack, isPost: true, dic: dic);
+
+    }
+
+    private void OnLogOnCallBack(RetValue obj)
+    {
+        if (obj.HasError)
+        {
+            //AppDebug.LogError("登录失败！" + obj.ErrorMsg);
+            ShowMessage("登录提示", "登录失败！");
+        }
+        else
+        {
+            if (m_AutoLogOn)
+            {
+
+            }
+            else
+            {
+                PlayerPrefs.SetString(ConstDefine.LogOn_AccountUserName, uiLogOnView.txtUserName.text);
+                PlayerPrefs.SetString(ConstDefine.LogOn_AccountPwd, uiLogOnView.txtPwd.text);
+                PlayerPrefs.SetInt(ConstDefine.LogOn_AccountID, (int)obj.Value);
+            }
+            UIViewMgr.Instance.OpenWindow(WindowUIType.GameServerEnter);
+        }
     }
 
     private void LogOnViewToRegClick(object[] param)
     {
         if (uiLogOnView != null)
         {
-            uiLogOnView.Close(true);
+            uiLogOnView.CloseAndOpenNext(WindowUIType.Reg);
         }
     }
 
     public void OpenLogOnView()
     {
         uiLogOnView = UIViewUtil.Instance.OpenWindow(WindowUIType.LogOn).GetComponent<UILogOnView>();
-        if(uiLogOnView != null)
-        {
-            uiLogOnView.OnViewClose += () => 
-            {
-                OpenRegWindow();
-            };
-        }
     }
 
     private void OpenRegWindow()
     {
         uiRegView = UIViewUtil.Instance.OpenWindow(WindowUIType.Reg).GetComponent<UIRegView>();
-        if(uiRegView != null)
-        {
-            uiRegView.OnViewClose += () =>
-            {
-                OpenLogOnView();
-            };
-        }
     }
 
     public override void Dispose()
     {
         base.Dispose();
-        UIDispatcher.Instance.RemoveEventHandler(ConstDefine.UILogOnView_btnLogOn, LogOnViewLogOnClick);
-        UIDispatcher.Instance.RemoveEventHandler(ConstDefine.UILogOnView_btnToReg, LogOnViewToRegClick);
+        RemoveEventHandler(ConstDefine.UILogOnView_btnLogOn, LogOnViewLogOnClick);
+        RemoveEventHandler(ConstDefine.UILogOnView_btnToReg, LogOnViewToRegClick);
 
-        UIDispatcher.Instance.RemoveEventHandler(ConstDefine.UIRegView_btnReg, RegViewRegClick);
-        UIDispatcher.Instance.RemoveEventHandler(ConstDefine.UIRegView_btnToLogOn, RegViewToLogOnClick);
+        RemoveEventHandler(ConstDefine.UIRegView_btnReg, RegViewRegClick);
+        RemoveEventHandler(ConstDefine.UIRegView_btnToLogOn, RegViewToLogOnClick);
     }
 
     public void OpenView(WindowUIType type)
@@ -86,6 +164,27 @@ public class AccountCtrl : Singleton<AccountCtrl>, ISystemCtrl
             case WindowUIType.Reg:
                 OpenRegWindow();
                 break;
+        }
+    }
+
+    public void QuickLogOn()
+    {
+        if (!PlayerPrefs.HasKey(ConstDefine.LogOn_AccountID))
+        {
+            OpenView(WindowUIType.Reg);
+        }
+        else
+        {
+            m_AutoLogOn = true;
+            string logOnUserName = PlayerPrefs.GetString(ConstDefine.LogOn_AccountUserName);
+            string logOnPwd = PlayerPrefs.GetString(ConstDefine.LogOn_AccountPwd);
+
+            Dictionary<string, object> dic = new Dictionary<string, object>();
+            dic["Type"] = 1;
+            dic["UserName"] = logOnUserName;
+            dic["Pwd"] = logOnPwd;
+
+            NetWorkHttp.Instance.SendData(GlobalInit.WebAccountUrl + "api/Account", OnLogOnCallBack, isPost: true, dic: dic);
         }
     }
 }

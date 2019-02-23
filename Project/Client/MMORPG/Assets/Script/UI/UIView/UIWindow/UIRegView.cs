@@ -1,7 +1,11 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class UIRegView : UIWindowViewBase {
+
+    public InputField txtUserName;
+    public InputField txtPwd;
 
     protected override void OnBtnClick(GameObject go)
     {

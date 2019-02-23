@@ -5,6 +5,8 @@
 //===================================================
 using UnityEngine;
 using System.Collections;
+using System.Net.NetworkInformation;
+using System;
 
 public class GlobalInit : MonoBehaviour 
 {
@@ -26,9 +28,9 @@ public class GlobalInit : MonoBehaviour
     /// <summary>
     /// 账户服务器地址
     /// </summary>
-    public const string WebAccountUrl = "http://192.168.110.82:5510/";
+    public const string WebAccountUrl = "http://172.17.128.171:5510/";
 
-    public const string SocketIP = "169.254.116.88";
+    public const string SocketIP = "172.17.128.171";
 
     public const ushort Port = 1011;
 
@@ -53,6 +55,17 @@ public class GlobalInit : MonoBehaviour
     /// </summary>
     public AnimationCurve UIAnimationCurve = new AnimationCurve(new Keyframe(0f, 0f, 0f, 1f), new Keyframe(1f, 1f, 1f, 0f));
 
+    private long m_StartServerTime;
+
+    [HideInInspector]
+    public long CurrServerTime
+    {
+        get
+        {
+            return m_StartServerTime + (long)RealTime.time;
+        }
+    }
+
     void Awake()
     {
         Instance = this;
@@ -61,6 +74,14 @@ public class GlobalInit : MonoBehaviour
 
 	void Start ()
 	{
-	
+        NetWorkHttp.Instance.SendData(WebAccountUrl + "api/Time", OnTimeCallback);
 	}
+
+    private void OnTimeCallback(RetValue obj)
+    {
+        if (!obj.HasError)
+        {
+            m_StartServerTime = long.Parse(obj.Value.ToString());
+        }
+    }
 }

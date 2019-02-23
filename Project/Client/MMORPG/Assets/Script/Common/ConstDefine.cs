@@ -8,4 +8,12 @@ public class ConstDefine
 
     public const string UIRegView_btnReg = "UIRegView_btnReg";
     public const string UIRegView_btnToLogOn = "UIRegView_btnToLogOn";
+
+    public const string UIGameServerEnterView_btnSelectGameServer = "UIGameServerEnterView_btnSelectGameServer";
+    public const string UIGameServerEnterView_btnEnterGame = "UIGameServerEnterView_btnEnterGame";
+
+    public const string LogOn_AccountID = "LogOn_AccountID";
+    public const string LogOn_AccountUserName = "LogOn_AccountUserName";
+    public const string LogOn_AccountPwd = "LogOn_AccountPwd";
+
 }

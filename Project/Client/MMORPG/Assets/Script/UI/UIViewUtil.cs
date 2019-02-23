@@ -61,6 +61,7 @@ public class UIViewUtil : Singleton<UIViewUtil>
             obj.transform.parent = transParent;
             obj.transform.localPosition = Vector3.zero;
             obj.transform.localScale = Vector3.one;
+            obj.GetComponent<RectTransform>().sizeDelta = Vector2.zero;
             obj.SetActive(false);
             StartShowWindow(windowBase, true);
         }
