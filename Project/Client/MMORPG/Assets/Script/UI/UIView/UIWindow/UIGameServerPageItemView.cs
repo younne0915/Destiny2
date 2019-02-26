@@ -8,7 +8,7 @@ public class UIGameServerPageItemView : MonoBehaviour
     private int m_PageIndex;
 
     [SerializeField]
-    private Text m_Name;
+    private Text m_GameServerName;
 
     public Action<int> OnGameServerPageClick;
 
@@ -28,6 +28,6 @@ public class UIGameServerPageItemView : MonoBehaviour
     public void SetUI(RetGameServerPageEntity entity)
     {
         m_PageIndex = entity.PageIndex;
-        m_Name.text = entity.Name;
+        m_GameServerName.text = entity.Name;
     }
 }

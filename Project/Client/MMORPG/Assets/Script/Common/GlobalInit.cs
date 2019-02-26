@@ -66,6 +66,12 @@ public class GlobalInit : MonoBehaviour
         }
     }
 
+    [HideInInspector]
+    public RetGameServerEntity CurrentSelectGameServer;
+
+    [HideInInspector]
+    public RetAccountEntity CurrentAccount;
+
     void Awake()
     {
         Instance = this;

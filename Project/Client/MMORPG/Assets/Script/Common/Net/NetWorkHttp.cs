@@ -113,7 +113,7 @@ public class NetWorkHttp : SingletonMono<NetWorkHttp>
                     m_RetValue.HasError = true;
                     m_RetValue.ErrorMsg = "未请求到数据";
                     m_CallBack(m_RetValue);
-                    m_CallBack = null;
+                    //m_CallBack = null;
                 }
             }
             else
@@ -122,7 +122,7 @@ public class NetWorkHttp : SingletonMono<NetWorkHttp>
                 {
                     RetValue retValue =LitJson.JsonMapper.ToObject<RetValue>(data.text);
                     m_CallBack(retValue);
-                    m_CallBack = null;
+                    //m_CallBack = null;
                 }
             }
         }
@@ -132,7 +132,7 @@ public class NetWorkHttp : SingletonMono<NetWorkHttp>
             {
                 RetValue retValue = LitJson.JsonMapper.ToObject<RetValue>(data.text);
                 m_CallBack(retValue);
-                m_CallBack = null;
+                //m_CallBack = null;
             }
         }
     }

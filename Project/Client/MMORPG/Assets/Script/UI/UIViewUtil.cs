@@ -7,6 +7,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using System;
 
 /// <summary>
 /// 窗口UI管理器
@@ -32,7 +33,7 @@ public class UIViewUtil : Singleton<UIViewUtil>
     /// </summary>
     /// <param name="type">窗口类型</param>
     /// <returns></returns>
-    public GameObject OpenWindow(WindowUIType type)
+    public GameObject OpenWindow(WindowUIType type, Action onshow = null)
     {
         if (type == WindowUIType.None) return null;
 
@@ -45,7 +46,10 @@ public class UIViewUtil : Singleton<UIViewUtil>
             if (obj == null) return null;
             UIWindowViewBase windowBase = obj.GetComponent<UIWindowViewBase>();
             if (windowBase == null) return null;
-
+            if(onshow != null)
+            {
+                windowBase.OnShow = onshow;
+            }
             m_DicWindow.Add(type, windowBase);
 
             windowBase.CurrentUIType = type;
@@ -215,7 +219,7 @@ public class UIViewUtil : Singleton<UIViewUtil>
     private void DestroyWindow(UIWindowViewBase windowBase)
     {
         m_DicWindow.Remove(windowBase.CurrentUIType);
-        Object.Destroy(windowBase.gameObject);
+        UnityEngine.Object.Destroy(windowBase.gameObject);
     }
     #endregion
 }

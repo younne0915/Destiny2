@@ -19,6 +19,17 @@ public class AccountCtrl : SystemCtrl<AccountCtrl>, ISystemCtrl
         AddEventHandler(ConstDefine.UIRegView_btnToLogOn, RegViewToLogOnClick);
     }
 
+    private void SetCurrentSelectGameServer(RetAccountEntity entity)
+    {
+        RetGameServerEntity retGameServerEntity = new RetGameServerEntity();
+        retGameServerEntity.Id = entity.LastServerId;
+        retGameServerEntity.Name = entity.LastServerName;
+        retGameServerEntity.Ip = entity.LastServerIp;
+        retGameServerEntity.Port = entity.LastPort;
+        GlobalInit.Instance.CurrentSelectGameServer = retGameServerEntity;
+        GlobalInit.Instance.CurrentAccount = entity;
+    }
+
     private void RegViewToLogOnClick(object[] param)
     {
         if(uiRegView != null)
@@ -64,9 +75,8 @@ public class AccountCtrl : SystemCtrl<AccountCtrl>, ISystemCtrl
         }
         else
         {
-            //AppDebug.Log("注册成功: " + obj.Value);
-            //ShowMessage("注册提示", "注册成功！");
-
+            RetAccountEntity retAccountEntity = LitJson.JsonMapper.ToObject<RetAccountEntity>(obj.Value.ToString());
+            SetCurrentSelectGameServer(retAccountEntity);
             if (uiRegView != null)
             {
                 PlayerPrefs.SetString(ConstDefine.LogOn_AccountUserName, uiRegView.txtUserName.text);
@@ -82,14 +92,12 @@ public class AccountCtrl : SystemCtrl<AccountCtrl>, ISystemCtrl
     {
         if (string.IsNullOrEmpty(uiLogOnView.txtUserName.text))
         {
-            //AppDebug.LogError("请输入用户名");
             ShowMessage("登录提示", "请输入用户名！");
             return;
         }
 
         if (string.IsNullOrEmpty(uiLogOnView.txtPwd.text))
         {
-            //AppDebug.LogError("请输入密码");
             ShowMessage("登录提示", "请输入密码！");
             return;
         }
@@ -112,11 +120,9 @@ public class AccountCtrl : SystemCtrl<AccountCtrl>, ISystemCtrl
         }
         else
         {
-            if (m_AutoLogOn)
-            {
-
-            }
-            else
+            RetAccountEntity retAccountEntity = LitJson.JsonMapper.ToObject<RetAccountEntity>(obj.Value.ToString());
+            SetCurrentSelectGameServer(retAccountEntity);
+            if (!m_AutoLogOn)
             {
                 PlayerPrefs.SetString(ConstDefine.LogOn_AccountUserName, uiLogOnView.txtUserName.text);
                 PlayerPrefs.SetString(ConstDefine.LogOn_AccountPwd, uiLogOnView.txtPwd.text);

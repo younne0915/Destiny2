@@ -1,11 +1,9 @@
-using UnityEngine;
-using System.Collections;
 using System;
 
 /// <summary>
 /// ’Àªß µÃÂ
 /// </summary>
-public class AccountEntity
+public class RetAccountEntity
 {
     public int Id { get; set; }
     public string UserName { get; set; }
@@ -15,5 +13,6 @@ public class AccountEntity
     public string LastServerName { get; set; }
     public DateTime CreateTime { get; set; }
     public DateTime UpdateTime { get; set; }
-
+    public string LastServerIp { get; set; }
+    public int LastPort { get; set; }
 }
