@@ -7,6 +7,7 @@ using UnityEngine;
 using System.Collections;
 using System.Net.NetworkInformation;
 using System;
+using System.Collections.Generic;
 
 public class GlobalInit : MonoBehaviour 
 {
@@ -28,11 +29,7 @@ public class GlobalInit : MonoBehaviour
     /// <summary>
     /// 账户服务器地址
     /// </summary>
-    public const string WebAccountUrl = "http://172.17.128.171:5510/";
-
-    public const string SocketIP = "172.17.128.171";
-
-    public const ushort Port = 1011;
+    public const string WebAccountUrl = "http://172.17.170.8:5510/";
 
     #endregion
 
@@ -49,6 +46,13 @@ public class GlobalInit : MonoBehaviour
     /// </summary>
     [HideInInspector]
     public RoleCtrl CurrPlayer;
+
+    [HideInInspector]
+    public RoleInfoMainPlayer MainPlayerInfo;
+
+    public Shader T4MShader;
+
+    public Shader SkyboxShader;
 
     /// <summary>
     /// UI动画曲线
@@ -72,6 +76,10 @@ public class GlobalInit : MonoBehaviour
     [HideInInspector]
     public RetAccountEntity CurrentAccount;
 
+    [HideInInspector]
+    public Dictionary<int, GameObject> JobObjectDic = new Dictionary<int, GameObject>();
+
+
     void Awake()
     {
         Instance = this;
@@ -82,6 +90,18 @@ public class GlobalInit : MonoBehaviour
 	{
         NetWorkHttp.Instance.SendData(WebAccountUrl + "api/Time", OnTimeCallback);
 	}
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            if (GlobalInit.Instance == null) return;
+            Transform trans = GlobalInit.Instance.CurrPlayer.transform;
+            string pos = string.Format("{0}_{1}_{2}_{3}", trans.position.x, trans.position.y, trans.position.z, trans.rotation.eulerAngles.y);
+            AppDebug.Log("位置信息 = " + pos);
+        }
+        
+    }
 
     private void OnTimeCallback(RetValue obj)
     {

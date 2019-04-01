@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using System.IO;
 
@@ -12,8 +12,12 @@ public class LocalFileMgr : Singleton<LocalFileMgr>
 
 #elif UNITY_IPHONE
     public readonly string LocalFilePath = Application.dataPath + "/../AssetBundles/iOS/";
+#else
+    public readonly string LocalFilePath = Application.dataPath + "/../AssetBundles/Windows/";
 #endif
 #elif UNITY_ANDROID || UNITY_IPHONE
+    public readonly string LocalFilePath = Application.persistentDataPath + "/";
+#else
     public readonly string LocalFilePath = Application.persistentDataPath + "/";
 #endif
     public byte[] GetBuffer(string path)

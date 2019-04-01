@@ -54,7 +54,7 @@ public class TestScene : MonoBehaviour
     {
         if (Input.GetKeyUp(KeyCode.A))
         {
-            SceneMgr.Instance.LoadToCity();
+            SceneMgr.Instance.LoadToWorldMap(1);
         }
         else if (Input.GetKeyUp(KeyCode.B))
         {

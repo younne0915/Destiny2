@@ -21,7 +21,7 @@ function ShopDBModel.Init()
     --print("列数"..gameDataTable.Column);
 
     for i = 3, gameDataTable.Row - 1, 1 do
-        shopTable[#shopTable+1] = ShopEntity.New( tonumber(gameDataTable.Data[i][0]), gameDataTable.Data[i][1], tonumber(gameDataTable.Data[i][2]), gameDataTable.Data[i][3], gameDataTable.Data[i][4] );
+        shopTable[#shopTable+1] = ShopEntity.New( tonumber(gameDataTable.Data[i][0]), tonumber(gameDataTable.Data[i][1]), tonumber(gameDataTable.Data[i][2]), tonumber(gameDataTable.Data[i][3]), tonumber(gameDataTable.Data[i][4]), tonumber(gameDataTable.Data[i][5]), tonumber(gameDataTable.Data[i][6]) );
     end
 
 end

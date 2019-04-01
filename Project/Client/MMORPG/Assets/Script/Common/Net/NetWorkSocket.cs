@@ -32,6 +32,8 @@ public class NetWorkSocket : SingletonMono<NetWorkSocket>
     private int m_ReceiveCount = 0;
     #endregion
 
+    public Action OnConnectOK;
+
     protected override void BeforeOnDestroy()
     {
         base.BeforeOnDestroy();
@@ -146,7 +148,7 @@ public class NetWorkSocket : SingletonMono<NetWorkSocket>
                                     protoCode = ms2.ReadUShort();
                                 }
                                 SocketDispatcher.Instance.Dispatch(protoCode, msgBuffer);
-                                Debug.LogErrorFormat("protoCode = {0}, recv Length = {1}", protoCode, msgBuffer.Length);
+                                //Debug.LogErrorFormat("protoCode = {0}, recv Length = {1}", protoCode, msgBuffer.Length);
                             }
                         }
                     }
@@ -170,13 +172,24 @@ public class NetWorkSocket : SingletonMono<NetWorkSocket>
         {
             m_Socket.Connect(new IPEndPoint(IPAddress.Parse(ip), port));
             m_CheckSendQueue = OnCheckSendQueueCallback;
-            Debug.LogError("连接成功");
+            AppDebug.LogError("连接成功");
+            
+            if(OnConnectOK != null) OnConnectOK();
 
             ReceieveMsg();
         }
         catch (Exception ex)
         {
-            Debug.LogError("连接失败" + ex.Message);
+            AppDebug.LogError("连接失败" + ex.Message);
+        }
+    }
+
+    public void Disconnect()
+    {
+        if (m_Socket != null && m_Socket.Connected)
+        {
+            m_Socket.Shutdown(SocketShutdown.Both);
+            m_Socket.Close();
         }
     }
 

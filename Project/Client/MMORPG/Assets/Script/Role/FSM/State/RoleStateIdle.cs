@@ -11,6 +11,9 @@ using System.Collections;
 /// </summary>
 public class RoleStateIdle : RoleStateAbstract
 {
+    private float m_NextChangeTime = 0;
+    private float m_ChangeStep = 5f;
+
     /// <summary>
     /// 构造函数
     /// </summary>
@@ -26,7 +29,35 @@ public class RoleStateIdle : RoleStateAbstract
     public override void OnEnter()
     {
         base.OnEnter();
+        if(CurrRoleFSMMgr.CurrRoleCtrl.CurrRoleType == RoleType.MainPlayer)
+        {
+            SetMainPlayerIdleBranchState();
+        }
+        else
+        {
+            SetMonsterIdleBranchState();
+        }
+    }
+
+    private void SetMonsterIdleBranchState()
+    {
         CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToIdleFight.ToString(), true);
+    }
+
+    private void SetMainPlayerIdleBranchState()
+    {
+        if (CurrRoleFSMMgr.ToRoleIdleState == RoleIdleState.IdleNormal)
+        {
+            CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToIdleNormal.ToString(), true);
+            CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToXiuXian.ToString(), false);
+            CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToIdleFight.ToString(), false);
+        }
+        else
+        {
+            CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToIdleFight.ToString(), true);
+            CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToIdleNormal.ToString(), false);
+            CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToXiuXian.ToString(), false);
+        }
     }
 
     /// <summary>
@@ -37,10 +68,65 @@ public class RoleStateIdle : RoleStateAbstract
         base.OnUpdate();
 
         CurrRoleAnimatorStateInfo = CurrRoleFSMMgr.CurrRoleCtrl.Animator.GetCurrentAnimatorStateInfo(0);
-        if (CurrRoleAnimatorStateInfo.IsName(RoleAnimatorName.Idle_Fight.ToString()))
+
+        if (CurrRoleFSMMgr.CurrRoleCtrl.CurrRoleType == RoleType.MainPlayer)
         {
-            CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(ToAnimatorCondition.CurrState.ToString(), (int)RoleState.Idle);
+            if (!CurrRoleAnimatorStateInfo.IsName(RoleAnimatorState.Idle_Normal.ToString()) ||
+                !CurrRoleAnimatorStateInfo.IsName(RoleAnimatorState.Idle_Fight.ToString()))
+            {
+                SetMainPlayerIdleBranchState();
+                CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(ToAnimatorCondition.CurrState.ToString(), (int)RoleAnimatorState.None);
+            }
+
+            if (CurrRoleAnimatorStateInfo.IsName(RoleAnimatorState.Idle_Normal.ToString()) && CurrState != RoleAnimatorState.Idle_Normal)
+            {
+                CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(ToAnimatorCondition.CurrState.ToString(), (int)RoleAnimatorState.Idle_Normal);
+            }
+
+            if (CurrRoleAnimatorStateInfo.IsName(RoleAnimatorState.XiuXian.ToString()) && CurrState != RoleAnimatorState.XiuXian)
+            {
+                CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(ToAnimatorCondition.CurrState.ToString(), (int)RoleAnimatorState.XiuXian);
+            }
+
+            if (CurrRoleAnimatorStateInfo.IsName(RoleAnimatorState.Idle_Fight.ToString()) && CurrState != RoleAnimatorState.Idle_Fight)
+            {
+                CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(ToAnimatorCondition.CurrState.ToString(), (int)RoleAnimatorState.Idle_Fight);
+            }
+
+            if (CurrRoleFSMMgr.ToRoleIdleState == RoleIdleState.IdleNormal)
+            {
+                if (Time.time > m_NextChangeTime)
+                {
+                    m_NextChangeTime = Time.time + m_ChangeStep;
+
+                    CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToIdleNormal.ToString(), false);
+                    CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToXiuXian.ToString(), true);
+                }
+
+                if (CurrState == RoleAnimatorState.XiuXian)
+                {
+                    if (CurrRoleAnimatorStateInfo.IsName(RoleAnimatorState.XiuXian.ToString()) && CurrRoleAnimatorStateInfo.normalizedTime > 1)
+                    {
+                        CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToIdleNormal.ToString(), true);
+                        CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToXiuXian.ToString(), false);
+                    }
+                }
+            }
         }
+        else
+        {
+            if (!CurrRoleAnimatorStateInfo.IsName(RoleAnimatorState.Idle_Fight.ToString()))
+            {
+                SetMonsterIdleBranchState();
+                CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(ToAnimatorCondition.CurrState.ToString(), (int)RoleAnimatorState.None);
+            }
+
+            if (CurrRoleAnimatorStateInfo.IsName(RoleAnimatorState.Idle_Fight.ToString()) && CurrState != RoleAnimatorState.Idle_Fight)
+            {
+                CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(ToAnimatorCondition.CurrState.ToString(), (int)RoleAnimatorState.Idle_Fight);
+            }
+        }
+            
     }
 
     /// <summary>
@@ -49,6 +135,22 @@ public class RoleStateIdle : RoleStateAbstract
     public override void OnLeave()
     {
         base.OnLeave();
-        CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToIdleFight.ToString(), false);
+        if (CurrRoleFSMMgr.CurrRoleCtrl.CurrRoleType == RoleType.MainPlayer)
+        {
+            if (CurrRoleFSMMgr.ToRoleIdleState == RoleIdleState.IdleNormal)
+            {
+                CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToIdleNormal.ToString(), false);
+                CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToXiuXian.ToString(), false);
+                m_NextChangeTime = 0;
+            }
+            else
+            {
+                CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToIdleFight.ToString(), false);
+            }
+        }
+        else
+        {
+            CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToIdleFight.ToString(), false);
+        }
     }
 }

@@ -1,3 +1,6 @@
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 // Upgrade NOTE: commented out 'sampler2D unity_Lightmap', a built-in variable
 // Upgrade NOTE: replaced tex2D unity_Lightmap with UNITY_SAMPLE_TEX2D
 
@@ -44,9 +47,9 @@ Shader "T4MShaders/ShaderModel2/Unlit/T4M World Projection Shader + LM"{
                 v2f vert(appdata_base v)
                 {
                     v2f o;
-                    o.pos = mul (UNITY_MATRIX_MVP, v.vertex);
-                    o.worldnormal = mul(_Object2World, float4(v.normal, 0.0f)).xyz;
-                    o.worldpos = mul(_Object2World, v.vertex);
+                    o.pos = UnityObjectToClipPos (v.vertex);
+                    o.worldnormal = mul(unity_ObjectToWorld, float4(v.normal, 0.0f)).xyz;
+                    o.worldpos = mul(unity_ObjectToWorld, v.vertex);
                     #ifdef LIGHTMAP_ON
 		            	o.uv[0] = v.texcoord.xy * unity_LightmapST.xy + unity_LightmapST.zw;
 		            #endif

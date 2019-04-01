@@ -13,8 +13,10 @@ using System.Collections;
 public enum SceneType
 {
     LogOn,
-    City,
+    SelectRole,
+    WorldMap,
     Shamo,
+    GameLevel
 }
 #endregion
 
@@ -42,6 +44,10 @@ public enum WindowUIType
     RoleInfo,
     GameServerEnter,
     GameServerSelect,
+    GameLevelMap,
+    GameLevelDetail,
+    GameLevelVictory,
+    GameLevelFail,
 }
 #endregion
 
@@ -124,7 +130,11 @@ public enum RoleType
     /// <summary>
     /// 怪
     /// </summary>
-    Monster = 2
+    Monster = 2,
+    /// <summary>
+    /// 其他玩家
+    /// </summary>
+    OtherPlayer = 3,
 }
 #endregion
 
@@ -156,22 +166,35 @@ public enum RoleState
     /// <summary>
     /// 死亡
     /// </summary>
-    Die = 5
+    Die = 5,
+
+    Select,
 }
 
 /// <summary>
 /// 角色动画状态名称
 /// </summary>
-public enum RoleAnimatorName
+public enum RoleAnimatorState
 {
-    Idle_Normal,
-    Idle_Fight,
-    Run,
-    Hurt,
-    Die,
-    PhyAttack1,
-    PhyAttack2,
-    PhyAttack3
+    None,
+    Idle_Normal = 1,
+    Idle_Fight = 2,
+    Run = 3,
+    Hurt = 4,
+    Die = 5,
+    Select = 6,
+    XiuXian = 7,
+    Died = 8,
+
+    PhyAttack1 = 11,
+    PhyAttack2 = 12,
+    PhyAttack3 = 13,
+    Skill1 = 14, 
+    Skill2 = 15,
+    Skill3 = 16,
+    Skill4 = 17,
+    Skill5 = 18,
+    Skill6 = 19,
 }
 
 public enum ToAnimatorCondition
@@ -182,6 +205,8 @@ public enum ToAnimatorCondition
     ToHurt,
     ToDie,
     ToPhyAttack,
+    ToSkill,
+    ToXiuXian,
     CurrState
 }
 
@@ -198,4 +223,73 @@ public enum Language
 {
     CN,
     EN
+}
+
+/// <summary>
+/// 游戏关卡难度等级
+/// </summary>
+public enum GameLevelGrade
+{
+    /// <summary>
+    /// 普通
+    /// </summary>
+    Normal = 0,
+    /// <summary>
+    /// 困难
+    /// </summary>
+    Hard = 1,
+    /// <summary>
+    /// 地狱
+    /// </summary>
+    Hell = 2
+}
+
+/// <summary>
+/// 物品类型
+/// </summary>
+public enum GoodsType
+{
+    /// <summary>
+    /// 装备
+    /// </summary>
+    Equip = 0,
+    /// <summary>
+    /// 道具
+    /// </summary>
+    Item = 1,
+    /// <summary>
+    /// 材料
+    /// </summary>
+    Material = 2
+}
+
+public enum RoleIdleState
+{
+    IdleNormal,
+    IdleFight,
+}
+
+public enum RoleAttackType
+{
+    PhyAttack,
+    SkillAttack
+}
+
+public enum ValueChangeType
+{
+    Add = 0,
+    Subtrack,
+}
+
+public enum PoolType
+{
+    Effect,
+    Monster,
+    UI,
+}
+
+public enum ResourLoadType
+{
+    AssetBundle,
+    Resources,
 }

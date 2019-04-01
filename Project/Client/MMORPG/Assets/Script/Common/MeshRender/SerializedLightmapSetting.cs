@@ -28,8 +28,8 @@ public class SerializedLightmapSetting : MonoBehaviour
             lightmapNear = new Texture2D[l];
             for (int i = 0; i < l; i++)
             {
-                lightmapFar[i] = LightmapSettings.lightmaps[i].lightmapFar;
-                lightmapNear[i] = LightmapSettings.lightmaps[i].lightmapNear;
+                lightmapFar[i] = LightmapSettings.lightmaps[i].lightmapColor;
+                lightmapNear[i] = LightmapSettings.lightmaps[i].lightmapDir;
             }
         }
         MeshLightmapSetting[] savers = FindObjectsOfType<MeshLightmapSetting>();
@@ -57,13 +57,26 @@ public class SerializedLightmapSetting : MonoBehaviour
                 {
                     lightmaps[i] = new LightmapData();
                     if (i < l1)
-                        lightmaps[i].lightmapFar = lightmapFar[i];
+                        lightmaps[i].lightmapColor = lightmapFar[i];
                     if (i < l2)
-                        lightmaps[i].lightmapNear = lightmapNear[i];
+                        lightmaps[i].lightmapDir = lightmapNear[i];
                 }
             }
             LightmapSettings.lightmaps = lightmaps;
             Destroy(this);
+            //if (LightmapSettings.lightmaps == null)
+            //{
+            //    AppDebug.Log("LightmapSettings.lightmaps  == null");
+            //}
+            //else if(LightmapSettings.lightmaps.Length == 0)
+            //{
+            //    AppDebug.Log("LightmapSettings.lightmaps.Length  == 0");
+            //}
+            //else
+            //{
+            //    AppDebug.Log("LightmapSettings.lightmaps.Length = aaa" + LightmapSettings.lightmaps.Length);
+            //}
+            //AppDebug.Log("LightmapSettings.Mode = " + mode);
         }
     }
 

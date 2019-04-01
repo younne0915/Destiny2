@@ -3,7 +3,7 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 
-public class GameServerCtrl : SystemCtrl<GameServerCtrl>, ISystemCtrl
+public class GameServerCtrl : SystemCtrlBase<GameServerCtrl>, ISystemCtrl
 {
     private UIGameServerEnterView uiGameServerEnterView;
     private UIGameServerSelectView uiGameServerSelectView;
@@ -18,11 +18,24 @@ public class GameServerCtrl : SystemCtrl<GameServerCtrl>, ISystemCtrl
     {
         AddEventHandler(ConstDefine.UIGameServerEnterView_btnSelectGameServer, UIGameServerEnterView_btnSelectGameServerClick);
         AddEventHandler(ConstDefine.UIGameServerEnterView_btnEnterGame, UIGameServerEnterView_btnEnterGameClick);
+
+        NetWorkSocket.Instance.OnConnectOK = OnConnectOKCallback;
     }
 
     private void UIGameServerEnterView_btnEnterGameClick(object[] p)
     {
+        NetWorkSocket.Instance.Connect(GlobalInit.Instance.CurrentSelectGameServer.Ip, GlobalInit.Instance.CurrentSelectGameServer.Port);
+    }
+
+    private void OnConnectOKCallback()
+    {
         UpdateLastLogOnServer();
+        SceneMgr.Instance.LoadToSelectRole();
+        if(uiGameServerEnterView != null)
+        {
+            uiGameServerEnterView.Close();
+            uiGameServerEnterView = null;
+        }
     }
 
     private void UpdateLastLogOnServer()
@@ -37,7 +50,7 @@ public class GameServerCtrl : SystemCtrl<GameServerCtrl>, ISystemCtrl
 
     private void OnUpdateLastLogOnServerCallBack(RetValue obj)
     {
-        AppDebug.Log(obj.HasError);
+        //AppDebug.Log(obj.HasError);
     }
 
     private void UIGameServerEnterView_btnSelectGameServerClick(object[] p)
@@ -96,6 +109,7 @@ public class GameServerCtrl : SystemCtrl<GameServerCtrl>, ISystemCtrl
         {
             //AppDebug.LogError("already contain " + pageIndex);
             uiGameServerSelectView.SetGameServerUI(m_GameServerDic[pageIndex]);
+            uiGameServerSelectView.OnGameServerClick = OnGameServerClickCallback;
             return;
         }
         if (m_GameServerBusy) return;

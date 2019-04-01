@@ -6,6 +6,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 /// <summary>
 /// 角色有限状态机管理器
@@ -29,11 +30,17 @@ public class RoleFSMMgr
 
     private Dictionary<RoleState, RoleStateAbstract> m_RoleStateDic;
 
+    public RoleIdleState CurrRoleIdleState { set; get; }
+
+    public RoleIdleState ToRoleIdleState { set; get; }
+
+    public bool IsRigidty = false;
+
     /// <summary>
     /// 构造函数
     /// </summary>
     /// <param name="currRoleCtrl"></param>
-    public RoleFSMMgr(RoleCtrl currRoleCtrl)
+    public RoleFSMMgr(RoleCtrl currRoleCtrl, Action OnRoleDie, Action OnRoleDestroy)
     {
         CurrRoleCtrl = currRoleCtrl;
         m_RoleStateDic = new Dictionary<RoleState, RoleStateAbstract>();
@@ -41,7 +48,7 @@ public class RoleFSMMgr
         m_RoleStateDic[RoleState.Run] = new RoleStateRun(this);
         m_RoleStateDic[RoleState.Attack] = new RoleStateAttack(this);
         m_RoleStateDic[RoleState.Hurt] = new RoleStateHurt(this);
-        m_RoleStateDic[RoleState.Die] = new RoleStateDie(this);
+        m_RoleStateDic[RoleState.Die] = new RoleStateDie(this, OnRoleDie, OnRoleDestroy);
 
         if (m_RoleStateDic.ContainsKey(CurrRoleStateEnum))
         {
@@ -68,7 +75,12 @@ public class RoleFSMMgr
     /// <param name="newState">新状态</param>
     public void ChangeState(RoleState newState)
     {
-        if (CurrRoleStateEnum == newState) return;
+        if (CurrRoleStateEnum == newState && CurrRoleStateEnum != RoleState.Idle && CurrRoleStateEnum != RoleState.Attack) return;
+
+        if (CurrRoleStateEnum == RoleState.Idle)
+        {
+            CurrRoleIdleState = ToRoleIdleState;
+        }
 
         //调用以前状态的离开方法
         if (m_CurrRoleState != null)
@@ -82,5 +94,11 @@ public class RoleFSMMgr
 
         ///调用新状态的进入方法
         m_CurrRoleState.OnEnter();
+    }
+
+    public RoleStateAbstract GetRoleState(RoleState roleState)
+    {
+        if (m_RoleStateDic.ContainsKey(roleState)) return m_RoleStateDic[roleState];
+        return null;
     }
 }

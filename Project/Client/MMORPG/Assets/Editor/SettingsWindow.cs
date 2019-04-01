@@ -3,7 +3,9 @@ using System.Collections;
 using UnityEditor;
 using System.Collections.Generic;
 
-public class SettingsWindow : EditorWindow {
+[ExecuteInEditMode]
+public class SettingsWindow : EditorWindow
+{
 
     private List<MacorItem> m_List = new List<MacorItem>();
 
@@ -13,8 +15,11 @@ public class SettingsWindow : EditorWindow {
 
     public SettingsWindow()
     {
-        m_Macor = PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android);
+    }
 
+    void OnEnable()
+    {
+        m_Macor = PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android);
         m_List.Clear();
         //m_List.Add(new MacorItem("DEBUG_MODEL", "调试模式", true, false));
         //m_List.Add(new MacorItem("DEBUG_LOG", "打印日志", true, false));
@@ -23,10 +28,11 @@ public class SettingsWindow : EditorWindow {
         m_List.Add(new MacorItem("DEBUG_MODEL", "DEBUG_MODEL", true, false));
         m_List.Add(new MacorItem("DEBUG_LOG", "DEBUG_LOG", true, false));
         m_List.Add(new MacorItem("STAT_TD", "STAT_TD", false, true));
+        m_List.Add(new MacorItem("DEBUG_ROLESTATE", "DEBUG_ROLESTATE", false, false));
 
         for (int i = 0; i < m_List.Count; i++)
         {
-            if(!string.IsNullOrEmpty(m_Macor) && m_Macor.IndexOf(m_List[i].Name) != -1)
+            if (!string.IsNullOrEmpty(m_Macor) && m_Macor.IndexOf(m_List[i].Name) != -1)
             {
                 m_Dic[m_List[i].Name] = true;
             }
@@ -35,11 +41,11 @@ public class SettingsWindow : EditorWindow {
                 m_Dic[m_List[i].Name] = false;
             }
         }
-        
     }
 
     void OnGUI()
     {
+        if (m_List == null || m_List.Count == 0) return;
         for (int i = 0; i < m_List.Count; i++)
         {
             EditorGUILayout.BeginHorizontal("box");
@@ -83,7 +89,7 @@ public class SettingsWindow : EditorWindow {
                 m_Macor += string.Format("{0};", item.Key);
             }
         }
-        PlayerSettings.SetScriptingDefineSymbolsForGroup( BuildTargetGroup.Android, m_Macor);
+        PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, m_Macor);
         PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.iOS, m_Macor);
         PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone, m_Macor);
 

@@ -5,6 +5,7 @@
 //===================================================
 using UnityEngine;
 using System.Collections;
+using System;
 
 /// <summary>
 /// 场景UI管理器
@@ -25,6 +26,7 @@ public class UISceneCtrl: Singleton<UISceneCtrl>
         /// 加载
         /// </summary>
         Loading,
+        SelectRole,
         /// <summary>
         /// 主城
         /// </summary>
@@ -42,7 +44,7 @@ public class UISceneCtrl: Singleton<UISceneCtrl>
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    public GameObject LoadSceneUI(SceneUIType type)
+    public GameObject LoadSceneUI(SceneUIType type, Action OnLoadComplete = null)
     {
         GameObject obj = null;
         switch (type)
@@ -51,12 +53,20 @@ public class UISceneCtrl: Singleton<UISceneCtrl>
                 obj = ResourcesMgr.Instance.Load(ResourcesMgr.ResourceType.UIScene, "UI Root_LogOn");
                 CurrentUIScene = obj.GetComponent<UISceneViewBase>();
                 break;
+            case SceneUIType.SelectRole:
+                obj = ResourcesMgr.Instance.Load(ResourcesMgr.ResourceType.UIScene, "UI Root_SelectRole");
+                CurrentUIScene = obj.GetComponent<UISceneViewBase>();
+                break;
             case SceneUIType.Loading:
                 break;
             case SceneUIType.MainCity:
-                obj = ResourcesMgr.Instance.Load(ResourcesMgr.ResourceType.UIScene, "UI Root_City");
+                obj = ResourcesMgr.Instance.Load(ResourcesMgr.ResourceType.UIScene, "UI Root_MainCity");
                 CurrentUIScene = obj.GetComponent<UISceneViewBase>();
                 break;
+        }
+        if(CurrentUIScene != null)
+        {
+            CurrentUIScene.OnLoadComplete = OnLoadComplete;
         }
         return obj;
     }

@@ -1,0 +1,7 @@
+1.我的场景寻路能走到外面田野里去，为啥？
+2.为什么摄像机要好几层结构，为什么Main Camera要locaoPosition = 0
+3.m_Dic.GetEnumerator().Current为什么是null
+4.资源右下角小窗中的Assetbundle的名字是怎么赋值的？
+5.将PoolManager优化与魔盒模式相同
+6.滑动时间如何在点击在UI上时候，不向下分发
+7.

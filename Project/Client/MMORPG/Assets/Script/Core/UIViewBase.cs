@@ -8,7 +8,7 @@ using UnityEngine.UI;
 /// </summary>
 public class UIViewBase : MonoBehaviour
 {
-    public Action OnShow;
+    public Action OnLoadComplete;
 
     void Awake()
     {
@@ -23,7 +23,7 @@ public class UIViewBase : MonoBehaviour
             EventTriggerListener.Get(btnArr[i].gameObject).onClick = BtnClick;
         }
         OnStart();
-        if (OnShow != null) OnShow();
+        if (OnLoadComplete != null) OnLoadComplete();
     }
 
     void OnDestroy()

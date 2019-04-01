@@ -36,7 +36,6 @@ public class RoleStateRun : RoleStateAbstract
     public override void OnEnter()
     {
         base.OnEnter();
-
         m_RotationSpeed = 0;
         CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToRun.ToString(), true);
     }
@@ -47,42 +46,93 @@ public class RoleStateRun : RoleStateAbstract
     public override void OnUpdate()
     {
         base.OnUpdate();
+
+        //===========测试代码==================Start
+
+        //if (CurrRoleFSMMgr.CurrRoleCtrl.AStarPath == null)
+        //{
+        //    CurrRoleAnimatorStateInfo = CurrRoleFSMMgr.CurrRoleCtrl.Animator.GetCurrentAnimatorStateInfo(0);
+        //    if (CurrRoleAnimatorStateInfo.IsName(RoleAnimatorState.Run.ToString()) && CurrState != RoleAnimatorState.Run)
+        //    {
+        //        CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(ToAnimatorCondition.CurrState.ToString(), (int)RoleAnimatorState.Run);
+        //    }
+        //    //else
+        //    //{
+        //    //    CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(ToAnimatorCondition.CurrState.ToString(), 0);
+        //    //}
+        //    return;
+        //}
+        //===========测试代码==================End
+
         CurrRoleAnimatorStateInfo = CurrRoleFSMMgr.CurrRoleCtrl.Animator.GetCurrentAnimatorStateInfo(0);
-        if (CurrRoleAnimatorStateInfo.IsName(RoleAnimatorName.Run.ToString()))
+        if (CurrRoleAnimatorStateInfo.IsName(RoleAnimatorState.Run.ToString()))
         {
-            CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(ToAnimatorCondition.CurrState.ToString(), (int)RoleState.Run);
-        }
-        else
-        {
-            CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(ToAnimatorCondition.CurrState.ToString(), 0);
-        }
-
-        if (Vector3.Distance(new Vector3(CurrRoleFSMMgr.CurrRoleCtrl.TargetPos.x, 0, CurrRoleFSMMgr.CurrRoleCtrl.TargetPos.z), new Vector3(CurrRoleFSMMgr.CurrRoleCtrl.transform.position.x, 0, CurrRoleFSMMgr.CurrRoleCtrl.transform.position.z)) > 0.1f)
-        {
-            Vector3 direction = CurrRoleFSMMgr.CurrRoleCtrl.TargetPos - CurrRoleFSMMgr.CurrRoleCtrl.transform.position;
-            direction = direction.normalized; //归一化
-            direction = direction * Time.deltaTime * CurrRoleFSMMgr.CurrRoleCtrl.Speed;
-            direction.y = 0;
-
-            //让角色缓慢转身
-            if (m_RotationSpeed <= 1)
+            if(CurrState != RoleAnimatorState.Run)
             {
-                m_RotationSpeed += 10f * Time.deltaTime;
-                m_TargetQuaternion = Quaternion.LookRotation(direction);
-                CurrRoleFSMMgr.CurrRoleCtrl.transform.rotation = Quaternion.Lerp(CurrRoleFSMMgr.CurrRoleCtrl.transform.rotation, m_TargetQuaternion, m_RotationSpeed);
-
-                if (Quaternion.Angle(CurrRoleFSMMgr.CurrRoleCtrl.transform.rotation, m_TargetQuaternion) < 1)
-                {
-                    m_RotationSpeed = 0;
-                }
+                CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(ToAnimatorCondition.CurrState.ToString(), (int)RoleAnimatorState.Run);
             }
-
-            CurrRoleFSMMgr.CurrRoleCtrl.CharacterController.Move(direction);
         }
         else
         {
-            CurrRoleFSMMgr.CurrRoleCtrl.ToIdle();
+            CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToRun.ToString(), true);
+            CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(ToAnimatorCondition.CurrState.ToString(), (int)RoleAnimatorState.None);
         }
+
+        if (CurrRoleFSMMgr.CurrRoleCtrl.AStarPath == null)
+        {
+            if (CurrRoleFSMMgr.CurrRoleCtrl.PreIdleFightTime < 0.01f)
+            {
+                CurrRoleFSMMgr.CurrRoleCtrl.ToIdle();
+            }
+            else
+            {
+                CurrRoleFSMMgr.CurrRoleCtrl.ToIdle(RoleIdleState.IdleFight);
+            }
+            return;
+        }
+
+        int index = CurrRoleFSMMgr.CurrRoleCtrl.AStarCurrWavePointIndex;
+        if (index >= CurrRoleFSMMgr.CurrRoleCtrl.AStarPath.vectorPath.Count)
+        {
+            if (CurrRoleFSMMgr.CurrRoleCtrl.PreIdleFightTime < 0.01f)
+            {
+                CurrRoleFSMMgr.CurrRoleCtrl.ToIdle();
+            }
+            else
+            {
+                CurrRoleFSMMgr.CurrRoleCtrl.ToIdle(RoleIdleState.IdleFight);
+            }
+            return;
+        }
+
+        Vector3 pathProcessPoint = new Vector3(CurrRoleFSMMgr.CurrRoleCtrl.AStarPath.vectorPath[index].x,
+            CurrRoleFSMMgr.CurrRoleCtrl.transform.position.y,
+           CurrRoleFSMMgr.CurrRoleCtrl.AStarPath.vectorPath[index].z);
+
+        Vector3 direction = pathProcessPoint - CurrRoleFSMMgr.CurrRoleCtrl.transform.position;
+        direction = direction.normalized; //归一化
+        direction = direction * Time.deltaTime * CurrRoleFSMMgr.CurrRoleCtrl.Speed;
+        direction.y = 0;
+
+        //让角色缓慢转身
+        if (m_RotationSpeed <= 1)
+        {
+            m_RotationSpeed += 10f * Time.deltaTime;
+            m_TargetQuaternion = Quaternion.LookRotation(direction);
+            CurrRoleFSMMgr.CurrRoleCtrl.transform.rotation = Quaternion.Lerp(CurrRoleFSMMgr.CurrRoleCtrl.transform.rotation, m_TargetQuaternion, m_RotationSpeed);
+
+            if (Quaternion.Angle(CurrRoleFSMMgr.CurrRoleCtrl.transform.rotation, m_TargetQuaternion) < 1)
+            {
+                m_RotationSpeed = 0;
+            }
+        }
+
+        if(Vector3.Distance(CurrRoleFSMMgr.CurrRoleCtrl.transform.position, pathProcessPoint) <= direction.magnitude + 0.1f)
+        {
+            CurrRoleFSMMgr.CurrRoleCtrl.AStarCurrWavePointIndex++;
+        }
+
+        CurrRoleFSMMgr.CurrRoleCtrl.CharacterController.Move(direction);
     }
 
     /// <summary>

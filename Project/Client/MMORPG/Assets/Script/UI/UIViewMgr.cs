@@ -13,6 +13,13 @@ public class UIViewMgr : Singleton<UIViewMgr>
 
         m_systemCtrlDic.Add(WindowUIType.GameServerEnter, GameServerCtrl.Instance);
         m_systemCtrlDic.Add(WindowUIType.GameServerSelect, GameServerCtrl.Instance);
+
+        m_systemCtrlDic.Add(WindowUIType.RoleInfo, PlayerCtrl.Instance);
+
+        m_systemCtrlDic.Add(WindowUIType.GameLevelMap, GameLevelCtrl.Instance);
+        m_systemCtrlDic.Add(WindowUIType.GameLevelDetail, GameLevelCtrl.Instance);
+        m_systemCtrlDic.Add(WindowUIType.GameLevelVictory, GameLevelCtrl.Instance);
+        m_systemCtrlDic.Add(WindowUIType.GameLevelFail, GameLevelCtrl.Instance);
     }
 
     public void OpenWindow(WindowUIType type)

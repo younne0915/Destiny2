@@ -1,20 +1,21 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections;
 using UnityEditor;
 using System.Collections.Generic;
 using System;
 using System.IO;
 
+[ExecuteInEditMode]
 public class AssetBundleWindow : EditorWindow
 {
     private AssetBundleDAL dal;
     private List<AssetBundleEntity> m_List;
     private Dictionary<string, bool> m_Dic;
 
-    private string[] arraTag = { "All", "Scene", "Role", "Effect", "Audio", "None"};
+    private string[] arraTag = { "All", "Scene", "Role", "Effect", "Audio", "None" };
     private int tagIndex = 0;
 
-    private string[] arrBuildTarget = {"Windows", "Android", "iOS" };
+    private string[] arrBuildTarget = { "Windows", "Android", "iOS" };
 
 #if UNITY_STANDALONE_WIN
     private BuildTarget target = BuildTarget.StandaloneWindows;
@@ -31,7 +32,12 @@ public class AssetBundleWindow : EditorWindow
 
     public AssetBundleWindow()
     {
-        string xmlPath = Application.dataPath + @"\Editor\AssetBundles\AssetBundleConfig.xml";
+
+    }
+
+    private void OnEnable()
+    {
+        string xmlPath = Application.dataPath + @"\Editor\AssetBundle\AssetBundleConfig.xml";
         dal = new AssetBundleDAL(xmlPath);
         m_List = dal.GetList();
 
@@ -47,11 +53,11 @@ public class AssetBundleWindow : EditorWindow
     {
         if (m_List == null) return;
 
-        #region °´Å¥ÐÐ
+        #region æŒ‰é’®è¡Œ
         GUILayout.BeginHorizontal("Box");
 
         tagIndex = EditorGUILayout.Popup(tagIndex, arraTag, GUILayout.Width(100));
-        if(GUILayout.Button("select Tag", GUILayout.Width(100)))
+        if (GUILayout.Button("select Tag", GUILayout.Width(100)))
         {
             EditorApplication.delayCall = OnSelectTagCallback;
         }
@@ -130,7 +136,7 @@ public class AssetBundleWindow : EditorWindow
     {
         switch (tagIndex)
         {
-            case 0://È«Ñ¡
+            case 0://å…¨é€‰
                 foreach (AssetBundleEntity entity in m_List)
                 {
                     m_Dic[entity.Key] = true;
@@ -203,10 +209,10 @@ public class AssetBundleWindow : EditorWindow
 
         for (int i = 0; i < lstNeedBuild.Count; i++)
         {
-            Debug.LogFormat("ÕýÔÚ´ò°ü{0}/{1}", i + 1, lstNeedBuild.Count);
+            Debug.LogFormat("æ­£åœ¨æ‰“åŒ…{0}/{1}", i + 1, lstNeedBuild.Count);
             BuildAssetBundle(lstNeedBuild[i]);
         }
-        Debug.Log("´ò°üÍê±Ï");
+        Debug.Log("æ‰“åŒ…å®Œæ¯•");
     }
 
     private void BuildAssetBundle(AssetBundleEntity entity)

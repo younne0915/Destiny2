@@ -6,6 +6,7 @@
 using UnityEngine;
 using System.Collections;
 using System;
+using UnityEngine.SceneManagement;
 
 public class SceneLoadingCtrl : MonoBehaviour 
 {
@@ -27,6 +28,7 @@ public class SceneLoadingCtrl : MonoBehaviour
         DelegateDefine.Instance.OnSceneLoadOK += OnSceneLoadOK;
         LayerUIMgr.Instance.Reset();
         StartCoroutine(LoadingScene());
+        UIViewUtil.Instance.CloseAllWindow();
     }
 
     private void OnDestroy()
@@ -52,21 +54,55 @@ public class SceneLoadingCtrl : MonoBehaviour
             case SceneType.LogOn:
                 strSceneName = "Scene_LogOn";
                 break;
-            case SceneType.City:
-                strSceneName = "GameScene_CunZhuang";
+            case SceneType.SelectRole:
+                strSceneName = "Scene_SelectRole";
+                break;
+            case SceneType.WorldMap:
+                WorldMapEntity entity = WorldMapDBModel.Instance.Get(SceneMgr.Instance.CurrWorldMapId);
+                if(entity != null)
+                {
+                    strSceneName = entity.SceneName;
+                }
+                if (string.IsNullOrEmpty(strSceneName)) yield break;
                 break;
             case SceneType.Shamo:
                 strSceneName = "GameScene_Shamo";
                 break;
+            case SceneType.GameLevel:
+                GameLevelEntity gameLevelEntity = GameLevelDBModel.Instance.Get(SceneMgr.Instance.CurrGameLevelId);
+                if (gameLevelEntity != null)
+                {
+                    strSceneName = gameLevelEntity.SceneName;
+                }
+                if (string.IsNullOrEmpty(strSceneName)) yield break;
+                break;
+            default:
+                AppDebug.LogError("SceneType Error");
+                yield break;
         }
 
-        m_Async = Application.LoadLevelAdditiveAsync(strSceneName);
-        m_Async.allowSceneActivation = false;
-        yield return m_Async;
+        RecyclePoolMgr.Instance.Clear();
+
+        if (SceneMgr.Instance.CurrentSceneType == SceneType.SelectRole || SceneMgr.Instance.CurrentSceneType == SceneType.WorldMap || SceneMgr.Instance.CurrentSceneType == SceneType.GameLevel)
+        {
+            AssetBundleLoaderAsync assetBundleAsync = AssetBundleMgr.Instance.LoadAsync(string.Format("Scene/{0}.unity3d", strSceneName), strSceneName);
+            assetBundleAsync.OnLoadCompleteNoObject = () =>
+             {
+                 m_Async = SceneManager.LoadSceneAsync(strSceneName, LoadSceneMode.Additive);
+                 m_Async.allowSceneActivation = false;
+             };
+        }
+        else
+        {
+            m_Async = SceneManager.LoadSceneAsync(strSceneName, LoadSceneMode.Additive);
+            m_Async.allowSceneActivation = false;
+            yield return m_Async;
+        }
     }
 
 	void Update ()
 	{
+        if (m_Async == null) return;
         int toProgress = 0;
 
         if (m_Async.progress < 0.9f)

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// 场景管理器
@@ -18,22 +19,53 @@ public class SceneMgr : Singleton<SceneMgr>
     public void LoadToLogOn()
     {
         CurrentSceneType = SceneType.LogOn;
-        
-        Application.LoadLevel("Scene_Loading");
+        SceneManager.LoadScene("Scene_Loading");
+    }
+
+    public void LoadToSelectRole()
+    {
+        CurrentSceneType = SceneType.SelectRole;
+        SceneManager.LoadScene("Scene_Loading");
+    }
+
+    public int CurrWorldMapId
+    {
+        get;
+        private set;
+    }
+
+    public int CurrGameLevelId
+    {
+        get;
+        private set;
+    }
+    public GameLevelGrade CurrGameLevelGrade
+    {
+        get;
+        private set;
     }
 
     /// <summary>
-    /// 去城镇场景
+    /// 去世界地图场景（主程+野外场景）
     /// </summary>
-    public void LoadToCity()
+    public void LoadToWorldMap(int worldMapId)
     {
-        CurrentSceneType = SceneType.City;
-        Application.LoadLevel("Scene_Loading");
+        CurrWorldMapId = worldMapId;
+        CurrentSceneType = SceneType.WorldMap;
+        SceneManager.LoadScene("Scene_Loading");
     }
 
     public void LoadToShamo()
     {
         CurrentSceneType = SceneType.Shamo;
-        Application.LoadLevel("Scene_Loading");
+        SceneManager.LoadScene("Scene_Loading");
+    }
+
+    public void LoadToGameLevel(int gamelevelId, GameLevelGrade grade)
+    {
+        CurrGameLevelId = gamelevelId;
+        CurrGameLevelGrade = grade;
+        CurrentSceneType = SceneType.GameLevel;
+        SceneManager.LoadScene("Scene_Loading");
     }
 }

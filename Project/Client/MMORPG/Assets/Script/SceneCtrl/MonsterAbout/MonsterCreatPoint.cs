@@ -50,11 +50,11 @@ public class MonsterCreatPoint : MonoBehaviour
                 roleCtrl.BornPoint = objClone.transform.position;
 
                 RoleInfoMonster roleInfo = new RoleInfoMonster();
-                roleInfo.RoleServerID = DateTime.Now.Ticks;
-                roleInfo.RoleID = 1;
-                roleInfo.CurrHP = roleInfo.MaxHP = 1000;
-                roleInfo.NickName = "偷书盗贼";
-                roleCtrl.Init(RoleType.Monster, roleInfo, new RoleMonsterAI(roleCtrl));
+                //roleInfo.RoleServerID = DateTime.Now.Ticks;
+                //roleInfo.RoleID = 1;
+                //roleInfo.CurrHP = roleInfo.MaxHP = 1000;
+                //roleInfo.NickName = "偷书盗贼";
+                roleCtrl.Init(RoleType.Monster, roleInfo, new GameLevelRoleMonsterAI(roleCtrl, null));
 
                 roleCtrl.OnRoleDie = RoleDie;
 

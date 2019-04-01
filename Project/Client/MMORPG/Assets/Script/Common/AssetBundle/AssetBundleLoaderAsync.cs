@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 
 public class AssetBundleLoaderAsync : MonoBehaviour
@@ -10,6 +10,8 @@ public class AssetBundleLoaderAsync : MonoBehaviour
     private AssetBundle bundle;
 
     public System.Action<Object> OnLoadComplete;
+
+    public System.Action OnLoadCompleteNoObject;
 
     public void Init(string path, string name)
     {
@@ -24,9 +26,14 @@ public class AssetBundleLoaderAsync : MonoBehaviour
 
     private IEnumerator Load()
     {
-        request = AssetBundle.CreateFromMemory(LocalFileMgr.Instance.GetBuffer(m_FullPath));
+        request = AssetBundle.LoadFromMemoryAsync(LocalFileMgr.Instance.GetBuffer(m_FullPath));
         yield return request;
         bundle = request.assetBundle;
+        if(OnLoadCompleteNoObject != null)
+        {
+            OnLoadCompleteNoObject();
+        }
+
         if(OnLoadComplete != null)
         {
             OnLoadComplete(bundle.LoadAsset(m_Name));

@@ -3,7 +3,7 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 
-public class AccountCtrl : SystemCtrl<AccountCtrl>, ISystemCtrl
+public class AccountCtrl : SystemCtrlBase<AccountCtrl>, ISystemCtrl
 {
     private UILogOnView uiLogOnView;
     private UIRegView uiRegView;
@@ -71,7 +71,7 @@ public class AccountCtrl : SystemCtrl<AccountCtrl>, ISystemCtrl
         if (obj.HasError)
         {
             //AppDebug.LogError("注册失败！" + obj.ErrorMsg);
-            ShowMessage("注册提示", "注册失败！");
+            ShowMessage("注册提示", obj.ErrorMsg);
         }
         else
         {
@@ -81,7 +81,7 @@ public class AccountCtrl : SystemCtrl<AccountCtrl>, ISystemCtrl
             {
                 PlayerPrefs.SetString(ConstDefine.LogOn_AccountUserName, uiRegView.txtUserName.text);
                 PlayerPrefs.SetString(ConstDefine.LogOn_AccountPwd, uiRegView.txtPwd.text);
-                PlayerPrefs.SetInt(ConstDefine.LogOn_AccountID, (int)obj.Value);
+                PlayerPrefs.SetInt(ConstDefine.LogOn_AccountID, (int)retAccountEntity.Id);
 
                 uiRegView.CloseAndOpenNext(WindowUIType.GameServerEnter);
             }
@@ -116,7 +116,7 @@ public class AccountCtrl : SystemCtrl<AccountCtrl>, ISystemCtrl
         if (obj.HasError)
         {
             //AppDebug.LogError("登录失败！" + obj.ErrorMsg);
-            ShowMessage("登录提示", "登录失败！");
+            ShowMessage("登录提示", obj.ErrorMsg);
         }
         else
         {
@@ -126,9 +126,13 @@ public class AccountCtrl : SystemCtrl<AccountCtrl>, ISystemCtrl
             {
                 PlayerPrefs.SetString(ConstDefine.LogOn_AccountUserName, uiLogOnView.txtUserName.text);
                 PlayerPrefs.SetString(ConstDefine.LogOn_AccountPwd, uiLogOnView.txtPwd.text);
-                PlayerPrefs.SetInt(ConstDefine.LogOn_AccountID, (int)obj.Value);
+                PlayerPrefs.SetInt(ConstDefine.LogOn_AccountID, retAccountEntity.Id);
+                uiLogOnView.CloseAndOpenNext(WindowUIType.GameServerEnter);
             }
-            UIViewMgr.Instance.OpenWindow(WindowUIType.GameServerEnter);
+            else
+            {
+                UIViewMgr.Instance.OpenWindow(WindowUIType.GameServerEnter);
+            }
         }
     }
 

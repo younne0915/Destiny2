@@ -11,7 +11,7 @@ public class Menu
     {
         SettingsWindow win = (SettingsWindow)EditorWindow.GetWindow(typeof(SettingsWindow));
         win.titleContent = new GUIContent("全局设置");
-        win.Show();
+        win.Show(true);
     }
 
     [MenuItem("YouyouTools/LanguageSetting")]
@@ -27,7 +27,7 @@ public class Menu
     {
         AssetBundleWindow win = EditorWindow.GetWindow<AssetBundleWindow>();
         win.titleContent = new GUIContent("资源打包");
-        win.Show();
+        win.Show(true);
     }
 
     [MenuItem("YouyouTools/ClearAllPlayerPrefs")]

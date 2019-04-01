@@ -1,0 +1,90 @@
+//===================================================
+//作    者：边涯  http://www.u3dol.com  QQ群：87481002
+//创建时间：2015-12-15 23:07:03
+//备    注：
+//===================================================
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+public class RoleMgr:Singleton<RoleMgr> 
+{
+    private bool m_IsMainPlayerInit = false;
+    /// <summary>
+    /// 初始化主角
+    /// </summary>
+    public void InitMainPlayer()
+    {
+        if (m_IsMainPlayerInit) return;
+        if(GlobalInit.Instance.MainPlayerInfo != null)
+        {
+            GameObject mainPlayer = Object.Instantiate(GlobalInit.Instance.JobObjectDic[GlobalInit.Instance.MainPlayerInfo.JobId]);
+            Object.DontDestroyOnLoad(mainPlayer);
+            GlobalInit.Instance.CurrPlayer = mainPlayer.GetComponent<RoleCtrl>();
+            JobEntity jobEntity = JobDBModel.Instance.Get(GlobalInit.Instance.MainPlayerInfo.JobId);
+            if(jobEntity != null)
+            {
+                GlobalInit.Instance.MainPlayerInfo.SetPhySkillId(jobEntity.UsedPhyAttackIds);
+            }
+            GlobalInit.Instance.CurrPlayer.Init(RoleType.MainPlayer, GlobalInit.Instance.MainPlayerInfo, new RoleMainPlayerCityAI(GlobalInit.Instance.CurrPlayer));
+
+        }
+        m_IsMainPlayerInit = true;
+    }
+
+    #region LoadRole 根据角色预设名称 加载角色
+    /// <summary>
+    /// 根据角色预设名称 加载角色
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public GameObject LoadRole(string name, RoleType type)
+    {
+        string path = string.Empty;
+
+        switch (type)
+        {
+            case RoleType.MainPlayer:
+                path = "Player";
+                break;
+            case RoleType.Monster:
+                path = "Monster";
+                break;
+        }
+
+        return ResourcesMgr.Instance.Load(ResourcesMgr.ResourceType.Role, string.Format("{0}/{1}", path, name), cache: true);
+    }
+    #endregion
+
+    public GameObject LoadPlayer(int jobId)
+    {
+        GameObject obj = GlobalInit.Instance.JobObjectDic[jobId];
+        return Object.Instantiate(obj);
+    }
+
+    public GameObject LoadNPC(string prefabName)
+    {
+        GameObject obj = AssetBundleMgr.Instance.Load(string.Format("Role/{0}.assetbundle", prefabName), prefabName);
+        return Object.Instantiate(obj);
+    }
+
+    public override void Dispose()
+    {
+        base.Dispose();
+    }
+
+    public Sprite LoadHeadSprite(string headPic)
+    {
+        return Resources.Load<Sprite>(string.Format("UI/HeadImg/{0}", headPic));
+    }
+
+    public GameObject LoadMonster(string prefabName)
+    {
+        return AssetBundleMgr.Instance.Load(string.Format("Role/{0}.assetbundle", prefabName), prefabName);
+    }
+
+    public Sprite LoadSkillPic(string skillPic)
+    {
+        return Resources.Load<Sprite>(string.Format("UI/SkillIco/{0}", skillPic));
+    }
+}

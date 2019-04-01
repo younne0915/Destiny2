@@ -5,6 +5,11 @@
 //===================================================
 using UnityEngine;
 using System.Collections;
+using Pathfinding;
+using System;
+
+[RequireComponent(typeof(Seeker))]
+[RequireComponent(typeof(FunnelModifier))]
 
 /// <summary>
 /// 角色控制器
@@ -104,7 +109,46 @@ public class RoleCtrl : MonoBehaviour
     /// </summary>
     public RoleFSMMgr CurrRoleFSMMgr = null;
 
-    private RoleHeadBarCtrl roleHeadBarCtrl = null;
+    private RoleHeadBarView roleHeadBarView = null;
+
+
+    //=============================寻路相关=======================================
+    private Seeker m_Seeker;
+
+    [HideInInspector]
+    public ABPath AStarPath;
+
+    public int AStarCurrWavePointIndex = 1;
+
+    //==============================战斗相关====================================
+    public RoleHurt m_Hurt;
+
+    public RoleAttack m_Attack;
+
+    [HideInInspector]
+    public RoleAttackInfo CurrAttackInfo;
+
+    [HideInInspector]
+    public float PreIdleFightTime = 0;
+
+    private bool m_IsAutoFight = false;
+
+    public bool IsAutoFight
+    {
+        get { return m_IsAutoFight; }
+        set
+        {
+            m_IsAutoFight = value;
+            if (!IsAutoFight)
+            {
+                LockEnemy = null;
+            }
+        }
+    }
+
+    public delegate void OnValueChangeHandler(ValueChangeType type);
+    public OnValueChangeHandler OnHPChange;
+    public OnValueChangeHandler OnMPChange;
 
     #endregion
 
@@ -124,7 +168,7 @@ public class RoleCtrl : MonoBehaviour
     void Start()
     {
         CharacterController = GetComponent<CharacterController>();
-
+        m_Seeker = GetComponent<Seeker>();
         if (CurrRoleType == RoleType.MainPlayer)
         {
             if (CameraCtrl.Instance != null)
@@ -133,20 +177,87 @@ public class RoleCtrl : MonoBehaviour
             }
         }
 
-        CurrRoleFSMMgr = new RoleFSMMgr(this);
-        ToIdle();
-        InitHeadBar();
+        CurrRoleFSMMgr = new RoleFSMMgr(this, OnRoleDieCallback, OnRoleDestroyCallback);
+        m_Hurt = new RoleHurt(CurrRoleFSMMgr);
+        m_Hurt.OnRoleHurt = OnRoleHurtCallback;
+        //m_Attack = new RoleAttack(CurrRoleFSMMgr);
+        m_Attack.SetRoleFSMMgr(CurrRoleFSMMgr);
+
+        if (CurrRoleType == RoleType.Monster)
+        {
+            ToIdle(RoleIdleState.IdleFight);
+        }
+        else
+        {
+            ToIdle(RoleIdleState.IdleNormal);
+        }
+    }
+
+    private void OnRoleDestroyCallback()
+    {
+        RecyclePoolMgr.Instance.Despawn(PoolType.Monster, transform);
+
+        if (CharacterController != null)
+        {
+            CharacterController.enabled = true;
+        }
+
+        if (CurrRoleType == RoleType.Monster)
+        {
+            ToIdle(RoleIdleState.IdleFight);
+        }
+        else
+        {
+            ToIdle(RoleIdleState.IdleNormal);
+        }
+
+        if (roleHeadBarView != null)
+        {
+            Destroy(roleHeadBarView.gameObject);
+        }
+    }
+
+    private void OnRoleDieCallback()
+    {
+        if(CharacterController != null)
+        {
+            CharacterController.enabled = false;
+        }
+
+        LockEnemy = null;
+
+        if(OnRoleDie != null)
+        {
+            OnRoleDie(this);
+        }
+    }
+
+    private void OnRoleHurtCallback()
+    {
+        if(roleHeadBarView != null)
+        {
+            roleHeadBarView.Hurt(0, (float)CurrRoleInfo.CurrHP / CurrRoleInfo.MaxHP);
+        }
+
+        if (CurrRoleType == RoleType.MainPlayer)
+        {
+            if(OnHPChange != null)
+            {
+                OnHPChange(ValueChangeType.Subtrack);
+            }
+        }
     }
 
     void Update()
     {
-        //如果角色没有AI 直接返回
-        if (CurrRoleAI == null) return;
-        CurrRoleAI.DoAI();
-
         if (CurrRoleFSMMgr != null)
             CurrRoleFSMMgr.OnUpdate();
 
+        if (CurrRoleFSMMgr.CurrRoleStateEnum == RoleState.Die) return;
+
+        //如果角色没有AI 直接返回
+        if (CurrRoleAI == null) return;
+        CurrRoleAI.DoAI();
 
         if (CharacterController == null) return;
 
@@ -156,31 +267,9 @@ public class RoleCtrl : MonoBehaviour
             CharacterController.Move((transform.position + new Vector3(0, -1000, 0)) - transform.position);
         }
 
-        //if (Input.GetMouseButtonUp(1))
-        //{
-        //    Collider[] colliderArr = Physics.OverlapSphere(transform.position, 3, 1 << LayerMask.NameToLayer("Item"));
-        //    if (colliderArr.Length > 0)
-        //    {
-        //        for (int i = 0; i < colliderArr.Length; i++)
-        //        {
-        //            Debug.Log("找到了附近的箱子" + colliderArr[i].gameObject.name);
-        //        }
-        //    }
-        //}
-
         if (Input.GetMouseButtonUp(1))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            //RaycastHit[] hitArr = Physics.RaycastAll(ray, Mathf.Infinity, 1 << LayerMask.NameToLayer("Item"));
-
-            //if (hitArr.Length > 0)
-            //{
-            //    for (int i = 0; i < hitArr.Length; i++)
-            //    {
-            //        Debug.Log("找到了" + hitArr[i].collider.gameObject.name);
-            //    }
-            //}
-
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit, Mathf.Infinity, 1 << LayerMask.NameToLayer("Item")))
             {
@@ -201,7 +290,25 @@ public class RoleCtrl : MonoBehaviour
         if (CurrRoleType == RoleType.MainPlayer)
         {
             CameraAutoFollow();
+            AutoSmallMap();
         }
+
+    }
+
+    private void AutoSmallMap()
+    {
+        if (SmallMapHelper.Instance == null || UIMainCitySmallMapView.Instance == null) return;
+
+        SmallMapHelper.Instance.transform.position = transform.position;
+        UIMainCitySmallMapView.Instance.transform.localPosition = new Vector3(SmallMapHelper.Instance.transform.localPosition.x * -512, SmallMapHelper.Instance.transform.localPosition.z * -512, 1);
+        UIMainCitySmallMapView.Instance.SmallMapArr.transform.eulerAngles = new Vector3(0,0, -transform.eulerAngles.y);
+    }
+
+    public void Born(Vector3 pos)
+    {
+        BornPoint = pos;
+        transform.position = pos;
+        InitHeadBar();
     }
 
     /// <summary>
@@ -217,37 +324,115 @@ public class RoleCtrl : MonoBehaviour
         m_HeadBar = ResourcesMgr.Instance.Load(ResourcesMgr.ResourceType.UIOther, "RoleHeadBar");
         m_HeadBar.transform.parent = RoleHeadBarRoot.Instance.gameObject.transform;
         m_HeadBar.transform.localScale = Vector3.one;
+        m_HeadBar.transform.localPosition = Vector3.zero;
 
-
-        roleHeadBarCtrl = m_HeadBar.GetComponent<RoleHeadBarCtrl>();
+        roleHeadBarView = m_HeadBar.GetComponent<RoleHeadBarView>();
 
         //给预设赋值
-        roleHeadBarCtrl.Init(m_HeadBarPos, CurrRoleInfo.NickName, isShowHPBar: (CurrRoleType == RoleType.MainPlayer ? false : true));
+        roleHeadBarView.Init(m_HeadBarPos, CurrRoleInfo.RoleNickName, (float)CurrRoleInfo.CurrHP / CurrRoleInfo.MaxHP, isShowHPBar: (CurrRoleType == RoleType.MainPlayer ? false : true));
     }
 
 
     #region 控制角色方法
 
-    public void ToIdle()
+    public void ToResurgence(RoleIdleState roleIdleState = RoleIdleState.IdleNormal)
     {
+        if(CharacterController != null)
+        {
+            CharacterController.enabled = true;
+        }
+
+        CurrRoleInfo.CurrHP = CurrRoleInfo.MaxHP;
+        CurrRoleInfo.CurrMP = CurrRoleInfo.MaxMP;
+        LockEnemy = null;
+        ToIdle(roleIdleState);
+    }
+
+    public void ToIdle(RoleIdleState idleState = RoleIdleState.IdleNormal)
+    {
+        //if(CurrRoleType == RoleType.MainPlayer)
+        //{
+        //    AppDebug.LogError("aaaa");
+        //}
+
+        if(idleState == RoleIdleState.IdleFight)
+        {
+            PreIdleFightTime = Time.time;
+        }
+        else
+        {
+            PreIdleFightTime = 0;
+        }
+
+        CurrRoleFSMMgr.ToRoleIdleState = idleState;
         CurrRoleFSMMgr.ChangeState(RoleState.Idle);
+    }
+
+    /// <summary>
+    /// 临时测试
+    /// </summary>
+    public void ToRun()
+    {
+        CurrRoleFSMMgr.ChangeState(RoleState.Run);
     }
 
     public void MoveTo(Vector3 targetPos)
     {
+        if (CurrRoleFSMMgr.CurrRoleStateEnum == RoleState.Die) return;
+        if (CurrRoleFSMMgr.IsRigidty) return;
         //如果目标点不是原点 进行移动
         if (targetPos == Vector3.zero) return;
         TargetPos = targetPos;
-        CurrRoleFSMMgr.ChangeState(RoleState.Run);
+        if (m_Seeker == null)
+        {
+            CurrRoleFSMMgr.ChangeState(RoleState.Idle);
+            return;
+        }
+        if (m_Seeker.IsDone())
+        {
+            m_Seeker.StartPath(transform.position, TargetPos, (Path p) =>
+            {
+                if (!p.error)
+                {
+                    AStarPath = (ABPath)p;
+                    if (Vector3.Distance(AStarPath.endPoint, new Vector3(AStarPath.originalEndPoint.x, AStarPath.endPoint.y, AStarPath.originalEndPoint.z)) > 0.5f)
+                    {
+                        AppDebug.Log("不能到达目标点");
+                        AStarPath = null;
+                    }
+                    else
+                    {
+                        CurrRoleFSMMgr.ChangeState(RoleState.Run);
+                    }
+                    CurrRoleFSMMgr.CurrRoleCtrl.AStarCurrWavePointIndex = 1;
+                }
+                else
+                { 
+                    AppDebug.Log("寻路出错");
+                    AStarPath = null;
+                }
+            });
+        }
     }
 
-    public void ToAttack()
+    public void ToAttackByIndex(RoleAttackType type, int index)
     {
-        if (LockEnemy == null) return;
-        CurrRoleFSMMgr.ChangeState(RoleState.Attack);
+        //if (LockEnemy == null) return;
+        //CurrRoleFSMMgr.ChangeState(RoleState.Attack);
 
-        //暂时写死
-        LockEnemy.ToHurt(100, 0.5f);
+        ////暂时写死
+        //LockEnemy.ToHurt(100, 0.5f);
+        m_Attack.ToAttackByIndex(type, index);
+    }
+
+    public bool ToAttack(RoleAttackType type, int skillId)
+    {
+        //if (LockEnemy == null) return;
+        //CurrRoleFSMMgr.ChangeState(RoleState.Attack);
+
+        ////暂时写死
+        //LockEnemy.ToHurt(100, 0.5f);
+        return m_Attack.ToAttack(type, skillId);
     }
 
     /// <summary>
@@ -255,41 +440,24 @@ public class RoleCtrl : MonoBehaviour
     /// </summary>
     /// <param name="attackValue">受到的攻击力</param>
     /// <param name="delay">延迟时间</param>
-    public void ToHurt(int attackValue,float delay)
+    public void ToHurt(RoleTransferAttackInfo roleTransferAttackInfo)
     {
-        StartCoroutine(ToHurtCoroutine(attackValue, delay));
-    }
-
-    private IEnumerator ToHurtCoroutine(int attackValue, float delay)
-    {
-        yield return new WaitForSeconds(delay);
-
-        //计算得出伤害数值
-        int hurt = (int)(attackValue * Random.Range(0.5f, 1f));
-
-        if (OnRoleHurt != null)
-        {
-            OnRoleHurt();
-        }
-
-        
-        CurrRoleInfo.CurrHP -= hurt;
-
-        roleHeadBarCtrl.Hurt(hurt, (float)CurrRoleInfo.CurrHP / CurrRoleInfo.MaxHP);
-
-        if (CurrRoleInfo.CurrHP <= 0)
-        {
-            CurrRoleFSMMgr.ChangeState(RoleState.Die);
-        }
-        else
-        {
-            CurrRoleFSMMgr.ChangeState(RoleState.Hurt);
-        }
+        StartCoroutine(m_Hurt.ToHurt(roleTransferAttackInfo));
     }
 
     public void ToDie()
     {
         CurrRoleFSMMgr.ChangeState(RoleState.Die);
+    }
+
+    public void ToSkillAttack(int skillId)
+    {
+        bool isSuccess = GlobalInit.Instance.CurrPlayer.ToAttack(RoleAttackType.SkillAttack, skillId);
+        if (isSuccess)
+        {
+            GlobalInit.Instance.MainPlayerInfo.SetSkillCD(skillId);
+            UIMainCitySkillView.Instance.BeganCD(skillId);
+        }
     }
 
     #endregion

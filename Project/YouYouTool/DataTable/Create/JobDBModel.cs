@@ -1,7 +1,7 @@
 
 //===================================================
 //作    者：边涯  http://www.u3dol.com  QQ群：87481002
-//创建时间：2018-08-25 18:12:17
+//创建时间：2019-03-24 17:12:48
 //备    注：此代码为工具生成 请勿手工修改
 //===================================================
 using System.Collections;
@@ -32,6 +32,14 @@ public partial class JobDBModel : AbstractDBModel<JobDBModel, JobEntity>
         entity.JobPic = parse.GetFieldValue("JobPic");
         entity.PrefabName = parse.GetFieldValue("PrefabName");
         entity.Desc = parse.GetFieldValue("Desc");
+        entity.Attack = parse.GetFieldValue("Attack").ToInt();
+        entity.Defense = parse.GetFieldValue("Defense").ToInt();
+        entity.Hit = parse.GetFieldValue("Hit").ToInt();
+        entity.Dodge = parse.GetFieldValue("Dodge").ToInt();
+        entity.Cri = parse.GetFieldValue("Cri").ToInt();
+        entity.Res = parse.GetFieldValue("Res").ToInt();
+        entity.UsedPhyAttackIds = parse.GetFieldValue("UsedPhyAttackIds");
+        entity.UsedSkillIds = parse.GetFieldValue("UsedSkillIds");
         return entity;
     }
 }

@@ -27,6 +27,18 @@ public class UIViewUtil : Singleton<UIViewUtil>
         }
     }
 
+    public void CloseAllWindow()
+    {
+        foreach (var item in m_DicWindow.Values)
+        {
+            if(item != null && item.gameObject != null)
+            {
+                UnityEngine.Object.Destroy(item.gameObject);
+            }
+        }
+        m_DicWindow.Clear();
+    }
+
     #region OpenWindow 打开窗口
     /// <summary>
     /// 打开窗口
@@ -39,7 +51,7 @@ public class UIViewUtil : Singleton<UIViewUtil>
 
         GameObject obj = null;
         //如果窗口不存在 则
-        if (!m_DicWindow.ContainsKey(type))
+        if (!m_DicWindow.ContainsKey(type) || m_DicWindow[type] == null)
         {
             //枚举的名称要和预设的名称对应
             obj = ResourcesMgr.Instance.Load(ResourcesMgr.ResourceType.UIWindow, string.Format("pan_{0}", type.ToString()), cache: true);
@@ -48,9 +60,9 @@ public class UIViewUtil : Singleton<UIViewUtil>
             if (windowBase == null) return null;
             if(onshow != null)
             {
-                windowBase.OnShow = onshow;
+                windowBase.OnLoadComplete = onshow;
             }
-            m_DicWindow.Add(type, windowBase);
+            m_DicWindow[type] = windowBase;
 
             windowBase.CurrentUIType = type;
             Transform transParent = null;

@@ -21,6 +21,14 @@ public abstract class RoleStateAbstract
     /// </summary>
     public AnimatorStateInfo CurrRoleAnimatorStateInfo { get; set; }
 
+    protected RoleAnimatorState CurrState
+    {
+        get
+        {
+            return (RoleAnimatorState)CurrRoleFSMMgr.CurrRoleCtrl.Animator.GetInteger(ToAnimatorCondition.CurrState.ToString());
+        }
+    }
+
     /// <summary>
     /// 构造函数
     /// </summary>
@@ -33,7 +41,7 @@ public abstract class RoleStateAbstract
     /// <summary>
     /// 进入状态
     /// </summary>
-    public virtual void OnEnter() { }
+    public virtual void OnEnter(){ }
 
     /// <summary>
     /// 执行状态

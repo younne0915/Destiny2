@@ -43,6 +43,6 @@ public class UIPlayerInfo : MonoBehaviour
 
     public void SetPlayerInfo()
     {
-        lblNickName.text = GlobalInit.Instance.CurrPlayer.CurrRoleInfo.NickName;
+        //lblNickName.text = GlobalInit.Instance.CurrPlayer.CurrRoleInfo.NickName;
     }
 }

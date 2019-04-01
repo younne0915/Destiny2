@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 
 public class AssetBundleLoader : System.IDisposable
@@ -11,7 +11,7 @@ public class AssetBundleLoader : System.IDisposable
         byte[] buffer = LocalFileMgr.Instance.GetBuffer(fullPath);
         if(buffer != null)
         {
-            bundle = AssetBundle.CreateFromMemoryImmediate(buffer);
+            bundle = AssetBundle.LoadFromMemory(buffer);
         }
         else
         {
