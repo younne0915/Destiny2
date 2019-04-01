@@ -60,7 +60,7 @@ public class RoleMainPlayerCityAI : IRoleAI
                         {
                             int ret = 0;
                             float dis1 = Vector3.Distance(r1.transform.position, CurrRole.transform.position);
-                            float dis2 = Vector3.Distance(r1.transform.position, CurrRole.transform.position);
+                            float dis2 = Vector3.Distance(r2.transform.position, CurrRole.transform.position);
 
                             if (dis1 < dis2)
                             {

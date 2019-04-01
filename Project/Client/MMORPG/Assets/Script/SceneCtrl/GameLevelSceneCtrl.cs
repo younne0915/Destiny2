@@ -23,7 +23,10 @@ public class GameLevelSceneCtrl : GameSceneCtrlBase
 
     private int m_CurrRegionMonsterCount;
 
-    private List<GameLevelMonsterEntity> m_RegionMonsterList = new List<GameLevelMonsterEntity>();
+    private List<GameLevelMonsterEntity> m_TempMonsterList;
+    private Dictionary<int, int> m_CurrRegionMonsterCountDic;
+
+    private List<int> m_CurrRegionMonsterIdList;
 
     private float m_MonsterCreateTime = 0;
 
@@ -66,6 +69,13 @@ public class GameLevelSceneCtrl : GameSceneCtrlBase
         base.OnStart();
         m_CurrGameLevelId = SceneMgr.Instance.CurrGameLevelId;
         m_CurrGrade = SceneMgr.Instance.CurrGameLevelGrade;
+
+
+        m_CurrRegionLiveMonsterList = new List<RoleCtrl>();
+        m_CurrRegionMonsterCountDic = new Dictionary<int, int>();
+        m_CurrRegionMonsterIdList = new List<int>();
+        m_TempMonsterList = new List<GameLevelMonsterEntity>();
+
     }
 
     protected override void OnLoadUIMainCityView()
@@ -77,8 +87,6 @@ public class GameLevelSceneCtrl : GameSceneCtrlBase
 
         m_AllMonsterCount = GameLevelMonsterDBModel.Instance.GetGameLevelMonsterTotalCount(m_CurrGameLevelId, m_CurrGrade);
         m_MonsterIdList = GameLevelMonsterDBModel.Instance.GetGameLevelMonsterIdList(m_CurrGameLevelId, m_CurrGrade);
-
-        m_CurrRegionLiveMonsterList = new List<RoleCtrl>();
 
         EnterRegionCtrl();
     }
@@ -142,7 +150,22 @@ public class GameLevelSceneCtrl : GameSceneCtrlBase
 
         m_CurrRegionMonsterCount = GameLevelMonsterDBModel.Instance.GetRegionMonsterTotalCount(m_CurrGameLevelId, m_CurrGrade, regionId);
 
-        GameLevelMonsterDBModel.Instance.GetGameLevelMonsterEntityList(m_CurrGameLevelId, m_CurrGrade, regionId, m_RegionMonsterList);
+        GameLevelMonsterDBModel.Instance.GetGameLevelMonsterEntityList(m_CurrGameLevelId, m_CurrGrade, regionId, m_TempMonsterList);
+        m_CurrRegionMonsterCountDic.Clear();
+        m_CurrRegionMonsterIdList.Clear();
+        for (int i = 0; i < m_TempMonsterList.Count; i++)
+        {
+            GameLevelMonsterEntity entity = m_TempMonsterList[i];
+            if (m_CurrRegionMonsterCountDic.ContainsKey(entity.SpriteId))
+            {
+                m_CurrRegionMonsterCountDic[entity.SpriteId] += entity.SpriteCount;
+            }
+            else
+            {
+                m_CurrRegionMonsterCountDic.Add(entity.SpriteId, entity.SpriteCount);
+            }
+            m_CurrRegionMonsterIdList.Add(entity.SpriteId);
+        }
     }
 
     private GameLevelRegionCtrl GetRegionCtrlByRegionId(int regionId)
@@ -169,7 +192,7 @@ public class GameLevelSceneCtrl : GameSceneCtrlBase
         {
             if (Time.time > m_MonsterCreateTime)
             {
-                m_MonsterCreateTime = Time.time + 1;
+                m_MonsterCreateTime = Time.time + 0.5f;
 
                 CreateMonster();
             }
@@ -182,19 +205,21 @@ public class GameLevelSceneCtrl : GameSceneCtrlBase
 
         m_CurrRegionCreatedMonsterCnt++;
 
-        if(m_RegionMonsterList.Count > 0)
+        if(m_CurrRegionMonsterCountDic.Count > 0)
         {
-            int index = UnityEngine.Random.Range(0, m_RegionMonsterList.Count);
-            GameLevelMonsterEntity gameLevelMonsterEntity = m_RegionMonsterList[index];
-            if (gameLevelMonsterEntity.SpriteCount > 0)
+            int index = UnityEngine.Random.Range(0, m_CurrRegionMonsterIdList.Count);
+            int spriteId = m_CurrRegionMonsterIdList[index];
+            
+            if (m_CurrRegionMonsterCountDic.ContainsKey(spriteId) && m_CurrRegionMonsterCountDic[spriteId] > 0)
             {
-                Transform monsterTransform = RecyclePoolMgr.Instance.Spawn(PoolType.Monster, ResourLoadType.AssetBundle, string.Format("Role/{0}", SpriteDBModel.Instance.Get(gameLevelMonsterEntity.SpriteId).PrefabName));
+
+                Transform monsterTransform = RecyclePoolMgr.Instance.Spawn(PoolType.Monster, ResourLoadType.AssetBundle, string.Format("Role/{0}", SpriteDBModel.Instance.Get(spriteId).PrefabName));
                 Transform monsterBornTransform = m_CurrGameLevelRegionCtrl.MonsterBornPos[UnityEngine.Random.Range(0, m_CurrGameLevelRegionCtrl.MonsterBornPos.Count)];
                 monsterTransform.localScale = Vector3.one;
                 RoleCtrl roleMonster = monsterTransform.GetComponent<RoleCtrl>();
                 if(roleMonster != null)
                 {
-                    SpriteEntity spriteEntity = SpriteDBModel.Instance.Get(gameLevelMonsterEntity.SpriteId);
+                    SpriteEntity spriteEntity = SpriteDBModel.Instance.Get(spriteId);
                     RoleInfoMonster infoMonster = new RoleInfoMonster();
                     if (spriteEntity != null)
                     {
@@ -221,10 +246,10 @@ public class GameLevelSceneCtrl : GameSceneCtrlBase
                     m_CurrRegionLiveMonsterList.Add(roleMonster);
                 }
 
-                gameLevelMonsterEntity.SpriteCount--;
-                if(gameLevelMonsterEntity.SpriteCount <= 0)
+                m_CurrRegionMonsterCountDic[spriteId]--;
+                if(m_CurrRegionMonsterCountDic[spriteId] <= 0)
                 {
-                    m_RegionMonsterList.RemoveAt(index);
+                    m_CurrRegionMonsterCountDic.Remove(spriteId);
                 }
             }
         }
@@ -274,7 +299,15 @@ public class GameLevelSceneCtrl : GameSceneCtrlBase
         }
     }
 
-    
+    protected override void BeforeOnDestroy()
+    {
+        base.BeforeOnDestroy();
+
+        if(GlobalInit.Instance != null)
+        {
+            GlobalInit.Instance.CurrPlayer.IsAutoFight = false;
+        }
+    }
 
 
 #if UNITY_EDITOR

@@ -33,9 +33,8 @@ public class RoleAttack
         }
 
         if (m_CurrRoleFSMMgr.IsRigidty) return;
+        RoleAttackInfo info = GetRoleAttackInfoByIndex(type, index);
 
-#if DEBUG_ROLESTATE
-        RoleAttackInfo info = GetRoleAttackInfoByIndex(type,index);
         if(info != null)
         {
             m_CurrRoleFSMMgr.CurrRoleCtrl.CurrAttackInfo = info;
@@ -44,9 +43,9 @@ public class RoleAttack
             effectTransform.rotation = m_CurrRoleFSMMgr.CurrRoleCtrl.transform.rotation;
             RecyclePoolMgr.Instance.Despawn(PoolType.Effect, effectTransform, info.EffectLifeTime);
         }
-#endif
 
-        if(info != null && info.IsDoCameraShake)
+
+        if (info != null && info.IsDoCameraShake)
         {
             CameraShake(info.CameraShakeDelay);
         }

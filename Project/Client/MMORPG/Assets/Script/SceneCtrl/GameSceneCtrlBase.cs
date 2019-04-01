@@ -85,6 +85,8 @@ public class GameSceneCtrlBase : MonoBehaviour
     /// </summary>
     private void OnPlayerClick()
     {
+        if (GlobalInit.Instance != null && GlobalInit.Instance.CurrPlayer != null && GlobalInit.Instance.CurrPlayer.IsAutoFight) return;
+
         if (EventSystem.current.IsPointerOverGameObject()) return;
 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
