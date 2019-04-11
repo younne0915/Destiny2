@@ -1,6 +1,6 @@
 //===================================================
 //作    者：边涯  http://www.u3dol.com  QQ群：87481002
-//创建时间：2019-03-24 19:58:13
+//创建时间：2019-04-04 12:24:09
 //备    注：
 //===================================================
 using System.Collections;
@@ -17,7 +17,7 @@ public struct WorldMap_OtherRoleEnterProto : IProto
     public int RoleId; //角色编号
     public string RoleNickName; //角色昵称
     public int RoleLevel; //角色等级
-    public int RoleJobId; //角色职业编号
+    public byte RoleJobId; //角色职业编号
     public int RoleCurrMP; //当前魔法
     public int RoleMaxMP; //最大魔法
     public int RoleCurrHP; //当前血量
@@ -35,7 +35,7 @@ public struct WorldMap_OtherRoleEnterProto : IProto
             ms.WriteInt(RoleId);
             ms.WriteUTF8String(RoleNickName);
             ms.WriteInt(RoleLevel);
-            ms.WriteInt(RoleJobId);
+            ms.WriteByte(RoleJobId);
             ms.WriteInt(RoleCurrMP);
             ms.WriteInt(RoleMaxMP);
             ms.WriteInt(RoleCurrHP);
@@ -57,7 +57,7 @@ public struct WorldMap_OtherRoleEnterProto : IProto
             proto.RoleId = ms.ReadInt();
             proto.RoleNickName = ms.ReadUTF8String();
             proto.RoleLevel = ms.ReadInt();
-            proto.RoleJobId = ms.ReadInt();
+            proto.RoleJobId = (byte)ms.ReadByte();
             proto.RoleCurrMP = ms.ReadInt();
             proto.RoleMaxMP = ms.ReadInt();
             proto.RoleCurrHP = ms.ReadInt();

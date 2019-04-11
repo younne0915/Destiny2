@@ -1,6 +1,6 @@
 //===================================================
 //作    者：边涯  http://www.u3dol.com  QQ群：87481002
-//创建时间：2019-03-24 19:58:13
+//创建时间：2019-04-04 12:24:09
 //备    注：
 //===================================================
 using System.Collections;
@@ -29,7 +29,7 @@ public struct WorldMap_InitRoleProto : IProto
         public int RoleCurrHP; //当前血量
         public int RoleMaxMP; //最大魔法
         public int RoleCurrMP; //当前魔法
-        public int RoleJobId; //角色职业编号
+        public byte RoleJobId; //角色职业编号
         public float RolePosX; //角色坐标X
         public float RolePosY; //角色坐标Y
         public float RolePosZ; //角色坐标Z
@@ -51,7 +51,7 @@ public struct WorldMap_InitRoleProto : IProto
                 ms.WriteInt(ItemList[i].RoleCurrHP);
                 ms.WriteInt(ItemList[i].RoleMaxMP);
                 ms.WriteInt(ItemList[i].RoleCurrMP);
-                ms.WriteInt(ItemList[i].RoleJobId);
+                ms.WriteByte(ItemList[i].RoleJobId);
                 ms.WriteFloat(ItemList[i].RolePosX);
                 ms.WriteFloat(ItemList[i].RolePosY);
                 ms.WriteFloat(ItemList[i].RolePosZ);
@@ -79,7 +79,7 @@ public struct WorldMap_InitRoleProto : IProto
                 _Item.RoleCurrHP = ms.ReadInt();
                 _Item.RoleMaxMP = ms.ReadInt();
                 _Item.RoleCurrMP = ms.ReadInt();
-                _Item.RoleJobId = ms.ReadInt();
+                _Item.RoleJobId = (byte)ms.ReadByte();
                 _Item.RolePosX = ms.ReadFloat();
                 _Item.RolePosY = ms.ReadFloat();
                 _Item.RolePosZ = ms.ReadFloat();

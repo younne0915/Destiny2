@@ -1,7 +1,7 @@
 
 //===================================================
 //作    者：边涯  http://www.u3dol.com  QQ群：87481002
-//创建时间：2019-03-27 19:13:37
+//创建时间：2019-04-09 21:54:44
 //备    注：此代码为工具生成 请勿手工修改
 //===================================================
 using System.Collections;
@@ -42,6 +42,7 @@ public partial class SkillDBModel : AbstractDBModel<SkillDBModel, SkillEntity>
         entity.BuffInfoID = parse.GetFieldValue("BuffInfoID").ToInt();
         entity.BuffTargetFilter = parse.GetFieldValue("BuffTargetFilter").ToInt();
         entity.BuffIsPercentage = parse.GetFieldValue("BuffIsPercentage").ToInt();
+        entity.AnimationInterval = parse.GetFieldValue("AnimationInterval").ToFloat();
         return entity;
     }
 }

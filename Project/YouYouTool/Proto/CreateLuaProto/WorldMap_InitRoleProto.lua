@@ -36,7 +36,7 @@ function WorldMap_InitRoleProto.SendProto(proto)
         ms:WriteInt(ItemList[i].RoleCurrHP);
         ms:WriteInt(ItemList[i].RoleMaxMP);
         ms:WriteInt(ItemList[i].RoleCurrMP);
-        ms:WriteInt(ItemList[i].RoleJobId);
+        ms:WriteByte(ItemList[i].RoleJobId);
         ms:WriteFloat(ItemList[i].RolePosX);
         ms:WriteFloat(ItemList[i].RolePosY);
         ms:WriteFloat(ItemList[i].RolePosZ);
@@ -65,7 +65,7 @@ function WorldMap_InitRoleProto.GetProto(buffer)
         _Item.RoleCurrHP = ms:ReadInt();
         _Item.RoleMaxMP = ms:ReadInt();
         _Item.RoleCurrMP = ms:ReadInt();
-        _Item.RoleJobId = ms:ReadInt();
+        _Item.RoleJobId = ms:ReadByte();
         _Item.RolePosX = ms:ReadFloat();
         _Item.RolePosY = ms:ReadFloat();
         _Item.RolePosZ = ms:ReadFloat();

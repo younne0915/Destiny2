@@ -20,7 +20,7 @@ function WorldMap_OtherRoleEnterProto.SendProto(proto)
     ms:WriteInt(proto.RoleId);
     ms:WriteUTF8String(proto.RoleNickName);
     ms:WriteInt(proto.RoleLevel);
-    ms:WriteInt(proto.RoleJobId);
+    ms:WriteByte(proto.RoleJobId);
     ms:WriteInt(proto.RoleCurrMP);
     ms:WriteInt(proto.RoleMaxMP);
     ms:WriteInt(proto.RoleCurrHP);
@@ -44,7 +44,7 @@ function WorldMap_OtherRoleEnterProto.GetProto(buffer)
     proto.RoleId = ms:ReadInt();
     proto.RoleNickName = ms:ReadUTF8String();
     proto.RoleLevel = ms:ReadInt();
-    proto.RoleJobId = ms:ReadInt();
+    proto.RoleJobId = ms:ReadByte();
     proto.RoleCurrMP = ms:ReadInt();
     proto.RoleMaxMP = ms:ReadInt();
     proto.RoleCurrHP = ms:ReadInt();
