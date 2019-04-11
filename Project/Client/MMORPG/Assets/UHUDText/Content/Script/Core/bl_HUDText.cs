@@ -46,8 +46,8 @@ public class bl_HUDText : MonoBehaviour {
     {
         for (int i = 0; i < texts.Count; i++ )
         {
-            //Destroy(texts[i].Rect.gameObject);
-            RecyclePoolMgr.Instance.Despawn(PoolType.UI, texts[i].transform);
+            Destroy(texts[i].Rect.gameObject);
+            //RecyclePoolMgr.Instance.Despawn(PoolType.UI, texts[i].transform);
             texts[i] = null;
             texts.Remove(texts[i]);
         }
@@ -81,8 +81,8 @@ public class bl_HUDText : MonoBehaviour {
                     //When player / Object death, destroy all last text.
                     if (DestroyTextOnDeath)
                     {
-                        //Destroy(texts[i].Rect.gameObject);
-                        RecyclePoolMgr.Instance.Despawn(PoolType.UI, texts[i].transform);
+                        Destroy(texts[i].Rect.gameObject);
+                        //RecyclePoolMgr.Instance.Despawn(PoolType.UI, texts[i].transform);
                         texts[i] = null;
                     }
                     texts.Remove(texts[i]);
@@ -100,8 +100,8 @@ public class bl_HUDText : MonoBehaviour {
                 //if complete fade remove and destroy text
                 if (texts[i].m_Color.a <= 0f)
                 {
-                    //Destroy(texts[i].Rect.gameObject);
-                    RecyclePoolMgr.Instance.Despawn(PoolType.UI, texts[i].transform);
+                    Destroy(texts[i].Rect.gameObject);
+                    //RecyclePoolMgr.Instance.Despawn(PoolType.UI, texts[i].transform);
                     texts[i] = null;
                     texts.Remove(texts[i]);
                 }
@@ -205,8 +205,8 @@ public class bl_HUDText : MonoBehaviour {
     /// </summary>
     public void NewText(string text, Transform trans, Color color, int size, float speed, float yAcceleration, float yAccelerationScaleFactor, bl_Guidance movement)
     {
-        //GameObject t = Instantiate(TextPrefab) as GameObject;
-        GameObject t = RecyclePoolMgr.Instance.Spawn(PoolType.UI, TextPrefab.transform).gameObject;
+        GameObject t = Instantiate(TextPrefab) as GameObject;
+        //GameObject t = RecyclePoolMgr.Instance.Spawn(PoolType.UI, TextPrefab.transform).gameObject;
         //Create new text info to instatiate 
         bl_Text item = t.GetComponent<bl_Text>();
 
@@ -218,7 +218,7 @@ public class bl_HUDText : MonoBehaviour {
         item.movement = movement;
         item.Yquickness = yAcceleration;
         item.YquicknessScaleFactor = yAccelerationScaleFactor;
-
+        t.transform.localPosition = Vector3.zero;
         t.transform.SetParent(CanvasParent, false);
         t.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
 

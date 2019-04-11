@@ -1,4 +1,4 @@
-using DG.Tweening;
+ï»¿using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -79,7 +79,7 @@ public class RoleAttack
             return false;
         }
 
-        #region ÊýÖµÏà¹Ø
+        #region æ‰¾æ•Œäººç›¸å…³
         //1.
         if (m_CurrRoleCtrl.CurrRoleType == RoleType.MainPlayer || m_CurrRoleCtrl.CurrRoleType == RoleType.Monster)
         {
@@ -90,7 +90,7 @@ public class RoleAttack
 
             if (skillLevelEntity.SpendMP > m_CurrRoleCtrl.CurrRoleInfo.CurrMP)
             {
-                AppDebug.LogError("Ä§²»×ã");
+                AppDebug.LogError("é­”ä¸è¶³");
                 return false;
             }
 
@@ -199,9 +199,38 @@ public class RoleAttack
                         if (m_CurrRoleCtrl.LockEnemy.CurrRoleInfo.RoleId == m_SearchList[i].CurrRoleInfo.RoleId)
                         {
                             needAttack++;
+                            continue;
                         }
                         if (i + 1 > needAttack) break;
                         m_EnemyList.Add(m_SearchList[i]);
+                    }
+                }
+
+                if (SceneMgr.Instance.CurrPlayType == PlayType.PVP)
+                {
+                    //å¦‚æžœæ˜¯PVPå‘é€æŠ€èƒ½æ¶ˆæ¯ç»™æœåŠ¡å™¨
+                    if (m_EnemyList.Count > 0)
+                    {
+                        WorldMap_CurrRoleUseSkillProto proto = new WorldMap_CurrRoleUseSkillProto();
+                        proto.BeAttackCount = m_EnemyList.Count;
+                        proto.RolePosX = m_CurrRoleCtrl.transform.position.x;
+                        proto.RolePosY = m_CurrRoleCtrl.transform.position.y;
+                        proto.RolePosZ = m_CurrRoleCtrl.transform.position.z;
+                        proto.RoleYAngle = m_CurrRoleCtrl.transform.eulerAngles.y;
+                        proto.SkillId = skillId;
+                        proto.SkillLevel = skillLevelEntity.Level;
+
+                        proto.ItemList = new List<WorldMap_CurrRoleUseSkillProto.BeAttackItem>();
+                        WorldMap_CurrRoleUseSkillProto.BeAttackItem item;
+                        for (int i = 0; i < m_EnemyList.Count; i++)
+                        {
+                            item = new WorldMap_CurrRoleUseSkillProto.BeAttackItem();
+                            item.BeAttackRoleId = m_EnemyList[i].CurrRoleInfo.RoleId;
+                            proto.ItemList.Add(item);
+
+                            //AppDebug.LogError(string.Format("å‘é€è§’è‰²æ”»å‡» : {0}, skillId : {1}", item.BeAttackRoleId, skillId));
+                        }
+                        NetWorkSocket.Instance.SendMsg(proto.ToArray());
                     }
                 }
             }
@@ -213,16 +242,41 @@ public class RoleAttack
                 }
             }
 
-            for (int i = 0; i < m_EnemyList.Count; i++)
+            if (m_EnemyList.Count == 0) return false;
+
+            #region æ•°å€¼ç›¸å…³
+
+            if(SceneMgr.Instance.CurrPlayType == PlayType.PVE)
             {
-                RoleTransferAttackInfo roleTransferAttackInfo = CalculateHurtValue(m_CurrRoleCtrl.LockEnemy, skillLevelEntity);
-                m_EnemyList[i].ToHurt(roleTransferAttackInfo);
+                for (int i = 0; i < m_EnemyList.Count; i++)
+                {
+                    RoleTransferAttackInfo roleTransferAttackInfo = CalculateHurtValue(m_CurrRoleCtrl.LockEnemy, skillLevelEntity);
+                    m_EnemyList[i].ToHurt(roleTransferAttackInfo);
+                }
             }
+            
+            #endregion
         }
 
         #endregion
 
-        #region ½ÇÉ«¶¯»­Ïà¹Ø
+        #region è§’è‰²åŠ¨ç”»ç›¸å…³
+        bool isPlayAttack = true;
+        if (SceneMgr.Instance.CurrPlayType == PlayType.PVE)
+        {
+            isPlayAttack = PlayAttack(type, skillId);
+        }
+        #endregion
+
+        return isPlayAttack;
+    }
+
+    public bool PlayAttack(RoleAttackType type, int skillId)
+    {
+        if (m_RoleStateAttack == null)
+        {
+            m_RoleStateAttack = m_CurrRoleFSMMgr.GetRoleState(RoleState.Attack) as RoleStateAttack;
+        }
 
         RoleAttackInfo info = GetRoleAttackInfo(type, skillId);
         if (info == null) return false;
@@ -250,9 +304,6 @@ public class RoleAttack
         m_RoleStateAttack.AnimatorConditionValue = info.Index;
         m_RoleStateAttack.AnimatorState = ConvertToAnimatorState(type, info.Index);
         m_CurrRoleFSMMgr.ChangeState(RoleState.Attack);
-
-#endregion
-
         return true;
     }
 
@@ -335,19 +386,19 @@ public class RoleAttack
         roleTransferAttackInfo.SkillId = skillLevelEntity.SkillId;
         roleTransferAttackInfo.SkillLevel = skillLevelEntity.Level;
         roleTransferAttackInfo.IsAbnormal = skillLevelEntity.AbnormalRatio == 1;
-        //1.¹¥»÷ÊýÖµ = ¹¥»÷·½µÄ×ÛºÏÕ½¶·Á¦ * (¼¼ÄÜµÄÉËº¦±¶ÂÊ * 0.01f)
+        //1.æ”»å‡»æ•°å€¼ = æ”»å‡»æ–¹çš„ç»¼åˆæˆ˜æ–—åŠ› * (æŠ€èƒ½çš„ä¼¤å®³å€çŽ‡ * 0.01f)
         float attackValue = m_CurrRoleCtrl.CurrRoleInfo.Fighting * (skillLevelEntity.HurtValueRate * 0.01f);
-        //2.»ù´¡ÉËº¦ = ¹¥»÷ÊýÖµ * ¹¥»÷ÊýÖµ / £¨¹¥»÷ÊýÖµ + ±»¹¥»÷·½µÄ·ÀÓù£©
+        //2.åŸºç¡€ä¼¤å®³ = æ”»å‡»æ•°å€¼ * æ”»å‡»æ•°å€¼ / ï¼ˆæ”»å‡»æ•°å€¼ + è¢«æ”»å‡»æ–¹çš„é˜²å¾¡ï¼‰
         float baseHurt = attackValue * attackValue / (attackValue + enemy.CurrRoleInfo.Defense);
-        //3.±©»÷¸ÅÂÊ = 0.05f + £¨¹¥»÷·½±©»÷/£¨¹¥»÷·½±©»÷+·ÀÓù·½¿¹ÐÔ£©£©* 0.1f
+        //3.æš´å‡»æ¦‚çŽ‡ = 0.05f + ï¼ˆæ”»å‡»æ–¹æš´å‡»/ï¼ˆæ”»å‡»æ–¹æš´å‡»+é˜²å¾¡æ–¹æŠ—æ€§ï¼‰ï¼‰* 0.1f
         float cri = 0.05f +( m_CurrRoleCtrl.CurrRoleInfo.Cri / (m_CurrRoleCtrl.CurrRoleInfo.Cri + enemy.CurrRoleInfo.Res)) * 0.1f;
-        //±©»÷¸ÅÂÊ = ±©»÷¸ÅÂÊ>0.5f£¿0.5f:±©»÷¸ÅÂÊ
+        //æš´å‡»æ¦‚çŽ‡ = æš´å‡»æ¦‚çŽ‡>0.5fï¼Ÿ0.5f:æš´å‡»æ¦‚çŽ‡
         cri = cri > 0.5f ? 0.5f : cri;
-        //4.ÊÇ·ñ±©»÷ = 0-1µÄËæ»úÊý <= ±©»÷¸ÅÂÊ
+        //4.æ˜¯å¦æš´å‡» = 0-1çš„éšæœºæ•° <= æš´å‡»æ¦‚çŽ‡
         bool isCri = UnityEngine.Random.Range(0f, 1f) <= cri;
-        //5.±©»÷¹¥»÷ÉËº¦±¶ÂÊ = ÓÐ±©»÷£¿1.5f£º1f
+        //5.æš´å‡»æ”»å‡»ä¼¤å®³å€çŽ‡ = æœ‰æš´å‡»ï¼Ÿ1.5fï¼š1f
         float criHurt = isCri ? 1.5f : 1;
-        //6.Ëæ»úÊý = 0.9f-1.1f
+        //6.éšæœºæ•° = 0.9f-1.1f
         float random = UnityEngine.Random.Range(0.9f, 1.1f);
         int hurtValue = Mathf.RoundToInt(baseHurt * criHurt * random);
         hurtValue = hurtValue < 1 ? 1 : hurtValue;

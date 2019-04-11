@@ -88,4 +88,7 @@ public class ConstDefine
     public const string WorldMapName = "WorldMapName";
     public const string WorldMapPostion = "WorldMapPostion";
     public const string WorldMapIco = "WorldMapIco";
+
+    public const string PlayerFailEvent = "PlayerFailEvent";
+    public const string PlayerResurgenceEvent = "PlayerResurgenceEvent";
 }

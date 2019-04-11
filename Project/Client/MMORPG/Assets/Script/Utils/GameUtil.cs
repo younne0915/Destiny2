@@ -160,9 +160,15 @@ public class GameUtil
         return Resources.Load<Sprite>(string.Format("UI/GameLevel/GameLevelIcon/{0}", pic));
     }
 
+
     public static Sprite LoadGameLevelDetailImg(string pic)
     {
         return Resources.Load<Sprite>(string.Format("UI/GameLevel/GameLevelDetail/{0}", pic));
+    }
+
+    public static Sprite LoadWorldMapIcon(string pic)
+    {
+        return Resources.Load<Sprite>(string.Format("UI/WorldMap/{0}", pic));
     }
 
     public static Vector3 GetRandomPos(Vector3 startPos, Vector3 targetPos, float distance)
@@ -172,5 +178,17 @@ public class GameUtil
         direction = Quaternion.Euler(0, UnityEngine.Random.Range(-90, 90), 0) * direction;
         direction = direction * distance * UnityEngine.Random.Range(0.8f, 1);
         return targetPos + direction;
+    }
+
+    public static float GetTotalDistance(List<Vector3> path)
+    {
+        float pathTotalDis = 0;
+        for (int i = 0; i < path.Count; i++)
+        {
+            if (i == path.Count - 1) break;
+            float distance = Vector3.Distance(path[i], path[i + 1]);
+            pathTotalDis += distance;
+        }
+        return pathTotalDis;
     }
 }

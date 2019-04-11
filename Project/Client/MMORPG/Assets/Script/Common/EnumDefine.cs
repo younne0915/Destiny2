@@ -48,6 +48,8 @@ public enum WindowUIType
     GameLevelDetail,
     GameLevelVictory,
     GameLevelFail,
+    WorldMap,
+    WorldMapFail
 }
 #endregion
 
@@ -204,6 +206,7 @@ public enum ToAnimatorCondition
     ToRun,
     ToHurt,
     ToDie,
+    ToDied,
     ToPhyAttack,
     ToSkill,
     ToXiuXian,
@@ -286,10 +289,17 @@ public enum PoolType
     Effect,
     Monster,
     UI,
+    Player,
 }
 
 public enum ResourLoadType
 {
     AssetBundle,
     Resources,
+}
+
+public enum PlayType
+{
+    PVE,
+    PVP,
 }

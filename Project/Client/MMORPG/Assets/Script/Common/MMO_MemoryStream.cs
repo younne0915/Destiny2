@@ -125,7 +125,7 @@ public class MMO_MemoryStream : MemoryStream
     /// 把一个long数据写入流
     /// </summary>
     /// <param name="value"></param>
-    public void WriteLong(int value)
+    public void WriteLong(long value)
     {
         byte[] arr = BitConverter.GetBytes(value);
         base.Write(arr, 0, arr.Length);

@@ -46,7 +46,9 @@ public class UIGameLevelVictoryView : UIWindowViewBase
         switch (go.name)
         {
             case "btnReturn":
-                SceneMgr.Instance.LoadToWorldMap(SceneMgr.Instance.CurrWorldMapId);
+                int sceneId = SceneMgr.Instance.CurrWorldMapId;
+                SceneMgr.Instance.CurrWorldMapId = 0;
+                SceneMgr.Instance.LoadToWorldMap(sceneId);
                 break;
         }
     }

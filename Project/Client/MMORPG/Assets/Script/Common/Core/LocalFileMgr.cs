@@ -18,8 +18,9 @@ public class LocalFileMgr : Singleton<LocalFileMgr>
 #elif UNITY_ANDROID || UNITY_IPHONE
     public readonly string LocalFilePath = Application.persistentDataPath + "/";
 #else
-    public readonly string LocalFilePath = Application.persistentDataPath + "/";
+    public readonly string LocalFilePath = @"F:\Unity\Project\Destiny\Destiny2\Project\Client\MMORPG\AssetBundles\Windows/";
 #endif
+
     public byte[] GetBuffer(string path)
     {
         byte[] buffer = null;

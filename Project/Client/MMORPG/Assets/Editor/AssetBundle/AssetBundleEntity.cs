@@ -11,9 +11,9 @@ public class AssetBundleEntity
 
     public string Name;
     public string Tag;
-    public int Version;
-    public long Size;
-    public string ToPath;
+    public bool IsFolder;
+    public bool IsFirstData;
+    public bool IsChecked = false;
 
     private List<string> m_PathList = new List<string>();
 

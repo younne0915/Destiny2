@@ -29,6 +29,11 @@ public class RoleMainPlayerCityAI : IRoleAI
     {
         if (CurrRole.CurrRoleFSMMgr.CurrRoleStateEnum == RoleState.Die) return;
 
+        //if(CurrRole.CurrRoleType == RoleType.MainPlayer)
+        //{
+        //    AppDebug.LogError(CurrRole.CurrRoleFSMMgr.CurrRoleStateEnum);
+        //}
+
         if (CurrRole.IsAutoFight)
         {
             AutoFightState();
@@ -153,6 +158,12 @@ public class RoleMainPlayerCityAI : IRoleAI
                 CurrRole.LockEnemy = null;
                 return;
             }
+
+            //if (CurrRole.LockEnemy.CurrRoleFSMMgr.CurrRoleStateEnum == RoleState.Die)
+            //{
+            //    CurrRole.LockEnemy = null;
+            //    return;
+            //}
 
             if (CurrRole.CurrRoleFSMMgr.CurrRoleStateEnum == RoleState.Idle)
             {

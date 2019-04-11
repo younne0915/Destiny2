@@ -53,6 +53,9 @@ public class UISceneMainCityView : UISceneViewBase
             case "btnCancelAutoFight":
                 SetAutoFightVisible(true);
                 break;
+            case "btnMenu_WorldMap":
+                UIViewMgr.Instance.OpenWindow(WindowUIType.WorldMap);
+                break;
         }
     }
 
@@ -81,6 +84,4 @@ public class UISceneMainCityView : UISceneViewBase
             go.transform.localScale = new Vector3(go.transform.localScale.x, go.transform.localScale.y*-1, go.transform.localScale.z);
         });
     }
-
-
 }

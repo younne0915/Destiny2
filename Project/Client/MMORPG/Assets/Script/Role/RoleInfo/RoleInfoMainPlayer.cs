@@ -17,6 +17,11 @@ public class RoleInfoMainPlayer : RoleInfoBase
     public byte JobId; //职业编号
     public int TotalRechargeMoney; //总充值金额
 
+    public RoleInfoMainPlayer()
+    {
+
+    }
+
     public RoleInfoMainPlayer(RoleOperation_SelectRoleInfoReturnProto proto) :base()
     {
         RoleId = proto.RoldId;
@@ -25,8 +30,8 @@ public class RoleInfoMainPlayer : RoleInfoBase
         Exp = proto.Exp;
         MaxHP = proto.MaxHP;
         MaxMP = proto.MaxMP;
-        CurrHP = proto.CurrHP + 9999999;
-        CurrMP = proto.CurrMP + 9999999;
+        CurrHP = proto.CurrHP;
+        CurrMP = proto.CurrMP;
         Attack = proto.Attack;
         Defense = proto.Defense;
         Hit = proto.Hit;
@@ -38,5 +43,13 @@ public class RoleInfoMainPlayer : RoleInfoBase
         Gold = proto.Gold;
         JobId = proto.JobId;
         TotalRechargeMoney = proto.TotalRechargeMoney;
+
+        LastInWorldMapId = proto.LastInWorldMapId;
+        string[] arr = proto.LastInWorldMapPos.Split('_');
+        if(arr != null && arr.Length >= 4)
+        {
+            LastInWorldMapPos = new Vector3(arr[0].ToFloat(), arr[1].ToFloat(), arr[2].ToFloat());
+            LastInWorldMapRotateY = arr[3].ToFloat();
+        }
     }
 }

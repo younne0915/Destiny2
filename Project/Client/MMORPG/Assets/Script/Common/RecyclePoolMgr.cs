@@ -39,9 +39,9 @@ public class RecyclePoolMgr : SingletonMono<RecyclePoolMgr>
             if(spawnPool.GetPrefabPool(prefab) == null)
             {
                 PrefabPool prefabPool = new PrefabPool(prefab);
-                prefabPool.preloadAmount = 1;
+                prefabPool.preloadAmount = 5;
                 prefabPool.cullDespawned = true;
-                prefabPool.cullAbove = 1;
+                prefabPool.cullAbove = 5;
                 prefabPool.cullDelay = 2;
                 prefabPool.cullMaxPerPass = 5;
 
@@ -56,9 +56,9 @@ public class RecyclePoolMgr : SingletonMono<RecyclePoolMgr>
             spawnPool.group.localScale = Vector3.one;
 
             PrefabPool prefabPool = new PrefabPool(prefab);
-            prefabPool.preloadAmount = 1;
+            prefabPool.preloadAmount = 5;
             prefabPool.cullDespawned = true;
-            prefabPool.cullAbove = 1;
+            prefabPool.cullAbove = 5;
             prefabPool.cullDelay = 2;
             prefabPool.cullMaxPerPass = 5;
 
@@ -73,6 +73,10 @@ public class RecyclePoolMgr : SingletonMono<RecyclePoolMgr>
     {
         if (m_SpawnPoolDic.ContainsKey(poolType))
         {
+            SpawnPool spawnPool = m_SpawnPoolDic[poolType];
+            prefabTrans.SetParent(spawnPool.group);
+            prefabTrans.localPosition = Vector3.zero;
+            prefabTrans.localScale = Vector3.one;
             m_SpawnPoolDic[poolType].Despawn(prefabTrans);
         }
         else
@@ -102,17 +106,16 @@ public class RecyclePoolMgr : SingletonMono<RecyclePoolMgr>
     protected override void BeforeOnDestroy()
     {
         base.BeforeOnDestroy();
+        Clear();
+    }
+
+    public void Clear()
+    {
         foreach (var item in m_SpawnPoolDic.Values)
         {
             Destroy(item.gameObject);
         }
         m_SpawnPoolDic.Clear();
-
         m_CacheResDic.Clear();
-    }
-
-    public void Clear()
-    {
-        Destroy(gameObject);
     }
 }

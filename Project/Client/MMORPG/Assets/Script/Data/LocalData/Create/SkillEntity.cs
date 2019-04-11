@@ -1,7 +1,7 @@
 
 //===================================================
 //作    者：边涯  http://www.u3dol.com  QQ群：87481002
-//创建时间：2019-03-24 17:12:59
+//创建时间：2019-04-09 21:54:44
 //备    注：此代码为工具生成 请勿手工修改
 //===================================================
 using System.Collections;
@@ -85,5 +85,10 @@ public partial class SkillEntity : AbstractEntity
     /// Buff效果值是否按百分比计算
     /// </summary>
     public int BuffIsPercentage { get; set; }
+
+    /// <summary>
+    /// 动画时长
+    /// </summary>
+    public float AnimationInterval { get; set; }
 
 }

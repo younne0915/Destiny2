@@ -29,7 +29,7 @@ public class GlobalInit : MonoBehaviour
     /// <summary>
     /// 账户服务器地址
     /// </summary>
-    public const string WebAccountUrl = "http://172.17.170.8:5510/";
+    public const string WebAccountUrl = "http://172.17.107.122:5510/";
 
     #endregion
 
@@ -62,7 +62,7 @@ public class GlobalInit : MonoBehaviour
     private long m_StartServerTime;
 
     [HideInInspector]
-    public long CurrServerTime
+    public long CurrHttpServerTime
     {
         get
         {
@@ -77,7 +77,13 @@ public class GlobalInit : MonoBehaviour
     public RetAccountEntity CurrentAccount;
 
     [HideInInspector]
-    public Dictionary<int, GameObject> JobObjectDic = new Dictionary<int, GameObject>();
+    public float PingValue;
+
+    [HideInInspector]
+    public long BeganGameServerTime;
+
+    [HideInInspector]
+    public float CheckTime;
 
 
     void Awake()
@@ -109,5 +115,10 @@ public class GlobalInit : MonoBehaviour
         {
             m_StartServerTime = long.Parse(obj.Value.ToString());
         }
+    }
+
+    public long GetCurrServetTime()
+    {
+        return (long)(Time.realtimeSinceStartup * 1000 - CheckTime) + BeganGameServerTime;
     }
 }

@@ -89,6 +89,11 @@ public class GameSceneCtrlBase : MonoBehaviour
 
         if (EventSystem.current.IsPointerOverGameObject()) return;
 
+        if (WorldMapCtrl.Instance != null)
+        {
+            WorldMapCtrl.Instance.AutoMove = false;
+        }
+
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
         RaycastHit hitInfo;
@@ -97,7 +102,7 @@ public class GameSceneCtrlBase : MonoBehaviour
         if (hitArr.Length > 0)
         {
             RoleCtrl hitRole = hitArr[0].collider.gameObject.GetComponent<RoleCtrl>();
-            if (hitRole.CurrRoleType == RoleType.Monster)
+            if (hitRole.CurrRoleType == RoleType.Monster || hitRole.CurrRoleType == RoleType.OtherPlayer)
             {
                 GlobalInit.Instance.CurrPlayer.LockEnemy = hitRole;
                 return;

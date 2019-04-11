@@ -29,7 +29,7 @@ public class RoleStateIdle : RoleStateAbstract
     public override void OnEnter()
     {
         base.OnEnter();
-        if(CurrRoleFSMMgr.CurrRoleCtrl.CurrRoleType == RoleType.MainPlayer)
+        if(CurrRoleFSMMgr.CurrRoleCtrl.CurrRoleType == RoleType.MainPlayer || CurrRoleFSMMgr.CurrRoleCtrl.CurrRoleType == RoleType.OtherPlayer)
         {
             SetMainPlayerIdleBranchState();
         }
@@ -37,6 +37,13 @@ public class RoleStateIdle : RoleStateAbstract
         {
             SetMonsterIdleBranchState();
         }
+        //if(CurrRoleFSMMgr.CurrRoleCtrl.CurrRoleInfo != null)
+        //{
+        //    if (CurrRoleFSMMgr.CurrRoleCtrl.CurrRoleInfo.RoleId == GlobalInit.Instance.CurrPlayer.CurrRoleInfo.RoleId)
+        //    {
+        //        AppDebug.LogError("idle enter");
+        //    }
+        //}
     }
 
     private void SetMonsterIdleBranchState()
@@ -69,13 +76,15 @@ public class RoleStateIdle : RoleStateAbstract
 
         CurrRoleAnimatorStateInfo = CurrRoleFSMMgr.CurrRoleCtrl.Animator.GetCurrentAnimatorStateInfo(0);
 
-        if (CurrRoleFSMMgr.CurrRoleCtrl.CurrRoleType == RoleType.MainPlayer)
+        if (CurrRoleFSMMgr.CurrRoleCtrl.CurrRoleType == RoleType.MainPlayer || CurrRoleFSMMgr.CurrRoleCtrl.CurrRoleType == RoleType.OtherPlayer)
         {
-            if (!CurrRoleAnimatorStateInfo.IsName(RoleAnimatorState.Idle_Normal.ToString()) ||
-                !CurrRoleAnimatorStateInfo.IsName(RoleAnimatorState.Idle_Fight.ToString()))
+            if (!CurrRoleAnimatorStateInfo.IsName(RoleAnimatorState.Idle_Normal.ToString()) && 
+                !CurrRoleAnimatorStateInfo.IsName(RoleAnimatorState.Idle_Fight.ToString()) &&
+                !CurrRoleAnimatorStateInfo.IsName(RoleAnimatorState.XiuXian.ToString()))
             {
-                SetMainPlayerIdleBranchState();
+
                 CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(ToAnimatorCondition.CurrState.ToString(), (int)RoleAnimatorState.None);
+                SetMainPlayerIdleBranchState();
             }
 
             if (CurrRoleAnimatorStateInfo.IsName(RoleAnimatorState.Idle_Normal.ToString()) && CurrState != RoleAnimatorState.Idle_Normal)
@@ -100,6 +109,7 @@ public class RoleStateIdle : RoleStateAbstract
                     m_NextChangeTime = Time.time + m_ChangeStep;
 
                     CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToIdleNormal.ToString(), false);
+                    CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(ToAnimatorCondition.CurrState.ToString(), (int)RoleAnimatorState.None);
                     CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToXiuXian.ToString(), true);
                 }
 
@@ -107,8 +117,9 @@ public class RoleStateIdle : RoleStateAbstract
                 {
                     if (CurrRoleAnimatorStateInfo.IsName(RoleAnimatorState.XiuXian.ToString()) && CurrRoleAnimatorStateInfo.normalizedTime > 1)
                     {
-                        CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToIdleNormal.ToString(), true);
+                        CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(ToAnimatorCondition.CurrState.ToString(), (int)RoleAnimatorState.None);
                         CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToXiuXian.ToString(), false);
+                        CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToIdleNormal.ToString(), true);
                     }
                 }
             }
@@ -117,8 +128,8 @@ public class RoleStateIdle : RoleStateAbstract
         {
             if (!CurrRoleAnimatorStateInfo.IsName(RoleAnimatorState.Idle_Fight.ToString()))
             {
-                SetMonsterIdleBranchState();
                 CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(ToAnimatorCondition.CurrState.ToString(), (int)RoleAnimatorState.None);
+                SetMonsterIdleBranchState();
             }
 
             if (CurrRoleAnimatorStateInfo.IsName(RoleAnimatorState.Idle_Fight.ToString()) && CurrState != RoleAnimatorState.Idle_Fight)
@@ -135,7 +146,7 @@ public class RoleStateIdle : RoleStateAbstract
     public override void OnLeave()
     {
         base.OnLeave();
-        if (CurrRoleFSMMgr.CurrRoleCtrl.CurrRoleType == RoleType.MainPlayer)
+        if (CurrRoleFSMMgr.CurrRoleCtrl.CurrRoleType == RoleType.MainPlayer || CurrRoleFSMMgr.CurrRoleCtrl.CurrRoleType == RoleType.OtherPlayer)
         {
             if (CurrRoleFSMMgr.ToRoleIdleState == RoleIdleState.IdleNormal)
             {

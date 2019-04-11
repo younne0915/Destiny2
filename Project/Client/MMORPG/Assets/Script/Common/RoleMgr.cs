@@ -7,7 +7,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class RoleMgr:Singleton<RoleMgr> 
+public class RoleMgr : Singleton<RoleMgr>
 {
     private bool m_IsMainPlayerInit = false;
     /// <summary>
@@ -16,17 +16,19 @@ public class RoleMgr:Singleton<RoleMgr>
     public void InitMainPlayer()
     {
         if (m_IsMainPlayerInit) return;
-        if(GlobalInit.Instance.MainPlayerInfo != null)
+        if (GlobalInit.Instance.MainPlayerInfo != null)
         {
-            GameObject mainPlayer = Object.Instantiate(GlobalInit.Instance.JobObjectDic[GlobalInit.Instance.MainPlayerInfo.JobId]);
-            Object.DontDestroyOnLoad(mainPlayer);
-            GlobalInit.Instance.CurrPlayer = mainPlayer.GetComponent<RoleCtrl>();
             JobEntity jobEntity = JobDBModel.Instance.Get(GlobalInit.Instance.MainPlayerInfo.JobId);
-            if(jobEntity != null)
+            if (jobEntity != null)
             {
+                GameObject mainPlayer = GameObject.Instantiate(AssetBundleMgr.Instance.Load(string.Format("Role/{0}.assetbundle", jobEntity.PrefabName), jobEntity.PrefabName));
+                //GameObject mainPlayer = RecyclePoolMgr.Instance.Spawn(PoolType.Player, ResourLoadType.AssetBundle, string.Format("Role/{0}", jobEntity.PrefabName)).gameObject;
+                mainPlayer.SetParent(null);
+                Object.DontDestroyOnLoad(mainPlayer);
+                GlobalInit.Instance.CurrPlayer = mainPlayer.GetComponent<RoleCtrl>();
                 GlobalInit.Instance.MainPlayerInfo.SetPhySkillId(jobEntity.UsedPhyAttackIds);
+                GlobalInit.Instance.CurrPlayer.Init(RoleType.MainPlayer, GlobalInit.Instance.MainPlayerInfo, new RoleMainPlayerCityAI(GlobalInit.Instance.CurrPlayer));
             }
-            GlobalInit.Instance.CurrPlayer.Init(RoleType.MainPlayer, GlobalInit.Instance.MainPlayerInfo, new RoleMainPlayerCityAI(GlobalInit.Instance.CurrPlayer));
 
         }
         m_IsMainPlayerInit = true;
@@ -58,8 +60,8 @@ public class RoleMgr:Singleton<RoleMgr>
 
     public GameObject LoadPlayer(int jobId)
     {
-        GameObject obj = GlobalInit.Instance.JobObjectDic[jobId];
-        return Object.Instantiate(obj);
+        JobEntity jobEntity = JobDBModel.Instance.Get(jobId);
+        return RecyclePoolMgr.Instance.Spawn(PoolType.Player, ResourLoadType.AssetBundle, string.Format("Role/{0}", jobEntity.PrefabName)).gameObject;
     }
 
     public GameObject LoadNPC(string prefabName)

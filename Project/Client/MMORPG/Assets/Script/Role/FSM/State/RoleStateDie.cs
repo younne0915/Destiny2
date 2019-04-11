@@ -34,18 +34,31 @@ public class RoleStateDie : RoleStateAbstract
     public override void OnEnter()
     {
         base.OnEnter();
-        CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToDie.ToString(), true);
-        if(OnRoleDie != null)
+
+        if (CurrRoleFSMMgr.CurrRoleCtrl.AlreadyDied)
         {
-            OnRoleDie();
+            CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToDied.ToString(), true);
         }
-        m_DieDelayTime = 0;
+        else
+        {
+            CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToDie.ToString(), true);
+            if (OnRoleDie != null)
+            {
+                OnRoleDie();
+            }
+            m_DieDelayTime = 0;
 
-        Transform effectTransform = RecyclePoolMgr.Instance.Spawn( PoolType.Effect, ResourLoadType.AssetBundle, "Effect/Effect_PenXue");
-        effectTransform.position = CurrRoleFSMMgr.CurrRoleCtrl.transform.position;
-        effectTransform.rotation = CurrRoleFSMMgr.CurrRoleCtrl.transform.rotation;
+            Transform effectTransform = RecyclePoolMgr.Instance.Spawn(PoolType.Effect, ResourLoadType.AssetBundle, "Effect/Effect_PenXue");
+            effectTransform.position = CurrRoleFSMMgr.CurrRoleCtrl.transform.position;
+            effectTransform.rotation = CurrRoleFSMMgr.CurrRoleCtrl.transform.rotation;
 
-        m_IsDestroy = false;
+            m_IsDestroy = false;
+
+            if (CurrRoleFSMMgr.CurrRoleCtrl.CurrRoleType == RoleType.OtherPlayer)
+            {
+                AppDebug.LogError("die enter nickName : " + CurrRoleFSMMgr.CurrRoleCtrl.CurrRoleInfo.RoleNickName + " , Time : " + Time.realtimeSinceStartup);
+            }
+        }
     }
 
     /// <summary>
@@ -55,32 +68,57 @@ public class RoleStateDie : RoleStateAbstract
     {
         base.OnUpdate();
 
-        if (!m_IsDestroy)
+        if (CurrRoleFSMMgr.CurrRoleCtrl.AlreadyDied)
         {
-            m_DieDelayTime += Time.deltaTime;
-            if (m_DieDelayTime > 3)
+            CurrRoleAnimatorStateInfo = CurrRoleFSMMgr.CurrRoleCtrl.Animator.GetCurrentAnimatorStateInfo(0);
+            if (CurrRoleAnimatorStateInfo.IsName(RoleAnimatorState.Died.ToString()))
             {
-                if (OnRoleDestroy != null)
+                if (CurrState != RoleAnimatorState.Died)
                 {
-                    OnRoleDestroy();
+                    CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(ToAnimatorCondition.CurrState.ToString(), (int)RoleAnimatorState.Died);
                 }
-                m_IsDestroy = true;
             }
-        }
-        
-        CurrRoleAnimatorStateInfo = CurrRoleFSMMgr.CurrRoleCtrl.Animator.GetCurrentAnimatorStateInfo(0);
-        if (CurrRoleAnimatorStateInfo.IsName(RoleAnimatorState.Die.ToString()))
-        {
-            if(CurrState != RoleAnimatorState.Die)
+            else
             {
-                CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(ToAnimatorCondition.CurrState.ToString(), (int)RoleAnimatorState.Die);
+                CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToDied.ToString(), true);
+                CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(ToAnimatorCondition.CurrState.ToString(), (int)RoleAnimatorState.None);
             }
         }
         else
         {
-            CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToDie.ToString(), true);
-            CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(ToAnimatorCondition.CurrState.ToString(), (int)RoleAnimatorState.None);
+            if (!m_IsDestroy)
+            {
+                m_DieDelayTime += Time.deltaTime;
+                if (m_DieDelayTime > 3)
+                {
+                    if (OnRoleDestroy != null)
+                    {
+                        OnRoleDestroy();
+
+                        if (CurrRoleFSMMgr.CurrRoleCtrl.CurrRoleInfo.RoleId == GlobalInit.Instance.CurrPlayer.CurrRoleInfo.RoleId)
+                        {
+                            EventDispatcher.Instance.Dispatch(ConstDefine.PlayerFailEvent, null);
+                        }
+                    }
+                    m_IsDestroy = true;
+                }
+            }
+
+            CurrRoleAnimatorStateInfo = CurrRoleFSMMgr.CurrRoleCtrl.Animator.GetCurrentAnimatorStateInfo(0);
+            if (CurrRoleAnimatorStateInfo.IsName(RoleAnimatorState.Die.ToString()))
+            {
+                if (CurrState != RoleAnimatorState.Die)
+                {
+                    CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(ToAnimatorCondition.CurrState.ToString(), (int)RoleAnimatorState.Die);
+                }
+            }
+            else
+            {
+                CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToDie.ToString(), true);
+                CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(ToAnimatorCondition.CurrState.ToString(), (int)RoleAnimatorState.None);
+            }
         }
+            
     }
 
     /// <summary>
@@ -90,5 +128,7 @@ public class RoleStateDie : RoleStateAbstract
     {
         base.OnLeave();
         CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToDie.ToString(), false);
+        CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToDied.ToString(), false);
+        CurrRoleFSMMgr.CurrRoleCtrl.AlreadyDied = false;
     }
 }

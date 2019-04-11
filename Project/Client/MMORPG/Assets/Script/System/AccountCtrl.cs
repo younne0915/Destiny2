@@ -179,7 +179,8 @@ public class AccountCtrl : SystemCtrlBase<AccountCtrl>, ISystemCtrl
 
     public void QuickLogOn()
     {
-        if (!PlayerPrefs.HasKey(ConstDefine.LogOn_AccountID))
+        //if (!PlayerPrefs.HasKey(ConstDefine.LogOn_AccountID))
+        if(true)
         {
             OpenView(WindowUIType.Reg);
         }

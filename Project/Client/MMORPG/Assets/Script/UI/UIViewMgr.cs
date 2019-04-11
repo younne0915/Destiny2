@@ -20,6 +20,8 @@ public class UIViewMgr : Singleton<UIViewMgr>
         m_systemCtrlDic.Add(WindowUIType.GameLevelDetail, GameLevelCtrl.Instance);
         m_systemCtrlDic.Add(WindowUIType.GameLevelVictory, GameLevelCtrl.Instance);
         m_systemCtrlDic.Add(WindowUIType.GameLevelFail, GameLevelCtrl.Instance);
+        m_systemCtrlDic.Add(WindowUIType.WorldMap, WorldMapCtrl.Instance);
+        m_systemCtrlDic.Add(WindowUIType.WorldMapFail, WorldMapCtrl.Instance);
     }
 
     public void OpenWindow(WindowUIType type)

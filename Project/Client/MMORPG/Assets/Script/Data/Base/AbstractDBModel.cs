@@ -54,7 +54,14 @@ public abstract class AbstractDBModel <T, P>
 
     private void LoadData()
     {
-        using (GameDataTableParser paser = new GameDataTableParser(string.Format(@"www\Data\{0}", FileName)))
+#if UNITY_EDITOR
+        string path = string.Format(@"www\Data\{0}", FileName);
+#elif UNITY_ANDROID || UNITY_IPHONE
+   string path = string.Format(@"www\Data\{0}", FileName);
+#else
+        string path = string.Format(@"F:\Unity\Project\Destiny\Destiny2\Project\Client\MMORPG\www\Data\{0}", FileName);
+#endif
+        using (GameDataTableParser paser = new GameDataTableParser(path))
         {
             while (!paser.Eof)
             {

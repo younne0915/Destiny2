@@ -68,8 +68,8 @@ public class RoleStateAttack : RoleStateAbstract
         }
         else
         {
-            CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(AnimatorConditionName.ToString(), AnimatorConditionValue);
             CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(ToAnimatorCondition.CurrState.ToString(), 0);
+            CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(AnimatorConditionName.ToString(), AnimatorConditionValue);
         }
     }
 

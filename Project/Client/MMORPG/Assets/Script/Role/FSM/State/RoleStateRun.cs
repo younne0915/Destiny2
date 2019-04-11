@@ -21,6 +21,8 @@ public class RoleStateRun : RoleStateAbstract
     /// </summary>
     private Quaternion m_TargetQuaternion;
 
+    private float m_Speed;
+
     /// <summary>
     /// 构造函数
     /// </summary>
@@ -74,8 +76,8 @@ public class RoleStateRun : RoleStateAbstract
         }
         else
         {
-            CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToRun.ToString(), true);
             CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetInteger(ToAnimatorCondition.CurrState.ToString(), (int)RoleAnimatorState.None);
+            CurrRoleFSMMgr.CurrRoleCtrl.Animator.SetBool(ToAnimatorCondition.ToRun.ToString(), true);
         }
 
         if (CurrRoleFSMMgr.CurrRoleCtrl.AStarPath == null)
@@ -109,9 +111,10 @@ public class RoleStateRun : RoleStateAbstract
             CurrRoleFSMMgr.CurrRoleCtrl.transform.position.y,
            CurrRoleFSMMgr.CurrRoleCtrl.AStarPath.vectorPath[index].z);
 
+        m_Speed = CurrRoleFSMMgr.CurrRoleCtrl.ModifySpeed > 0 ? CurrRoleFSMMgr.CurrRoleCtrl.ModifySpeed : CurrRoleFSMMgr.CurrRoleCtrl.Speed;
         Vector3 direction = pathProcessPoint - CurrRoleFSMMgr.CurrRoleCtrl.transform.position;
         direction = direction.normalized; //归一化
-        direction = direction * Time.deltaTime * CurrRoleFSMMgr.CurrRoleCtrl.Speed;
+        direction = direction * Time.deltaTime * m_Speed;
         direction.y = 0;
 
         //让角色缓慢转身

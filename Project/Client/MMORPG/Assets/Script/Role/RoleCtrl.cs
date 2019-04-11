@@ -7,6 +7,7 @@ using UnityEngine;
 using System.Collections;
 using Pathfinding;
 using System;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(Seeker))]
 [RequireComponent(typeof(FunnelModifier))]
@@ -31,7 +32,6 @@ public class RoleCtrl : MonoBehaviour
     /// <summary>
     /// 动画
     /// </summary>
-    [SerializeField]
     public Animator Animator;
 
     /// <summary>
@@ -49,8 +49,14 @@ public class RoleCtrl : MonoBehaviour
     /// <summary>
     /// 移动速度
     /// </summary>
-    [SerializeField]
+    [HideInInspector]
     public float Speed = 10f;
+
+    /// <summary>
+    /// 移动速度
+    /// </summary>
+    [HideInInspector]
+    public float ModifySpeed = 10f;
 
     /// <summary>
     /// 出生点
@@ -114,6 +120,10 @@ public class RoleCtrl : MonoBehaviour
 
     //=============================寻路相关=======================================
     private Seeker m_Seeker;
+    public Seeker Seeker
+    {
+        get { return m_Seeker; }
+    }
 
     [HideInInspector]
     public ABPath AStarPath;
@@ -145,6 +155,8 @@ public class RoleCtrl : MonoBehaviour
             }
         }
     }
+
+    public bool AlreadyDied = false;
 
     public delegate void OnValueChangeHandler(ValueChangeType type);
     public OnValueChangeHandler OnHPChange;
@@ -189,14 +201,43 @@ public class RoleCtrl : MonoBehaviour
         }
         else
         {
-            ToIdle(RoleIdleState.IdleNormal);
+            if (CurrRoleType == RoleType.OtherPlayer && CurrRoleInfo.CurrHP <= 0)
+            {
+                ToDie(true);
+            }
+            else
+            {
+                ToIdle(RoleIdleState.IdleNormal);
+            }
         }
     }
 
     private void OnRoleDestroyCallback()
     {
-        RecyclePoolMgr.Instance.Despawn(PoolType.Monster, transform);
+        //AppDebug.LogError("OnRoleDestroyCallback");
+        //if (CharacterController != null)
+        //{
+        //    CharacterController.enabled = true;
+        //}
 
+        //if (CurrRoleType == RoleType.Monster)
+        //{
+        //    RecyclePoolMgr.Instance.Despawn(PoolType.Monster, transform);
+        //    ToIdle(RoleIdleState.IdleFight);
+        //}
+        //else if (CurrRoleType == RoleType.OtherPlayer)
+        //{
+        //    AppDebug.LogError("OnRoleDestroyCallback OtherPlayer");
+        //    RecyclePoolMgr.Instance.Despawn(PoolType.Player, transform);
+        //    ToIdle(RoleIdleState.IdleNormal);
+        //}
+
+        DespawnHeadBar();
+    }
+
+    public void RoleRecycle()
+    {
+        AppDebug.LogError("RoleRecycle");
         if (CharacterController != null)
         {
             CharacterController.enabled = true;
@@ -204,16 +245,25 @@ public class RoleCtrl : MonoBehaviour
 
         if (CurrRoleType == RoleType.Monster)
         {
+            RecyclePoolMgr.Instance.Despawn(PoolType.Monster, transform);
             ToIdle(RoleIdleState.IdleFight);
         }
-        else
+        else if (CurrRoleType == RoleType.OtherPlayer)
         {
+            AppDebug.LogError("OnRoleDestroyCallback OtherPlayer");
+            RecyclePoolMgr.Instance.Despawn(PoolType.Player, transform);
             ToIdle(RoleIdleState.IdleNormal);
         }
 
-        if (roleHeadBarView != null)
+        DespawnHeadBar();
+    }
+
+    public void DespawnHeadBar()
+    {
+        if (m_HeadBar != null)
         {
-            Destroy(roleHeadBarView.gameObject);
+            //Destroy(roleHeadBarView.gameObject);
+            RecyclePoolMgr.Instance.Despawn(PoolType.UI, m_HeadBar.transform);
         }
     }
 
@@ -236,12 +286,13 @@ public class RoleCtrl : MonoBehaviour
     {
         if(roleHeadBarView != null)
         {
+            AppDebug.LogError("OnRoleHurtCallback : " + (float)CurrRoleInfo.CurrHP / CurrRoleInfo.MaxHP);
             roleHeadBarView.Hurt(0, (float)CurrRoleInfo.CurrHP / CurrRoleInfo.MaxHP);
         }
 
         if (CurrRoleType == RoleType.MainPlayer)
         {
-            if(OnHPChange != null)
+            if (OnHPChange != null)
             {
                 OnHPChange(ValueChangeType.Subtrack);
             }
@@ -321,13 +372,18 @@ public class RoleCtrl : MonoBehaviour
         if (m_HeadBarPos == null) return;
 
         //克隆预设
-        m_HeadBar = ResourcesMgr.Instance.Load(ResourcesMgr.ResourceType.UIOther, "RoleHeadBar");
+        //m_HeadBar = ResourcesMgr.Instance.Load(ResourcesMgr.ResourceType.UIOther, "RoleHeadBar");
+        m_HeadBar = RecyclePoolMgr.Instance.Spawn( PoolType.UI, ResourLoadType.Resources, "UIPrefab/UIOther/RoleHeadBar").gameObject;
         m_HeadBar.transform.parent = RoleHeadBarRoot.Instance.gameObject.transform;
         m_HeadBar.transform.localScale = Vector3.one;
         m_HeadBar.transform.localPosition = Vector3.zero;
 
         roleHeadBarView = m_HeadBar.GetComponent<RoleHeadBarView>();
 
+        if(CurrRoleType == RoleType.OtherPlayer)
+        {
+            AppDebug.LogError("CurrRoleInfo.MaxHP = " + CurrRoleInfo.MaxHP);
+        }
         //给预设赋值
         roleHeadBarView.Init(m_HeadBarPos, CurrRoleInfo.RoleNickName, (float)CurrRoleInfo.CurrHP / CurrRoleInfo.MaxHP, isShowHPBar: (CurrRoleType == RoleType.MainPlayer ? false : true));
     }
@@ -337,25 +393,27 @@ public class RoleCtrl : MonoBehaviour
 
     public void ToResurgence(RoleIdleState roleIdleState = RoleIdleState.IdleNormal)
     {
-        if(CharacterController != null)
+        if (CharacterController != null)
         {
             CharacterController.enabled = true;
         }
 
         CurrRoleInfo.CurrHP = CurrRoleInfo.MaxHP;
         CurrRoleInfo.CurrMP = CurrRoleInfo.MaxMP;
+
+        if (CurrRoleType == RoleType.OtherPlayer)
+        {
+            AppDebug.LogError("CurrRoleInfo.CurrHP = " + CurrRoleInfo.CurrHP);
+        }
+
         LockEnemy = null;
         ToIdle(roleIdleState);
+        InitHeadBar();
     }
 
     public void ToIdle(RoleIdleState idleState = RoleIdleState.IdleNormal)
     {
-        //if(CurrRoleType == RoleType.MainPlayer)
-        //{
-        //    AppDebug.LogError("aaaa");
-        //}
-
-        if(idleState == RoleIdleState.IdleFight)
+        if (idleState == RoleIdleState.IdleFight)
         {
             PreIdleFightTime = Time.time;
         }
@@ -376,8 +434,11 @@ public class RoleCtrl : MonoBehaviour
         CurrRoleFSMMgr.ChangeState(RoleState.Run);
     }
 
+    private Path m_Path = null;
+
     public void MoveTo(Vector3 targetPos)
     {
+        if (CurrRoleFSMMgr == null) return;
         if (CurrRoleFSMMgr.CurrRoleStateEnum == RoleState.Die) return;
         if (CurrRoleFSMMgr.IsRigidty) return;
         //如果目标点不是原点 进行移动
@@ -388,10 +449,19 @@ public class RoleCtrl : MonoBehaviour
             CurrRoleFSMMgr.ChangeState(RoleState.Idle);
             return;
         }
-        if (m_Seeker.IsDone())
+        if (CurrRoleType == RoleType.OtherPlayer)
+        {
+            AppDebug.LogError(string.Format("想要 : {0}", targetPos));
+        }
+
+        //AppDebug.LogError(string.Format("寻路roleID :{0},角色名称:{1}", CurrRoleInfo.RoleId, CurrRoleInfo.RoleNickName));
+
+        //if (m_Path == null || m_Path.IsDone())
+        if(m_Seeker.IsDone())
         {
             m_Seeker.StartPath(transform.position, TargetPos, (Path p) =>
             {
+                m_Path = p;
                 if (!p.error)
                 {
                     AStarPath = (ABPath)p;
@@ -402,6 +472,11 @@ public class RoleCtrl : MonoBehaviour
                     }
                     else
                     {
+                        if (CurrRoleType == RoleType.OtherPlayer)
+                        {
+                            AppDebug.LogError(string.Format("走到 : {0}", targetPos));
+                        }
+                        AttemptSendPVPMove(TargetPos, AStarPath.vectorPath);
                         CurrRoleFSMMgr.ChangeState(RoleState.Run);
                     }
                     CurrRoleFSMMgr.CurrRoleCtrl.AStarCurrWavePointIndex = 1;
@@ -413,6 +488,28 @@ public class RoleCtrl : MonoBehaviour
                 }
             });
         }
+    }
+
+    private void AttemptSendPVPMove(Vector3 targetPos, List<Vector3> path)
+    {
+        if(CurrRoleType == RoleType.MainPlayer && SceneMgr.Instance.CurrPlayType == PlayType.PVP)
+        {
+            float pathTotalDis = GameUtil.GetTotalDistance(path);
+
+            WorldMap_CurrRoleMoveProto proto = new WorldMap_CurrRoleMoveProto();
+            proto.ServerTime = GlobalInit.Instance.GetCurrServetTime();
+            proto.TargetPosX = targetPos.x;
+            proto.TargetPosY = targetPos.y;
+            proto.TargetPosZ = targetPos.z;
+            proto.NeedTime = (int)(pathTotalDis / Speed * 1000);
+            NetWorkSocket.Instance.SendMsg(proto.ToArray());
+
+            //AppDebug.LogError(string.Format("pathTotalDis : {0}, ServerTime : {1}, NeedTime : {2}", pathTotalDis, proto.ServerTime, proto.NeedTime));
+        }
+        //else
+        //{
+        //    AppDebug.LogError(string.Format("其他玩家移动到 : {0}", targetPos));
+        //}
     }
 
     public void ToAttackByIndex(RoleAttackType type, int index)
@@ -445,8 +542,10 @@ public class RoleCtrl : MonoBehaviour
         StartCoroutine(m_Hurt.ToHurt(roleTransferAttackInfo));
     }
 
-    public void ToDie()
+    public void ToDie(bool isDied = false)
     {
+        AlreadyDied = isDied;
+        CurrRoleInfo.CurrHP = 0;
         CurrRoleFSMMgr.ChangeState(RoleState.Die);
     }
 
@@ -460,19 +559,6 @@ public class RoleCtrl : MonoBehaviour
         }
     }
 
-    #endregion
-
-    #region OnDestroy 销毁
-    /// <summary>
-    /// 销毁
-    /// </summary>
-    void OnDestroy()
-    {
-        if (m_HeadBar != null)
-        {
-            Destroy(m_HeadBar);
-        }
-    }
     #endregion
 
     #region CameraAutoFollow 摄像机自动跟随

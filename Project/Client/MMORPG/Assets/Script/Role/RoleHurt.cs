@@ -7,12 +7,14 @@ using UnityEngine;
 public class RoleHurt
 {
     private RoleFSMMgr m_CurrRoleFSMMgr = null;
+    private RoleStateHurt m_RoleStateHurt;
 
     public Action OnRoleHurt;
 
     public RoleHurt(RoleFSMMgr fsm)
     {
         m_CurrRoleFSMMgr = fsm;
+        m_RoleStateHurt = m_CurrRoleFSMMgr.GetRoleState(RoleState.Hurt) as RoleStateHurt;
     }
 
     public IEnumerator ToHurt(RoleTransferAttackInfo roleTransferAttackInfo)
@@ -21,10 +23,15 @@ public class RoleHurt
 
         if (m_CurrRoleFSMMgr.CurrRoleStateEnum == RoleState.Die) yield break;
 
+        if (m_CurrRoleFSMMgr.IsRigidty) yield break;
+
         SkillEntity skillEntity = SkillDBModel.Instance.Get(roleTransferAttackInfo.SkillId);
         SkillLevelEntity skillLevelEntity = SkillLevelDBModel.Instance.GetSkillLevelEntityBySkillIdAndLevel(roleTransferAttackInfo.SkillId, roleTransferAttackInfo.SkillLevel);
         if (skillEntity == null || skillLevelEntity == null) yield break;
 
+        m_RoleStateHurt.ShowHurtEffectDelaySecond = skillEntity.ShowHurtEffectDelaySecond;
+        m_CurrRoleFSMMgr.ChangeState(RoleState.Hurt);
+        //AppDebug.LogError(string.Format("ToHurt : {0}, skillId : {1}", Time.realtimeSinceStartup, roleTransferAttackInfo.SkillId));
         yield return new WaitForSeconds(skillEntity.ShowHurtEffectDelaySecond);
 
         m_CurrRoleFSMMgr.CurrRoleCtrl.CurrRoleInfo.CurrHP -= roleTransferAttackInfo.HurtValue;
@@ -32,11 +39,21 @@ public class RoleHurt
         {
             OnRoleHurt();
         }
-        if (m_CurrRoleFSMMgr.CurrRoleCtrl.CurrRoleInfo.CurrHP <= 0)
+
+        if(SceneMgr.Instance.CurrPlayType == PlayType.PVE)
         {
-            m_CurrRoleFSMMgr.CurrRoleCtrl.CurrRoleInfo.CurrHP = 0;
-            m_CurrRoleFSMMgr.CurrRoleCtrl.ToDie();
-            yield break;
+            if (m_CurrRoleFSMMgr.CurrRoleCtrl.CurrRoleInfo.CurrHP <= 0)
+            {
+                m_CurrRoleFSMMgr.CurrRoleCtrl.ToDie();
+                yield break;
+            }
+        }
+        else
+        {
+            if (m_CurrRoleFSMMgr.CurrRoleCtrl.CurrRoleInfo.CurrHP <= 0)
+            {
+                m_CurrRoleFSMMgr.CurrRoleCtrl.CurrRoleInfo.CurrHP = 1;
+            }
         }
 
         Color color = Color.red;
@@ -59,11 +76,5 @@ public class RoleHurt
         effectTransform.position = m_CurrRoleFSMMgr.CurrRoleCtrl.transform.position;
         effectTransform.rotation = m_CurrRoleFSMMgr.CurrRoleCtrl.transform.rotation;
         RecyclePoolMgr.Instance.Despawn(PoolType.Effect, effectTransform, 3);
-
-        if (!m_CurrRoleFSMMgr.IsRigidty)
-        {
-            m_CurrRoleFSMMgr.ChangeState(RoleState.Hurt);
-        }
-
     }
 }

@@ -53,8 +53,8 @@ public class NetWorkHttp : SingletonMono<NetWorkHttp>
             {
                 dic["deviceUniqueIdentifier"] = DeviceUtil.DeviceUniqueIdentifier;
                 dic["deviceModel"] = DeviceUtil.DeviceModel;
-                dic["sign"] = EncryptUtil.Md5(string.Format("{0}:{1}", GlobalInit.Instance.CurrServerTime, DeviceUtil.DeviceUniqueIdentifier));
-                dic["t"] = GlobalInit.Instance.CurrServerTime;
+                dic["sign"] = EncryptUtil.Md5(string.Format("{0}:{1}", GlobalInit.Instance.CurrHttpServerTime, DeviceUtil.DeviceUniqueIdentifier));
+                dic["t"] = GlobalInit.Instance.CurrHttpServerTime;
             }
             PostUrl(url, dic == null ? "" : LitJson.JsonMapper.ToJson(dic));
         }

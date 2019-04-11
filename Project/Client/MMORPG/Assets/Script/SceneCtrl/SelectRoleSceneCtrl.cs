@@ -79,7 +79,7 @@ public class SelectRoleSceneCtrl : MonoBehaviour
         UIDispatcher.Instance.AddEventHandler(ConstDefine.SelectRole_CreateRole, OnBtnSelectRole_CreateRoleClick);
 
         LogOnGameServer();
-        LoadJobObject();
+        m_Jobist = JobDBModel.Instance.GetList();
         CurrentJobId = 1;
     }
 
@@ -90,9 +90,11 @@ public class SelectRoleSceneCtrl : MonoBehaviour
         for (int i = 0; i < proto.CurrSkillDataList.Count; i++)
         {
             skillData = proto.CurrSkillDataList[i];
+            AppDebug.LogError("skillId : " + skillData.SkillId);
             GlobalInit.Instance.MainPlayerInfo.SkillList.Add(new RoleInfoSkill(skillData.SkillId, skillData.SkillLevel, skillData.SlotsNo));
         }
-        SceneMgr.Instance.LoadToWorldMap(m_LastInWorldMapId);
+        SceneMgr.Instance.LoadToWorldMap(GlobalInit.Instance.MainPlayerInfo.LastInWorldMapId);
+        //SceneMgr.Instance.LoadToWorldMap(3);
     }
 
     private void OnDestroy()
@@ -272,19 +274,6 @@ public class SelectRoleSceneCtrl : MonoBehaviour
         }
     }
 
-    private void LoadJobObject()
-    {
-        m_Jobist = JobDBModel.Instance.GetList();
-        for (int i = 0; i < m_Jobist.Count; i++)
-        {
-            GameObject obj = AssetBundleMgr.Instance.Load(string.Format("Role/{0}.assetbundle", m_Jobist[i].PrefabName), m_Jobist[i].PrefabName);
-            if(obj != null)
-            {
-                GlobalInit.Instance.JobObjectDic[m_Jobist[i].Id] = obj;
-            }
-        }
-    }
-
     private void LogOnGameServer()
     {
         RoleOperation_LogOnGameServerProto proto = new RoleOperation_LogOnGameServerProto();
@@ -333,7 +322,7 @@ public class SelectRoleSceneCtrl : MonoBehaviour
 
         for (int i = 0; i < m_Jobist.Count; i++)
         {
-            GameObject objRole = Instantiate(GlobalInit.Instance.JobObjectDic[m_Jobist[i].Id]);
+            GameObject objRole = RoleMgr.Instance.LoadPlayer(m_Jobist[i].Id);
             objRole.transform.parent = CreateRoleContainers[i];
 
             objRole.transform.localScale = Vector3.one;
@@ -341,7 +330,7 @@ public class SelectRoleSceneCtrl : MonoBehaviour
             objRole.transform.localRotation = Quaternion.Euler(Vector3.zero);
 
             RoleCtrl roleCtrl = objRole.GetComponent<RoleCtrl>();
-            if(roleCtrl != null)
+            if (roleCtrl != null)
             {
                 m_JobRoleCtrl[m_Jobist[i].Id] = roleCtrl;
             }
@@ -451,7 +440,7 @@ public class SelectRoleSceneCtrl : MonoBehaviour
             Destroy(m_CurrSelectRoleModel);
         }
 
-        m_CurrSelectRoleModel = Instantiate(GlobalInit.Instance.JobObjectDic[item.RoleJob]);
+        m_CurrSelectRoleModel = RoleMgr.Instance.LoadPlayer(item.RoleJob);
         m_CurrSelectRoleModel.transform.parent = CreateRoleContainers[0];
 
         m_CurrSelectRoleModel.transform.localScale = Vector3.one;
@@ -487,15 +476,12 @@ public class SelectRoleSceneCtrl : MonoBehaviour
         return default(RoleOperation_LogOnGameServerReturnProto.RoleItem);
     }
 
-    private int m_LastInWorldMapId;
-
     private void OnSelectRoleInfoReturn(byte[] p)
     {
         RoleOperation_SelectRoleInfoReturnProto proto = RoleOperation_SelectRoleInfoReturnProto.GetProto(p);
         if (proto.IsSuccess)
         {
             GlobalInit.Instance.MainPlayerInfo = new RoleInfoMainPlayer(proto);
-            m_LastInWorldMapId = proto.LastInWorldMapId;
         }
         else
         {

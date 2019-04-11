@@ -2,6 +2,11 @@ using System;
 
 public static class ConvertUtil
 {
+    public static byte ConvertToByte(object o)
+    {
+        return Convert.ToByte(o);
+    }
+
     public static int ConvertToInt(object o)
     {
         return Convert.ToInt32(o);

@@ -19,7 +19,26 @@ public class GameServerCtrl : SystemCtrlBase<GameServerCtrl>, ISystemCtrl
         AddEventHandler(ConstDefine.UIGameServerEnterView_btnSelectGameServer, UIGameServerEnterView_btnSelectGameServerClick);
         AddEventHandler(ConstDefine.UIGameServerEnterView_btnEnterGame, UIGameServerEnterView_btnEnterGameClick);
 
+        SocketDispatcher.Instance.AddEventHandler(ProtoCodeDef.System_ServerTimeReturn, OnSystem_ServerTimeReturn);
+
         NetWorkSocket.Instance.OnConnectOK = OnConnectOKCallback;
+    }
+
+    private void OnSystem_ServerTimeReturn(byte[] p)
+    {
+        System_ServerTimeReturnProto proto = System_ServerTimeReturnProto.GetProto(p);
+        GlobalInit.Instance.PingValue = (Time.realtimeSinceStartup * 1000 - proto.LocalTime) / 2;
+        GlobalInit.Instance.BeganGameServerTime = proto.ServerTime - (long)GlobalInit.Instance.PingValue;
+
+        //AppDebug.LogError(string.Format("PingValue : {0}, GameServerTime : {1}, clientTime : {2}", GlobalInit.Instance.PingValue, GlobalInit.Instance.BeganGameServerTime, proto.LocalTime));
+
+        UpdateLastLogOnServer();
+        SceneMgr.Instance.LoadToSelectRole();
+        if (uiGameServerEnterView != null)
+        {
+            uiGameServerEnterView.Close();
+            uiGameServerEnterView = null;
+        }
     }
 
     private void UIGameServerEnterView_btnEnterGameClick(object[] p)
@@ -29,13 +48,11 @@ public class GameServerCtrl : SystemCtrlBase<GameServerCtrl>, ISystemCtrl
 
     private void OnConnectOKCallback()
     {
-        UpdateLastLogOnServer();
-        SceneMgr.Instance.LoadToSelectRole();
-        if(uiGameServerEnterView != null)
-        {
-            uiGameServerEnterView.Close();
-            uiGameServerEnterView = null;
-        }
+        System_SendLocalTimeProto proto = new System_SendLocalTimeProto();
+        proto.LocalTime = GlobalInit.Instance.CheckTime = Time.realtimeSinceStartup * 1000;
+        NetWorkSocket.Instance.SendMsg(proto.ToArray());
+
+        //AppDebug.LogError("对表 : " + proto.LocalTime);
     }
 
     private void UpdateLastLogOnServer()
@@ -178,5 +195,6 @@ public class GameServerCtrl : SystemCtrlBase<GameServerCtrl>, ISystemCtrl
     {
         base.Dispose();
         RemoveEventHandler(ConstDefine.UIGameServerEnterView_btnEnterGame, UIGameServerEnterView_btnSelectGameServerClick);
+        SocketDispatcher.Instance.RemoveEventHandler(ProtoCodeDef.System_ServerTimeReturn, OnSystem_ServerTimeReturn);
     }
 }

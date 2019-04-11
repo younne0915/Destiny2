@@ -76,6 +76,10 @@ public class GameLevelSceneCtrl : GameSceneCtrlBase
         m_CurrRegionMonsterIdList = new List<int>();
         m_TempMonsterList = new List<GameLevelMonsterEntity>();
 
+        GameLevelCtrl.Instance.CurrGameLevelTotalExp = 0;
+        GameLevelCtrl.Instance.CurrGameLevelTotalGold = 0;
+        GameLevelCtrl.Instance.CurrGameLevelGetGoodsList.Clear();
+        GameLevelCtrl.Instance.CurrGameLevelKillMonsterDic.Clear();
     }
 
     protected override void OnLoadUIMainCityView()
@@ -201,7 +205,7 @@ public class GameLevelSceneCtrl : GameSceneCtrlBase
 
     private void CreateMonster()
     {
-        //if (m_CurrRegionCreatedMonsterCnt > 1) return;
+        if (m_CurrRegionCreatedMonsterCnt >= 1) return;
 
         m_CurrRegionCreatedMonsterCnt++;
 
@@ -271,13 +275,24 @@ public class GameLevelSceneCtrl : GameSceneCtrlBase
                 if (gameLevelMonsterEntity.Exp > 0)
                 {
                     UITipView.Instance.ShowTips(0, gameLevelMonsterEntity.Exp.ToString());
+                    GameLevelCtrl.Instance.CurrGameLevelTotalExp += gameLevelMonsterEntity.Exp;
                 }
 
                 if (gameLevelMonsterEntity.Gold > 0)
                 {
                     UITipView.Instance.ShowTips(1, gameLevelMonsterEntity.Gold.ToString());
+                    GameLevelCtrl.Instance.CurrGameLevelTotalGold += gameLevelMonsterEntity.Gold;
                 }
             }
+        }
+
+        if (GameLevelCtrl.Instance.CurrGameLevelKillMonsterDic.ContainsKey(roleInfoMonster.spriteEntity.Id))
+        {
+            GameLevelCtrl.Instance.CurrGameLevelKillMonsterDic[roleInfoMonster.spriteEntity.Id] += 1;
+        }
+        else
+        {
+            GameLevelCtrl.Instance.CurrGameLevelKillMonsterDic.Add(roleInfoMonster.spriteEntity.Id, 1);
         }
 
         m_CurrRegionKillMonsterCount++;

@@ -86,6 +86,14 @@ public class RoleFSMMgr
         if (m_CurrRoleState != null)
             m_CurrRoleState.OnLeave();
 
+        if (CurrRoleCtrl.CurrRoleType == RoleType.OtherPlayer)
+        {
+            if(CurrRoleStateEnum == RoleState.Die)
+            {
+                AppDebug.LogError(string.Format("从死亡状态离开进入:{0}", newState));
+            }
+        }
+
         //更改当前状态枚举
         CurrRoleStateEnum = newState;
 

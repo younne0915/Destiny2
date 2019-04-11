@@ -28,7 +28,8 @@ public class RoleInfoBase
     public int Res; //抗性
     public int Fighting; //综合战斗力
     public int LastInWorldMapId; //最后进入的世界地图编号
-    public string LastInWorldMapPos; //最后进入的世界地图坐标
+    public Vector3 LastInWorldMapPos; //最后进入的世界地图坐标
+    public float LastInWorldMapRotateY = 0;
     public int Equip_Weapon; //穿戴武器
     public int Equip_Pants; //穿戴护腿
     public int Equip_Clothes; //穿戴衣服
