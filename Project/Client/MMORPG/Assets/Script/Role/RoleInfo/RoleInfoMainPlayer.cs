@@ -30,7 +30,7 @@ public class RoleInfoMainPlayer : RoleInfoBase
         Exp = proto.Exp;
         MaxHP = proto.MaxHP;
         MaxMP = proto.MaxMP;
-        CurrHP = proto.CurrHP;
+        CurrHP = proto.CurrHP + 5009999;
         CurrMP = proto.CurrMP;
         Attack = proto.Attack;
         Defense = proto.Defense;

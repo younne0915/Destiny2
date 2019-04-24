@@ -55,6 +55,6 @@ public class UIWindowBase : UIBase
     {
         LayerUIMgr.Instance.CheckOpenWindow();
         if (NextOpenWindow == WindowUIType.None) return;
-        UIViewUtil.Instance.OpenWindow(NextOpenWindow);
+        UIViewUtil.Instance.LoadWindow(NextOpenWindow, (GameObject obj)=> { });
     }
 }

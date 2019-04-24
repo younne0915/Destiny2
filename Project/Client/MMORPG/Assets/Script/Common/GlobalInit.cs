@@ -1,4 +1,4 @@
-//===================================================
+﻿//===================================================
 //作    者：边涯  http://www.u3dol.com  QQ群：87481002
 //创建时间：2015-12-01 22:26:02
 //备    注：
@@ -26,10 +26,36 @@ public class GlobalInit : MonoBehaviour
     /// </summary>
     public const string MMO_PWD = "MMO_PWD";
 
+    private const string m_Ip = "http://192.168.28.249";
+
+    private static string m_WebAccountUrl = "";
     /// <summary>
     /// 账户服务器地址
     /// </summary>
-    public const string WebAccountUrl = "http://172.17.107.122:5510/";
+    public static string WebAccountUrl
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(m_WebAccountUrl))
+            {
+                m_WebAccountUrl = string.Format("{0}:5510/", m_Ip);
+            }
+            return m_WebAccountUrl;
+        }
+    }
+
+    private static string m_CDNUrl = "";
+    public static string CDNUrl
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(m_CDNUrl))
+            {
+                m_CDNUrl = string.Format("{0}:4250/", m_Ip);
+            }
+            return m_CDNUrl;
+        }
+    }
 
     #endregion
 

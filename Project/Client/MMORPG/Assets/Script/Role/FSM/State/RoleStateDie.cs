@@ -48,16 +48,13 @@ public class RoleStateDie : RoleStateAbstract
             }
             m_DieDelayTime = 0;
 
-            Transform effectTransform = RecyclePoolMgr.Instance.Spawn(PoolType.Effect, ResourLoadType.AssetBundle, "Effect/Effect_PenXue");
-            effectTransform.position = CurrRoleFSMMgr.CurrRoleCtrl.transform.position;
-            effectTransform.rotation = CurrRoleFSMMgr.CurrRoleCtrl.transform.rotation;
+            RecyclePoolMgr.Instance.SpawnOrLoadByAssetBundle(PoolType.Effect, "Download/Prefab/Effect/Common/Effect_PenXue", (Transform effectTransform) => 
+            {
+                effectTransform.position = CurrRoleFSMMgr.CurrRoleCtrl.transform.position;
+                effectTransform.rotation = CurrRoleFSMMgr.CurrRoleCtrl.transform.rotation;
+            });
 
             m_IsDestroy = false;
-
-            if (CurrRoleFSMMgr.CurrRoleCtrl.CurrRoleType == RoleType.OtherPlayer)
-            {
-                AppDebug.LogError("die enter nickName : " + CurrRoleFSMMgr.CurrRoleCtrl.CurrRoleInfo.RoleNickName + " , Time : " + Time.realtimeSinceStartup);
-            }
         }
     }
 

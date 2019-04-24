@@ -7,6 +7,7 @@ using UnityEngine;
 using System.Collections;
 using System;
 using UnityEngine.SceneManagement;
+using System.IO;
 
 public class SceneLoadingCtrl : MonoBehaviour 
 {
@@ -25,6 +26,9 @@ public class SceneLoadingCtrl : MonoBehaviour
 
 	void Start ()
 	{
+        LoaderMgr.Instance.UnLoadAssetBundle();
+        Resources.UnloadUnusedAssets();
+
         DelegateDefine.Instance.OnSceneLoadOK += OnSceneLoadOK;
         LayerUIMgr.Instance.Reset();
         StartCoroutine(LoadingScene());
@@ -85,12 +89,41 @@ public class SceneLoadingCtrl : MonoBehaviour
 
         if (SceneMgr.Instance.CurrentSceneType == SceneType.SelectRole || SceneMgr.Instance.CurrentSceneType == SceneType.WorldMap || SceneMgr.Instance.CurrentSceneType == SceneType.GameLevel)
         {
-            AssetBundleLoaderAsync assetBundleAsync = AssetBundleMgr.Instance.LoadAsync(string.Format("Scene/{0}.unity3d", strSceneName), strSceneName);
-            assetBundleAsync.OnLoadCompleteNoObject = () =>
-             {
-                 m_Async = SceneManager.LoadSceneAsync(strSceneName, LoadSceneMode.Additive);
-                 m_Async.allowSceneActivation = false;
-             };
+#if DISABLE_ASSETBUNDLE
+            yield return null;
+            strSceneName = string.Format("Download/Scene/{0}", strSceneName);
+            m_Async = SceneManager.LoadSceneAsync(strSceneName, LoadSceneMode.Additive);
+            m_Async.allowSceneActivation = false;
+#else
+            string scenePath = string.Format("Download/Scene/{0}.unity3d", strSceneName);
+            string fullPath = LocalFileMgr.Instance.LocalFilePath + scenePath;
+            if (!File.Exists(fullPath))
+            {
+                DownloadDataEntity downloadDataEntity = DownloadMgr.Instance.GetServerData(scenePath);
+                AssetBundleDownload.Instance.DownloadData(downloadDataEntity, (bool isSucess)=> 
+                {
+                    AppDebug.LogError("下载结果 ： " + isSucess);
+                    if (isSucess)
+                    {
+                        AssetBundleLoaderAsync assetBundleAsync = AssetBundleMgr.Instance.LoadAsync(scenePath, strSceneName);
+                        assetBundleAsync.OnLoadCompleteNoObject = () =>
+                        {
+                            m_Async = SceneManager.LoadSceneAsync(strSceneName, LoadSceneMode.Additive);
+                            m_Async.allowSceneActivation = false;
+                        };
+                    }
+                });
+            }
+            else
+            {
+                AssetBundleLoaderAsync assetBundleAsync = AssetBundleMgr.Instance.LoadAsync(scenePath, strSceneName);
+                assetBundleAsync.OnLoadCompleteNoObject = () =>
+                {
+                    m_Async = SceneManager.LoadSceneAsync(strSceneName, LoadSceneMode.Additive);
+                    m_Async.allowSceneActivation = false;
+                };
+            }
+#endif
         }
         else
         {

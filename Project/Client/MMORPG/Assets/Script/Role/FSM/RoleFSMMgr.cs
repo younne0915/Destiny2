@@ -11,7 +11,7 @@ using System;
 /// <summary>
 /// 角色有限状态机管理器
 /// </summary>
-public class RoleFSMMgr 
+public class RoleFSMMgr
 {
     /// <summary>
     /// 当前角色控制器
@@ -75,7 +75,7 @@ public class RoleFSMMgr
     /// <param name="newState">新状态</param>
     public void ChangeState(RoleState newState)
     {
-        if (CurrRoleStateEnum == newState && CurrRoleStateEnum != RoleState.Idle && CurrRoleStateEnum != RoleState.Attack) return;
+        if (CurrRoleStateEnum == newState && CurrRoleStateEnum != RoleState.Idle && CurrRoleStateEnum != RoleState.Attack && CurrRoleStateEnum != RoleState.Hurt) return;
 
         if (CurrRoleStateEnum == RoleState.Idle)
         {
@@ -85,14 +85,6 @@ public class RoleFSMMgr
         //调用以前状态的离开方法
         if (m_CurrRoleState != null)
             m_CurrRoleState.OnLeave();
-
-        if (CurrRoleCtrl.CurrRoleType == RoleType.OtherPlayer)
-        {
-            if(CurrRoleStateEnum == RoleState.Die)
-            {
-                AppDebug.LogError(string.Format("从死亡状态离开进入:{0}", newState));
-            }
-        }
 
         //更改当前状态枚举
         CurrRoleStateEnum = newState;

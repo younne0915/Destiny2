@@ -36,44 +36,54 @@ public class WorldMapCtrl : SystemCtrlBase<WorldMapCtrl>, ISystemCtrl
     private void OpenWorldMapFailView()
     {
         AppDebug.LogError("OpenWorldMapFailView : " + AttackNickName);
-        m_UIWorldMapFailView = UIViewUtil.Instance.OpenWindow(WindowUIType.WorldMapFail).GetComponent<UIWorldMapFailView>();
-        TransferData transferData = new TransferData();
-        transferData.SetValue(ConstDefine.WorldMapName, AttackNickName);
-        m_UIWorldMapFailView.SetUI(transferData);
-
+        UIViewUtil.Instance.LoadWindow(WindowUIType.WorldMapFail,(GameObject obj)=> 
+        {
+            if(obj != null)
+            {
+                m_UIWorldMapFailView = obj.GetComponent<UIWorldMapFailView>();
+                TransferData transferData = new TransferData();
+                transferData.SetValue(ConstDefine.WorldMapName, AttackNickName);
+                m_UIWorldMapFailView.SetUI(transferData);
+            }
+        });
     }
 
     private void OpenWorldMapView()
     {
         List<WorldMapEntity> listWorldMap = WorldMapDBModel.Instance.GetList();
         if (listWorldMap == null || listWorldMap.Count == 0) return;
-        m_UIWorldMapView = UIViewUtil.Instance.OpenWindow(WindowUIType.WorldMap).GetComponent<UIWorldMapView>();
-
-        TransferData transferData = new TransferData();
-        List<TransferData> list = new List<TransferData>();
-
-        for (int i = 0; i < listWorldMap.Count; i++)
+        UIViewUtil.Instance.LoadWindow(WindowUIType.WorldMap,(GameObject obj)=> 
         {
-            WorldMapEntity entity = listWorldMap[i];
-            if (entity.IsShowInMap == 0) continue;
-
-            TransferData childData = new TransferData();
-            childData.SetValue(ConstDefine.WorldMapId, entity.Id);
-            childData.SetValue(ConstDefine.WorldMapName, entity.Name);
-            childData.SetValue(ConstDefine.WorldMapIco, entity.IcoInMap);
-
-            string[] arr = entity.PosInMap.Split('_');
-            Vector2 pos = new Vector2();
-            if(arr.Length == 2)
+            if(obj != null)
             {
-                pos.x = arr[0].ToFloat();
-                pos.y = arr[1].ToFloat();
+                m_UIWorldMapView = obj.GetComponent<UIWorldMapView>();
+                TransferData transferData = new TransferData();
+                List<TransferData> list = new List<TransferData>();
+
+                for (int i = 0; i < listWorldMap.Count; i++)
+                {
+                    WorldMapEntity entity = listWorldMap[i];
+                    if (entity.IsShowInMap == 0) continue;
+
+                    TransferData childData = new TransferData();
+                    childData.SetValue(ConstDefine.WorldMapId, entity.Id);
+                    childData.SetValue(ConstDefine.WorldMapName, entity.Name);
+                    childData.SetValue(ConstDefine.WorldMapIco, entity.IcoInMap);
+
+                    string[] arr = entity.PosInMap.Split('_');
+                    Vector2 pos = new Vector2();
+                    if (arr.Length == 2)
+                    {
+                        pos.x = arr[0].ToFloat();
+                        pos.y = arr[1].ToFloat();
+                    }
+                    childData.SetValue(ConstDefine.WorldMapPostion, pos);
+                    list.Add(childData);
+                }
+                transferData.SetValue(ConstDefine.WorldMapList, list);
+                m_UIWorldMapView.SetUI(transferData, OnWorldMapItemClick);
             }
-            childData.SetValue(ConstDefine.WorldMapPostion, pos);
-            list.Add(childData);
-        }
-        transferData.SetValue(ConstDefine.WorldMapList, list);
-        m_UIWorldMapView.SetUI(transferData, OnWorldMapItemClick);
+        });
     }
 
     private void OnWorldMapItemClick(int obj)

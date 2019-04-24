@@ -22,6 +22,9 @@ public class UIViewMgr : Singleton<UIViewMgr>
         m_systemCtrlDic.Add(WindowUIType.GameLevelFail, GameLevelCtrl.Instance);
         m_systemCtrlDic.Add(WindowUIType.WorldMap, WorldMapCtrl.Instance);
         m_systemCtrlDic.Add(WindowUIType.WorldMapFail, WorldMapCtrl.Instance);
+
+        m_systemCtrlDic.Add(WindowUIType.Test, AccountCtrl.Instance);
+
     }
 
     public void OpenWindow(WindowUIType type)

@@ -6,6 +6,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class RoleMgr : Singleton<RoleMgr>
 {
@@ -21,10 +22,10 @@ public class RoleMgr : Singleton<RoleMgr>
             JobEntity jobEntity = JobDBModel.Instance.Get(GlobalInit.Instance.MainPlayerInfo.JobId);
             if (jobEntity != null)
             {
-                GameObject mainPlayer = GameObject.Instantiate(AssetBundleMgr.Instance.Load(string.Format("Role/{0}.assetbundle", jobEntity.PrefabName), jobEntity.PrefabName));
+                GameObject mainPlayer = GameObject.Instantiate(LoaderMgr.Instance.Load(string.Format("Download/Prefab/RolePrefab/Player/{0}", jobEntity.PrefabName), jobEntity.PrefabName));
                 //GameObject mainPlayer = RecyclePoolMgr.Instance.Spawn(PoolType.Player, ResourLoadType.AssetBundle, string.Format("Role/{0}", jobEntity.PrefabName)).gameObject;
                 mainPlayer.SetParent(null);
-                Object.DontDestroyOnLoad(mainPlayer);
+                UnityEngine.Object.DontDestroyOnLoad(mainPlayer);
                 GlobalInit.Instance.CurrPlayer = mainPlayer.GetComponent<RoleCtrl>();
                 GlobalInit.Instance.MainPlayerInfo.SetPhySkillId(jobEntity.UsedPhyAttackIds);
                 GlobalInit.Instance.CurrPlayer.Init(RoleType.MainPlayer, GlobalInit.Instance.MainPlayerInfo, new RoleMainPlayerCityAI(GlobalInit.Instance.CurrPlayer));
@@ -61,13 +62,12 @@ public class RoleMgr : Singleton<RoleMgr>
     public GameObject LoadPlayer(int jobId)
     {
         JobEntity jobEntity = JobDBModel.Instance.Get(jobId);
-        return RecyclePoolMgr.Instance.Spawn(PoolType.Player, ResourLoadType.AssetBundle, string.Format("Role/{0}", jobEntity.PrefabName)).gameObject;
+        return RecyclePoolMgr.Instance.Spawn(PoolType.Player, ResourLoadType.AssetBundle, string.Format("Download/Prefab/RolePrefab/Player/{0}", jobEntity.PrefabName)).gameObject;
     }
 
-    public GameObject LoadNPC(string prefabName)
+    public void LoadNPC(string prefabName, Action<GameObject> onComplete)
     {
-        GameObject obj = AssetBundleMgr.Instance.Load(string.Format("Role/{0}.assetbundle", prefabName), prefabName);
-        return Object.Instantiate(obj);
+        LoaderMgr.Instance.LoadOrDownload(string.Format("Download/Prefab/RolePrefab/NPC/{0}", prefabName), prefabName, onComplete);
     }
 
     public override void Dispose()
@@ -82,7 +82,7 @@ public class RoleMgr : Singleton<RoleMgr>
 
     public GameObject LoadMonster(string prefabName)
     {
-        return AssetBundleMgr.Instance.Load(string.Format("Role/{0}.assetbundle", prefabName), prefabName);
+        return LoaderMgr.Instance.Load(string.Format("Download/Prefab/RolePrefab/Monster/{0}", prefabName), prefabName);
     }
 
     public Sprite LoadSkillPic(string skillPic)

@@ -65,70 +65,65 @@ public class UIGameLevelMapView : UIWindowViewBase
         m_OnGameLevelItemClick = onGameLevelItemClick;
         m_ChapterId = data.GetValue<int>(ConstDefine.ChapterId);
         txtChapterName.SetText(data.GetValue<string>(ConstDefine.ChapterName));
-        imgMap.texture = GameUtil.LoadGameLevelMapPic(data.GetValue<string>(ConstDefine.ChapterBG));
+        //imgMap.texture = GameUtil.LoadGameLevelMapPic(data.GetValue<string>(ConstDefine.ChapterBG));
+
+        LoaderMgr.Instance.LoadOrDownload<Texture>(string.Format("Download/Source/UISource/GameLevel/GameLevelMap/{0}", data.GetValue<string>(ConstDefine.ChapterBG)), data.GetValue<string>(ConstDefine.ChapterBG), (Texture obj) =>
+        {
+            imgMap.texture = obj;
+        }, type: 1);
 
         m_GameLevelDataList = data.GetValue<List<TransferData>>(ConstDefine.GameLevelList);
 
-        StartCoroutine(CreatePointCorotine());
+
+        RecyclePoolMgr.Instance.SpawnOrLoadByAssetBundle(PoolType.UI, "Download/Prefab/UIPrefab/UIWindowsChild/GameLevel/GameLevelMapItem", (Transform gameLevelMapTransform) =>
+        {
+            StartCoroutine(CreateGameLevelMapItemCorotine(gameLevelMapTransform));
+        });
     }
 
-    private void Test()
+    private IEnumerator CreatePointCoroutine(Transform gameLevelMapPointTransform)
     {
-        if (m_GameLevelDataList != null)
+        for (int i = 0; i < m_GameLevelList.Count; i++)
         {
-            m_GameLevelList.Clear();
-            TransferData gameLevelData;
-            for (int i = 0; i < m_GameLevelDataList.Count; i++)
+            if (i == m_GameLevelList.Count - 1) break;
+
+            Transform beganPoint = m_GameLevelList[i];
+            Transform endPoint = m_GameLevelList[i + 1];
+
+            float distance = Vector3.Distance(beganPoint.localPosition, endPoint.localPosition);
+            int createCount = Mathf.FloorToInt(distance / 20);
+
+            float deltX = endPoint.localPosition.x - beganPoint.localPosition.x;
+            float deltY = endPoint.localPosition.y - beganPoint.localPosition.y;
+
+            float stepX = deltX / createCount;
+            float stepY = deltY / createCount;
+
+            for (int j = 0; j < createCount; j++)
             {
-                gameLevelData = m_GameLevelDataList[i];
-                GameObject obj = ResourcesMgr.Instance.Load(ResourcesMgr.ResourceType.UIWindowChild, "GameLevel/GameLevelMapItem");
-                obj.SetParent(gameLevelContainer.transform);
-                obj.transform.localPosition = gameLevelData.GetValue<Vector2>(ConstDefine.GameLevelPostion);
-                UIGameLevelMapItemView itemView = obj.GetComponent<UIGameLevelMapItemView>();
-                itemView.SetUI(gameLevelData, null);
-                m_GameLevelList.Add(obj.transform);
-
+                GameObject obj = RecyclePoolMgr.Instance.Spawn(PoolType.UI, gameLevelMapPointTransform).gameObject;
+                obj.SetParent(pointContainer);
+                obj.transform.localPosition = new Vector3(beganPoint.localPosition.x + j * stepX, beganPoint.localPosition.y + j * stepY, 0);
+                UIGameLevelMapPointView view = obj.GetComponent<UIGameLevelMapPointView>();
+                view.SetUI(true);
+                yield return null;
             }
-
-            for (int i = 0; i < m_GameLevelList.Count; i++)
-            {
-                if (i == m_GameLevelList.Count - 1) break;
-
-                Transform beganPoint = m_GameLevelList[i];
-                Transform endPoint = m_GameLevelList[i + 1];
-
-                float distance = Vector3.Distance(beganPoint.localPosition, endPoint.localPosition);
-                int createCount = Mathf.FloorToInt(distance / 20);
-
-                float deltX = endPoint.localPosition.x - beganPoint.localPosition.x;
-                float deltY = endPoint.localPosition.y - beganPoint.localPosition.y;
-
-                float stepX = deltX / createCount;
-                float stepY = deltY / createCount;
-
-                for (int j = 0; j < createCount; j++)
-                {
-                    GameObject obj = ResourcesMgr.Instance.Load(ResourcesMgr.ResourceType.UIWindowChild, "GameLevel/GameLevelMapPoint");
-                    obj.SetParent(pointContainer);
-                    obj.transform.localPosition = new Vector3(beganPoint.localPosition.x + j * stepX, beganPoint.localPosition.y + j * stepY, 0);
-                    UIGameLevelMapPointView view = obj.GetComponent<UIGameLevelMapPointView>();
-                    view.SetUI(true);
-                }
-            }
+            yield return null;
         }
     }
 
-    private IEnumerator CreatePointCorotine()
+    private IEnumerator CreateGameLevelMapItemCorotine(Transform gameLevelMapTransform)
     {
         if (m_GameLevelDataList == null) yield break;
         if (m_GameLevelDataList != null)
         {
             m_GameLevelList.Clear();
             TransferData gameLevelData;
+
             for (int i = 0; i < m_GameLevelDataList.Count; i++)
             {
                 gameLevelData = m_GameLevelDataList[i];
-                GameObject obj = ResourcesMgr.Instance.Load(ResourcesMgr.ResourceType.UIWindowChild, "GameLevel/GameLevelMapItem");
+                GameObject obj = RecyclePoolMgr.Instance.Spawn(PoolType.UI, gameLevelMapTransform).gameObject;
                 obj.SetParent(gameLevelContainer.transform);
                 obj.transform.localPosition = gameLevelData.GetValue<Vector2>(ConstDefine.GameLevelPostion);
                 UIGameLevelMapItemView itemView = obj.GetComponent<UIGameLevelMapItemView>();
@@ -138,33 +133,10 @@ public class UIGameLevelMapView : UIWindowViewBase
                 yield return null;
             }
 
-            for (int i = 0; i < m_GameLevelList.Count; i++)
+            RecyclePoolMgr.Instance.SpawnOrLoadByAssetBundle(PoolType.UI, "Download/Prefab/UIPrefab/UIWindowsChild/GameLevel/GameLevelMapPoint", (Transform gameLevelMapPointTransform) =>
             {
-                if (i == m_GameLevelList.Count - 1) break;
-
-                Transform beganPoint = m_GameLevelList[i];
-                Transform endPoint = m_GameLevelList[i + 1];
-
-                float distance = Vector3.Distance(beganPoint.localPosition, endPoint.localPosition);
-                int createCount = Mathf.FloorToInt(distance / 20);
-
-                float deltX = endPoint.localPosition.x - beganPoint.localPosition.x;
-                float deltY = endPoint.localPosition.y - beganPoint.localPosition.y;
-
-                float stepX = deltX / createCount;
-                float stepY = deltY / createCount;
-
-                for (int j = 0; j < createCount; j++)
-                {
-                    GameObject obj = ResourcesMgr.Instance.Load(ResourcesMgr.ResourceType.UIWindowChild, "GameLevel/GameLevelMapPoint");
-                    obj.SetParent(pointContainer);
-                    obj.transform.localPosition = new Vector3(beganPoint.localPosition.x + j * stepX, beganPoint.localPosition.y + j * stepY, 0);
-                    UIGameLevelMapPointView view = obj.GetComponent<UIGameLevelMapPointView>();
-                    view.SetUI(true);
-                    yield return null;
-                }
-                yield return null;
-            }
+                StartCoroutine(CreatePointCoroutine(gameLevelMapPointTransform));
+            });
         }
     }
 

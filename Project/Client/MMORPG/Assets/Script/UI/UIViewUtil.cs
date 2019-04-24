@@ -45,48 +45,55 @@ public class UIViewUtil : Singleton<UIViewUtil>
     /// </summary>
     /// <param name="type">窗口类型</param>
     /// <returns></returns>
-    public GameObject OpenWindow(WindowUIType type, Action onshow = null)
+    public void LoadWindow(WindowUIType type, Action<GameObject> OnComplete, Action OnShow = null)
     {
-        if (type == WindowUIType.None) return null;
+        if (type == WindowUIType.None) return;
 
-        GameObject obj = null;
         //如果窗口不存在 则
         if (!m_DicWindow.ContainsKey(type) || m_DicWindow[type] == null)
         {
-            //枚举的名称要和预设的名称对应
-            obj = ResourcesMgr.Instance.Load(ResourcesMgr.ResourceType.UIWindow, string.Format("pan_{0}", type.ToString()), cache: true);
-            if (obj == null) return null;
-            UIWindowViewBase windowBase = obj.GetComponent<UIWindowViewBase>();
-            if (windowBase == null) return null;
-            if(onshow != null)
+            LoaderMgr.Instance.LoadOrDownload("Download/Prefab/UIPrefab/UIWindows/" + string.Format("pan_{0}", type.ToString()), string.Format("pan_{0}", type.ToString()), (GameObject obj)=>
             {
-                windowBase.OnLoadComplete = onshow;
-            }
-            m_DicWindow[type] = windowBase;
+                if (obj != null)
+                {
+                    obj = UnityEngine.Object.Instantiate(obj);
+                    UIWindowViewBase windowBase = obj.GetComponent<UIWindowViewBase>();
+                    if (windowBase == null) return;
+                    m_DicWindow[type] = windowBase;
 
-            windowBase.CurrentUIType = type;
-            Transform transParent = null;
+                    windowBase.CurrentUIType = type;
+                    windowBase.OnShow = OnShow;
+                    Transform transParent = null;
 
-            switch (windowBase.containerType)
-            {
-                case WindowUIContainerType.Center:
-                    transParent = UISceneCtrl.Instance.CurrentUIScene.Container_Center;
-                    break;
-            }
+                    switch (windowBase.containerType)
+                    {
+                        case WindowUIContainerType.Center:
+                            transParent = UISceneCtrl.Instance.CurrentUIScene.Container_Center;
+                            break;
+                    }
 
-            obj.transform.parent = transParent;
-            obj.transform.localPosition = Vector3.zero;
-            obj.transform.localScale = Vector3.one;
-            obj.GetComponent<RectTransform>().sizeDelta = Vector2.zero;
-            obj.SetActive(false);
-            StartShowWindow(windowBase, true);
+                    obj.transform.parent = transParent;
+                    obj.transform.localPosition = Vector3.zero;
+                    obj.transform.localScale = Vector3.one;
+                    obj.GetComponent<RectTransform>().sizeDelta = Vector2.zero;
+                    obj.SetActive(false);
+                    LayerUIMgr.Instance.SetLayer(obj);
+                    StartShowWindow(windowBase, true);
+                }
+                if (OnComplete != null)
+                {
+                    OnComplete(obj);
+                }
+            });
         }
         else
         {
-            obj = m_DicWindow[type].gameObject;
+            LayerUIMgr.Instance.SetLayer(m_DicWindow[type].gameObject);
+            if (OnComplete != null)
+            {
+                OnComplete(m_DicWindow[type].gameObject);
+            }
         }
-        LayerUIMgr.Instance.SetLayer(obj);
-        return obj;
     }
     #endregion
 

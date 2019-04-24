@@ -122,7 +122,12 @@ public class UIGameLevelDetailView : UIWindowViewBase
     public void SetUI(TransferData data)
     {
         m_GameLevelId = data.GetValue<int>(ConstDefine.GameLevelId);
-        imgDetail.SetImage(GameUtil.LoadGameLevelDetailImg(data.GetValue<string>(ConstDefine.GameLevelDlgPic)));
+        //imgDetail.SetImage(GameUtil.LoadGameLevelDetailImg(data.GetValue<string>(ConstDefine.GameLevelDlgPic)));
+        LoaderMgr.Instance.LoadOrDownload<Sprite>(string.Format("Download/Source/UISource/GameLevel/GameLevelDetail/{0}", data.GetValue<string>(ConstDefine.GameLevelDlgPic)), data.GetValue<string>(ConstDefine.GameLevelDlgPic), (Sprite obj) =>
+        {
+            imgDetail.overrideSprite = obj;
+        }, type: 1);
+
         lblGameLevelName.SetText(data.GetValue<string>(ConstDefine.GameLevelName));
 
         lblExp.SetText(data.GetValue<int>(ConstDefine.GameLevelExp).ToString());

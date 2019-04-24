@@ -44,7 +44,17 @@ public class UIGameLevelMapItemView : UISubViewBase
         m_OnGameLevelItemClick = onGameLevelItemClick;
         txtName.SetText(data.GetValue<string>(ConstDefine.GameLevelName));
         m_GameLevelId = data.GetValue<int>(ConstDefine.GameLevelId);
-        imgIco.overrideSprite = GameUtil.LoadGameLevelIcon(data.GetValue<string>(ConstDefine.GameLevelIco));
+        //imgIco.overrideSprite = GameUtil.LoadGameLevelIcon(data.GetValue<string>(ConstDefine.GameLevelIco));
+
+        LoaderMgr.Instance.LoadOrDownload<Texture2D>(string.Format("Download/Source/UISource/GameLevel/GameLevelIcon/{0}", data.GetValue<string>(ConstDefine.GameLevelIco)), data.GetValue<string>(ConstDefine.GameLevelIco), (Texture2D obj) =>
+        {
+            if (obj == null) return;
+
+            var iconRect = new Rect(0, 0, obj.width, obj.height);
+            var iconSprite = Sprite.Create(obj, iconRect, new Vector2(.5f, .5f));
+
+            imgIco.overrideSprite = iconSprite;
+        }, type: 1);
     }
 
     protected override void BeforeOnDestroy()

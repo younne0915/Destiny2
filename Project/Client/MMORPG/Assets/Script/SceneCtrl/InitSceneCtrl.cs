@@ -5,13 +5,23 @@
 //===================================================
 using UnityEngine;
 using System.Collections;
+using System;
 
 public class InitSceneCtrl : MonoBehaviour 
 {
 	void Start ()
 	{
+#if DISABLE_ASSETBUNDLE
+        SceneMgr.Instance.LoadToLogOn();
+#else
+       DownloadMgr.Instance.InitStreamingAssets(OnInitComplete);
+#endif
+    }
+
+    private void OnInitComplete()
+    {
         StartCoroutine(LoadLogOn());
-	}
+    }
 
     private IEnumerator LoadLogOn()
     {

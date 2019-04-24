@@ -1,8 +1,10 @@
-using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
 
-public class UIRegView : UIWindowViewBase {
+public class UIRegView : UIWindowViewBase
+{
 
     public InputField txtUserName;
     public InputField txtPwd;

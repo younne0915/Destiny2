@@ -91,4 +91,6 @@ public class ConstDefine
 
     public const string PlayerFailEvent = "PlayerFailEvent";
     public const string PlayerResurgenceEvent = "PlayerResurgenceEvent";
+
+    public const string TestAttack = "TestAttackEvent";
 }

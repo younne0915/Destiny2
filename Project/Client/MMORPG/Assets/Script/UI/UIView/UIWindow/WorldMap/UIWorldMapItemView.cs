@@ -47,16 +47,16 @@ public class UIWorldMapItemView : UISubViewBase
 
         string picName = data.GetValue<string>(ConstDefine.WorldMapIco);
 
-        imgIco.overrideSprite = GameUtil.LoadWorldMapIcon(picName);
-        //AssetBundleMgr.Instance.LoadOrDownload<Texture2D>(string.Format("Download/Source/UISource/WorldMap/{0}.assetbundle", picName), picName, (Texture2D obj) =>
-        //{
-        //    if (obj == null) return;
+        //imgIco.overrideSprite = GameUtil.LoadWorldMapIcon(picName);
+        LoaderMgr.Instance.LoadOrDownload<Texture2D>(string.Format("Download/Source/UISource/WorldMap/{0}", picName), picName, (Texture2D obj) =>
+        {
+            if (obj == null) return;
 
-        //    var iconRect = new Rect(0, 0, obj.width, obj.height);
-        //    var iconSprite = Sprite.Create(obj, iconRect, new Vector2(.5f, .5f));
+            var iconRect = new Rect(0, 0, obj.width, obj.height);
+            var iconSprite = Sprite.Create(obj, iconRect, new Vector2(.5f, .5f));
 
-        //    imgIco.overrideSprite = iconSprite;
-        //}, type: 1);
+            imgIco.overrideSprite = iconSprite;
+        }, type: 1);
     }
 
     protected override void BeforeOnDestroy()

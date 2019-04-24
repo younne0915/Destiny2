@@ -1,4 +1,5 @@
 using PathologicalGames;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,7 +19,9 @@ public class RecyclePoolMgr : SingletonMono<RecyclePoolMgr>
                 int index = path.LastIndexOf('/') + 1;
                 string prefabName = path.Substring(index, path.Length - index);
                 //AppDebug.Log(string.Format("path = {0}, index = {1}, prefabName = {2}", path, index, prefabName));
-                m_CacheResDic[path] = AssetBundleMgr.Instance.Load(string.Format("{0}.assetbundle", path), prefabName);
+
+                //m_CacheResDic[path] = AssetBundleMgr.Instance.Load(string.Format("{0}.assetbundle", path), prefabName);
+                m_CacheResDic[path] = LoaderMgr.Instance.Load(path, prefabName);
             }
             else
             {
@@ -28,6 +31,40 @@ public class RecyclePoolMgr : SingletonMono<RecyclePoolMgr>
         }
 
         return Spawn(poolType, m_CacheResDic[path].transform);
+    }
+
+    public void SpawnOrLoadByAssetBundle(PoolType poolType, string path, Action<Transform> onComplete)
+    {
+        if (!m_CacheResDic.ContainsKey(path))
+        {
+            int index = path.LastIndexOf('/') + 1;
+            string prefabName = path.Substring(index, path.Length - index);
+            LoaderMgr.Instance.LoadOrDownload(path, prefabName, (GameObject obj)=> 
+            {
+                if (obj != null)
+                {
+                    m_CacheResDic[path] = obj;
+                    if(onComplete != null)
+                    {
+                        onComplete(Spawn(poolType, m_CacheResDic[path].transform));
+                    }                    
+                }
+                else
+                {
+                    if (onComplete != null)
+                    {
+                        onComplete(null);
+                    }
+                }
+            });
+        }
+        else
+        {
+            if (onComplete != null)
+            {
+                onComplete(Spawn(poolType, m_CacheResDic[path].transform));
+            }
+        }
     }
 
     public Transform Spawn(PoolType poolType, Transform prefab)

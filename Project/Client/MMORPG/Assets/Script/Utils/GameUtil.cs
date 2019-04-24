@@ -150,6 +150,31 @@ public class GameUtil
     //}
     #endregion
 
+    #region GetFileName 获取文件名
+    /// <summary>
+    /// 获取文件名
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    public static string GetFileName(string path)
+    {
+        string fileName = path;
+        int lastIndex = path.LastIndexOf('/');
+        if (lastIndex > -1)
+        {
+            fileName = fileName.Substring(lastIndex + 1);
+        }
+
+        lastIndex = fileName.LastIndexOf('.');
+        if (lastIndex > -1)
+        {
+            fileName = fileName.Substring(0, lastIndex);
+        }
+
+        return fileName;
+    }
+    #endregion
+
     public static Texture LoadGameLevelMapPic(string pic)
     {
         return Resources.Load<Texture>(string.Format("UI/GameLevel/GameLevelMap/{0}", pic));
@@ -175,7 +200,7 @@ public class GameUtil
     {
         Vector3 direction = startPos - targetPos;
         direction.Normalize();
-        direction = Quaternion.Euler(0, UnityEngine.Random.Range(-90, 90), 0) * direction;
+        direction = Quaternion.Euler(0, UnityEngine.Random.Range(-120, 120), 0) * direction;
         direction = direction * distance * UnityEngine.Random.Range(0.8f, 1);
         return targetPos + direction;
     }

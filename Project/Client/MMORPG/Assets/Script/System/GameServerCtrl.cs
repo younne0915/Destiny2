@@ -72,11 +72,15 @@ public class GameServerCtrl : SystemCtrlBase<GameServerCtrl>, ISystemCtrl
 
     private void UIGameServerEnterView_btnSelectGameServerClick(object[] p)
     {
-        uiGameServerSelectView = UIViewUtil.Instance.OpenWindow(WindowUIType.GameServerSelect, ()=>
+        UIViewUtil.Instance.LoadWindow(WindowUIType.GameServerSelect, (GameObject obj)=>
         {
-            uiGameServerSelectView.SetGameServerSelectItemView(GlobalInit.Instance.CurrentSelectGameServer);
-            GetGameServerPage();
-        }).GetComponent<UIGameServerSelectView>();
+            if(obj != null)
+            {
+                uiGameServerSelectView = obj.GetComponent<UIGameServerSelectView>();
+                uiGameServerSelectView.SetGameServerSelectItemView(GlobalInit.Instance.CurrentSelectGameServer);
+                GetGameServerPage();
+            }
+        });
     }
 
     /// <summary>
@@ -180,15 +184,25 @@ public class GameServerCtrl : SystemCtrlBase<GameServerCtrl>, ISystemCtrl
 
     private void OpenGameServerEnterView()
     {
-        uiGameServerEnterView = UIViewUtil.Instance.OpenWindow(WindowUIType.GameServerEnter, ()=>
+        UIViewUtil.Instance.LoadWindow(WindowUIType.GameServerEnter, (GameObject obj)=>
         {
-            uiGameServerEnterView.SetUI(GlobalInit.Instance.CurrentSelectGameServer.Name);
-        }).GetComponent<UIGameServerEnterView>();
+            if(obj != null)
+            {
+                uiGameServerEnterView = obj.GetComponent<UIGameServerEnterView>();
+                uiGameServerEnterView.SetUI(GlobalInit.Instance.CurrentSelectGameServer.Name);
+            }
+        });
     }
 
     private void OpenGameServerSelectView()
     {
-        uiGameServerSelectView = UIViewUtil.Instance.OpenWindow(WindowUIType.GameServerSelect).GetComponent<UIGameServerSelectView>();
+        UIViewUtil.Instance.LoadWindow(WindowUIType.GameServerSelect,(GameObject obj)=> 
+        {
+            if(obj != null)
+            {
+                uiGameServerSelectView = obj.GetComponent<UIGameServerSelectView>();
+            }
+        });
     }
 
     public override void Dispose()

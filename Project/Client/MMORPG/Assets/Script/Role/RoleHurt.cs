@@ -23,18 +23,15 @@ public class RoleHurt
 
         if (m_CurrRoleFSMMgr.CurrRoleStateEnum == RoleState.Die) yield break;
 
-        if (m_CurrRoleFSMMgr.IsRigidty) yield break;
-
         SkillEntity skillEntity = SkillDBModel.Instance.Get(roleTransferAttackInfo.SkillId);
         SkillLevelEntity skillLevelEntity = SkillLevelDBModel.Instance.GetSkillLevelEntityBySkillIdAndLevel(roleTransferAttackInfo.SkillId, roleTransferAttackInfo.SkillLevel);
         if (skillEntity == null || skillLevelEntity == null) yield break;
 
-        m_RoleStateHurt.ShowHurtEffectDelaySecond = skillEntity.ShowHurtEffectDelaySecond;
-        m_CurrRoleFSMMgr.ChangeState(RoleState.Hurt);
         //AppDebug.LogError(string.Format("ToHurt : {0}, skillId : {1}", Time.realtimeSinceStartup, roleTransferAttackInfo.SkillId));
         yield return new WaitForSeconds(skillEntity.ShowHurtEffectDelaySecond);
 
         m_CurrRoleFSMMgr.CurrRoleCtrl.CurrRoleInfo.CurrHP -= roleTransferAttackInfo.HurtValue;
+
         if (OnRoleHurt != null)
         {
             OnRoleHurt();
@@ -70,11 +67,23 @@ public class RoleHurt
             y2 = 4.4f;
         }
 
-        UISceneCtrl.Instance.CurrentUIScene.HUDText.NewText("- " + roleTransferAttackInfo.HurtValue, m_CurrRoleFSMMgr.CurrRoleCtrl.transform, color, frontSize, speed, y1, y2, UnityEngine.Random.Range(0, 2) == 1? bl_Guidance.RightDown: bl_Guidance.LeftDown);
+        if (UISceneCtrl.Instance.CurrentUIScene != null)
+        {
+            UISceneCtrl.Instance.CurrentUIScene.HUDText.NewText("- " + roleTransferAttackInfo.HurtValue, m_CurrRoleFSMMgr.CurrRoleCtrl.transform, color, frontSize, speed, y1, y2, UnityEngine.Random.Range(0, 2) == 1 ? bl_Guidance.RightDown : bl_Guidance.LeftDown);
+        }
 
-        Transform effectTransform = RecyclePoolMgr.Instance.Spawn(PoolType.Effect, ResourLoadType.AssetBundle, "Effect/Effect_Hurt");
-        effectTransform.position = m_CurrRoleFSMMgr.CurrRoleCtrl.transform.position;
-        effectTransform.rotation = m_CurrRoleFSMMgr.CurrRoleCtrl.transform.rotation;
-        RecyclePoolMgr.Instance.Despawn(PoolType.Effect, effectTransform, 3);
+
+
+        RecyclePoolMgr.Instance.SpawnOrLoadByAssetBundle(PoolType.Effect, "Download/Prefab/Effect/Common/Effect_Hurt", (Transform effectTransform) => 
+        {
+            effectTransform.position = m_CurrRoleFSMMgr.CurrRoleCtrl.transform.position;
+            effectTransform.rotation = m_CurrRoleFSMMgr.CurrRoleCtrl.transform.rotation;
+            RecyclePoolMgr.Instance.Despawn(PoolType.Effect, effectTransform, 3);
+        });
+        
+
+        if (m_CurrRoleFSMMgr.IsRigidty) yield break;
+
+        m_CurrRoleFSMMgr.ChangeState(RoleState.Hurt);
     }
 }

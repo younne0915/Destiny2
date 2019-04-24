@@ -126,6 +126,7 @@ public class RoleMainPlayerCityAI : IRoleAI
                                 {
                                     CurrRole.ToAttack(type, skillId);
                                 }
+
                             }
                             else
                             {

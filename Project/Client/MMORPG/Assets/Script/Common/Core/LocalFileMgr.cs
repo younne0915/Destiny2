@@ -6,7 +6,8 @@ public class LocalFileMgr : Singleton<LocalFileMgr>
 {
 #if UNITY_EDITOR
 #if UNITY_STANDALONE_WIN
-    public readonly string LocalFilePath = Application.dataPath + "/../AssetBundles/Windows/";
+    public readonly string LocalFilePath = Application.persistentDataPath + "/";
+    //public readonly string LocalFilePath = Application.dataPath + "/../AssetBundles/Windows/";
 #elif UNITY_ANDROID
     public readonly string LocalFilePath = Application.dataPath + "/../AssetBundles/Android/";
 

@@ -38,7 +38,7 @@ public class NPCCtrl : MonoBehaviour
 
     private void Update()
     {
-        if(Time.time > m_Time && m_NPCTalkContent != null && m_NPCTalkContent.Length > 0)
+        if(Time.time > m_Time && m_NPCTalkContent != null && m_NPCTalkContent.Length > 0 && m_NpcHeadBarView!= null)
         {
             m_Time = Time.time + 7f;
             m_NpcHeadBarView.Talk(m_NPCTalkContent[Random.Range(0, m_NPCTalkContent.Length)], 4f);
@@ -52,14 +52,18 @@ public class NPCCtrl : MonoBehaviour
         if (m_HeadBarPos == null) return;
 
         //克隆预设
-        m_HeadBar = ResourcesMgr.Instance.Load(ResourcesMgr.ResourceType.UIOther, "NPCHeadBar");
-        m_HeadBar.transform.parent = RoleHeadBarRoot.Instance.gameObject.transform;
-        m_HeadBar.transform.localScale = Vector3.one;
-        m_HeadBar.transform.localPosition = Vector3.zero;
 
-        m_NpcHeadBarView = m_HeadBar.GetComponent<NPCHeadBarView>();
+        RecyclePoolMgr.Instance.SpawnOrLoadByAssetBundle(PoolType.UI, "Download/Prefab/UIPrefab/UIOther/NPCHeadBar", (Transform headBarTransform) =>
+        {
+            m_HeadBar = headBarTransform.gameObject;
+            m_HeadBar.transform.parent = RoleHeadBarRoot.Instance.gameObject.transform;
+            m_HeadBar.transform.localScale = Vector3.one;
+            m_HeadBar.transform.localPosition = Vector3.zero;
 
-        //给预设赋值
-        m_NpcHeadBarView.Init(m_HeadBarPos, m_CurrNPCWorldMapData.npcEntity.Name);
+            m_NpcHeadBarView = m_HeadBar.GetComponent<NPCHeadBarView>();
+
+            //给预设赋值
+            m_NpcHeadBarView.Init(m_HeadBarPos, m_CurrNPCWorldMapData.npcEntity.Name);
+        });
     }
 }

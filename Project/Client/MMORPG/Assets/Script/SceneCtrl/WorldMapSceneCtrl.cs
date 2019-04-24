@@ -1,4 +1,4 @@
-//===================================================
+﻿//===================================================
 //作    者：边涯  http://www.u3dol.com  QQ群：87481002
 //创建时间：2015-12-06 07:43:41
 //备    注：
@@ -88,7 +88,7 @@ public class WorldMapSceneCtrl : GameSceneCtrlBase
         JobEntity entity = JobDBModel.Instance.Get(jobId);
         if(entity != null)
         {
-            Transform otherRoleTrans = RecyclePoolMgr.Instance.Spawn(PoolType.Player, ResourLoadType.AssetBundle, string.Format("Role/{0}", entity.PrefabName));
+            Transform otherRoleTrans = RecyclePoolMgr.Instance.Spawn(PoolType.Player, ResourLoadType.AssetBundle, string.Format("Download/Prefab/RolePrefab/Player/{0}", entity.PrefabName));
             otherRoleTrans.eulerAngles = new Vector3(0, yAngle, 0);
             RoleCtrl ctrl = otherRoleTrans.GetComponent<RoleCtrl>();
             RoleInfoMainPlayer roleInfoPlayer = new RoleInfoMainPlayer();
@@ -162,7 +162,7 @@ public class WorldMapSceneCtrl : GameSceneCtrlBase
             SkillEntity skillEntity = SkillDBModel.Instance.Get(proto.SkillId);
             if(skillEntity != null)
             {
-                m_AllRoleDic[proto.AttackRoleId].m_Attack.PlayAttack(skillEntity.IsPhyAttack == 1? RoleAttackType.PhyAttack : RoleAttackType.SkillAttack, proto.SkillId);
+                m_AllRoleDic[proto.AttackRoleId].m_Attack.PlayAttack(proto.SkillId);
             }
         }
 
@@ -226,59 +226,73 @@ public class WorldMapSceneCtrl : GameSceneCtrlBase
 
     #endregion
 
-    protected override void OnLoadUIMainCityView()
+    private void LoadTransPrefab()
     {
-        RoleMgr.Instance.InitMainPlayer();
+        string effectPath = "Download/Prefab/Effect/Common/Effect_Trans";
+        LoaderMgr.Instance.LoadOrDownload(effectPath, "Effect_Trans", LoadTransPrefabCallback);
+    }
 
-        if (GlobalInit.Instance != null && GlobalInit.Instance.CurrPlayer != null)
+    private void LoadTransPrefabCallback(GameObject obj)
+    {
+        if(obj != null)
         {
-            m_AllRoleDic.Add(GlobalInit.Instance.MainPlayerInfo.RoleId, GlobalInit.Instance.CurrPlayer);
-            CurrWorldMapEntity = WorldMapDBModel.Instance.Get(SceneMgr.Instance.CurrWorldMapId);
-            if (CurrWorldMapEntity != null)
+            if (GlobalInit.Instance != null && GlobalInit.Instance.CurrPlayer != null)
             {
-                InitTransPos();
-                if (SceneMgr.Instance.TargetWorldMapTransPosId > 0)
+                m_AllRoleDic.Add(GlobalInit.Instance.MainPlayerInfo.RoleId, GlobalInit.Instance.CurrPlayer);
+                CurrWorldMapEntity = WorldMapDBModel.Instance.Get(SceneMgr.Instance.CurrWorldMapId);
+                if (CurrWorldMapEntity != null)
                 {
-                    if (m_TransDic.ContainsKey(SceneMgr.Instance.TargetWorldMapTransPosId))
+                    InitTransPos();
+                    if (SceneMgr.Instance.TargetWorldMapTransPosId > 0)
                     {
-                        WorldMapTransCtrl ctrl = m_TransDic[SceneMgr.Instance.TargetWorldMapTransPosId];
-                        Vector3 newPos = ctrl.transform.forward.normalized * 3 + ctrl.transform.position;
-                        GlobalInit.Instance.CurrPlayer.Born(newPos);
-                        GlobalInit.Instance.CurrPlayer.transform.eulerAngles = new Vector3(0, ctrl.transform.eulerAngles.y, 0);
-                    }
-                    
-                    SceneMgr.Instance.TargetWorldMapTransPosId = 0;
-                }
-                else
-                {
-                    if(GlobalInit.Instance.MainPlayerInfo.LastInWorldMapRotateY > 0)
-                    {
-                        GlobalInit.Instance.CurrPlayer.Born(GlobalInit.Instance.MainPlayerInfo.LastInWorldMapPos);
-                        GlobalInit.Instance.CurrPlayer.transform.eulerAngles = new Vector3(0, GlobalInit.Instance.MainPlayerInfo.LastInWorldMapRotateY, 0);
+                        if (m_TransDic.ContainsKey(SceneMgr.Instance.TargetWorldMapTransPosId))
+                        {
+                            WorldMapTransCtrl ctrl = m_TransDic[SceneMgr.Instance.TargetWorldMapTransPosId];
+                            Vector3 newPos = ctrl.transform.forward.normalized * 3 + ctrl.transform.position;
+                            GlobalInit.Instance.CurrPlayer.Born(newPos);
+                            GlobalInit.Instance.CurrPlayer.transform.eulerAngles = new Vector3(0, ctrl.transform.eulerAngles.y, 0);
+                        }
+
+                        SceneMgr.Instance.TargetWorldMapTransPosId = 0;
                     }
                     else
                     {
-                        GlobalInit.Instance.CurrPlayer.Born(CurrWorldMapEntity.RoleBirthPosition);
-                        GlobalInit.Instance.CurrPlayer.transform.eulerAngles = new Vector3(0, CurrWorldMapEntity.RoleBirthEulerAnglesY, 0);
+                        if (GlobalInit.Instance.MainPlayerInfo.LastInWorldMapRotateY > 0)
+                        {
+                            GlobalInit.Instance.CurrPlayer.Born(GlobalInit.Instance.MainPlayerInfo.LastInWorldMapPos);
+                            GlobalInit.Instance.CurrPlayer.transform.eulerAngles = new Vector3(0, GlobalInit.Instance.MainPlayerInfo.LastInWorldMapRotateY, 0);
+                        }
+                        else
+                        {
+                            GlobalInit.Instance.CurrPlayer.Born(CurrWorldMapEntity.RoleBirthPosition);
+                            GlobalInit.Instance.CurrPlayer.transform.eulerAngles = new Vector3(0, CurrWorldMapEntity.RoleBirthEulerAnglesY, 0);
+                        }
                     }
                 }
+                else
+                {
+                    GlobalInit.Instance.CurrPlayer.Born(PlayerBornPos);
+                }
+                SendRoleAlreadyEnterMsg();
+                PlayerCtrl.Instance.SetMainCityData();
             }
-            else
+
+            //加载完毕
+            if (DelegateDefine.Instance.OnSceneLoadOK != null)
             {
-                GlobalInit.Instance.CurrPlayer.Born(PlayerBornPos);
+                DelegateDefine.Instance.OnSceneLoadOK();
             }
-            SendRoleAlreadyEnterMsg();
-            PlayerCtrl.Instance.SetMainCityData();
-        }
 
-        //加载完毕
-        if (DelegateDefine.Instance.OnSceneLoadOK != null)
-        {
-            DelegateDefine.Instance.OnSceneLoadOK();
+            StartCoroutine(InitNPC());
+            AutoMove();
         }
+    }
 
-        StartCoroutine(InitNPC());
-        AutoMove();
+    protected override void OnLoadUIMainCityView(GameObject obj)
+    {
+        base.OnLoadUIMainCityView(obj);
+        RoleMgr.Instance.InitMainPlayer();
+        LoadTransPrefab();
     }
 
     private IEnumerator InitNPC()
@@ -287,16 +301,36 @@ public class WorldMapSceneCtrl : GameSceneCtrlBase
 
         if (CurrWorldMapEntity == null) yield break;
 
-        for (int i = 0; i < CurrWorldMapEntity.NPCWorldMapDataList.Count; i++)
+        LoadNPC(0);
+    }
+
+    private void LoadNPC(int index)
+    {
+        if (index >= CurrWorldMapEntity.NPCWorldMapDataList.Count) return;
+        NPCWorldMapData data = CurrWorldMapEntity.NPCWorldMapDataList[index];
+
+        RoleMgr.Instance.LoadNPC(data.npcEntity.PrefabName, (GameObject obj) =>
         {
-            NPCWorldMapData data = CurrWorldMapEntity.NPCWorldMapDataList[i];
-            GameObject obj = RoleMgr.Instance.LoadNPC(data.npcEntity.PrefabName);
-            obj.transform.position = data.NPCPosition;
-            obj.transform.eulerAngles = new Vector3(0, data.EulerAnglesY, 0);
-            obj.transform.localScale = Vector3.one;
-            NPCCtrl ctrl = obj.GetComponent<NPCCtrl>();
-            ctrl.Init(data);
-        }
+            if(obj != null)
+            {
+                obj = UnityEngine.Object.Instantiate(obj);
+                obj.transform.position = data.NPCPosition;
+                obj.transform.eulerAngles = new Vector3(0, data.EulerAnglesY, 0);
+                obj.transform.localScale = Vector3.one;
+                NPCCtrl ctrl = obj.GetComponent<NPCCtrl>();
+                ctrl.Init(data);
+
+                index++;
+                if (index == CurrWorldMapEntity.NPCWorldMapDataList.Count)
+                {
+                    AppDebug.LogError("NPC加载完毕");
+                }
+                else
+                {
+                    LoadNPC(index);
+                }
+            }
+        });
     }
 
     private void InitTransPos()
@@ -315,7 +349,7 @@ public class WorldMapSceneCtrl : GameSceneCtrlBase
                     float y = arr2[1].ToFloat();
                     float z = arr2[2].ToFloat();
                     float eulerY = arr2[3].ToFloat();
-                    Transform effectTrans = RecyclePoolMgr.Instance.Spawn(PoolType.Effect, ResourLoadType.AssetBundle, "Effect/Effect_Trans");
+                    Transform effectTrans = RecyclePoolMgr.Instance.Spawn(PoolType.Effect, ResourLoadType.AssetBundle, "Download/Prefab/Effect/Common/Effect_Trans");
                     effectTrans.parent = null;
                     effectTrans.localScale = Vector3.one;
                     effectTrans.eulerAngles = new Vector3(0, eulerY, 0);

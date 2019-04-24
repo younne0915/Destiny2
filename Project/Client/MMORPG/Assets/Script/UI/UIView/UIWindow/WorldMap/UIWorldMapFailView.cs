@@ -17,7 +17,7 @@ public class UIWorldMapFailView : UIWindowViewBase
             case "btnReturn":
                 //Íæ¼Ò¸´»î
                 GlobalInit.Instance.CurrPlayer.ToResurgence(RoleIdleState.IdleNormal);
-                SceneMgr.Instance.LoadToWorldMap(2);
+                SceneMgr.Instance.LoadToWorldMap(GlobalInit.Instance.MainPlayerInfo.LastInWorldMapId);
                 break;
             case "btnResurgence":
                 EventDispatcher.Instance.Dispatch(ConstDefine.PlayerResurgenceEvent);

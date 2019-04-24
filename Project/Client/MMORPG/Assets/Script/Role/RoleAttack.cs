@@ -7,9 +7,6 @@ using UnityEngine;
 [System.Serializable]
 public class RoleAttack
 {
-    public List<RoleAttackInfo> PhyAttackInfoList;
-    public List<RoleAttackInfo> SkillAttackInfoList;
-
     private RoleFSMMgr m_CurrRoleFSMMgr = null;
     private RoleCtrl m_CurrRoleCtrl = null;
 
@@ -23,44 +20,6 @@ public class RoleAttack
     {
         m_CurrRoleFSMMgr = fsm;
         m_CurrRoleCtrl = fsm.CurrRoleCtrl;
-    }
-
-    public void ToAttackByIndex(RoleAttackType type, int index)
-    {
-        if(m_RoleStateAttack == null)
-        {
-            m_RoleStateAttack = m_CurrRoleFSMMgr.GetRoleState(RoleState.Attack) as RoleStateAttack;
-        }
-
-        if (m_CurrRoleFSMMgr.IsRigidty) return;
-        RoleAttackInfo info = GetRoleAttackInfoByIndex(type, index);
-
-        if(info != null)
-        {
-            m_CurrRoleFSMMgr.CurrRoleCtrl.CurrAttackInfo = info;
-            Transform effectTransform = RecyclePoolMgr.Instance.Spawn(PoolType.Effect, ResourLoadType.AssetBundle, string.Format("Effect/{0}", info.EffectName));
-            effectTransform.position = m_CurrRoleFSMMgr.CurrRoleCtrl.transform.position;
-            effectTransform.rotation = m_CurrRoleFSMMgr.CurrRoleCtrl.transform.rotation;
-            RecyclePoolMgr.Instance.Despawn(PoolType.Effect, effectTransform, info.EffectLifeTime);
-        }
-
-
-        if (info != null && info.IsDoCameraShake)
-        {
-            CameraShake(info.CameraShakeDelay);
-        }
-
-        if (type == RoleAttackType.PhyAttack)
-        {
-            m_RoleStateAttack.AnimatorConditionName = ToAnimatorCondition.ToPhyAttack;
-        }
-        else if(type == RoleAttackType.SkillAttack)
-        {
-            m_RoleStateAttack.AnimatorConditionName = ToAnimatorCondition.ToSkill;
-        }
-        m_RoleStateAttack.AnimatorConditionValue = index;
-        m_RoleStateAttack.AnimatorState = ConvertToAnimatorState(type, index);
-        m_CurrRoleFSMMgr.ChangeState(RoleState.Attack);
     }
 
     public bool ToAttack(RoleAttackType type, int skillId)
@@ -80,78 +39,36 @@ public class RoleAttack
         }
 
         #region 找敌人相关
-        //1.
-        if (m_CurrRoleCtrl.CurrRoleType == RoleType.MainPlayer || m_CurrRoleCtrl.CurrRoleType == RoleType.Monster)
+        SkillEntity skillEntity = SkillDBModel.Instance.Get(skillId);
+        if (skillEntity == null) return false;
+        SkillLevelEntity skillLevelEntity = SkillLevelDBModel.Instance.GetSkillLevelEntityBySkillIdAndLevel(skillId, m_CurrRoleCtrl.CurrRoleInfo.GetSkillLevel(skillId));
+        if (skillLevelEntity == null) return false;
+
+        if (skillLevelEntity.SpendMP > m_CurrRoleCtrl.CurrRoleInfo.CurrMP)
         {
-            SkillEntity skillEntity = SkillDBModel.Instance.Get(skillId);
-            if (skillEntity == null) return false;
-            SkillLevelEntity skillLevelEntity = SkillLevelDBModel.Instance.GetSkillLevelEntityBySkillIdAndLevel(skillId, m_CurrRoleCtrl.CurrRoleInfo.GetSkillLevel(skillId));
-            if (skillLevelEntity == null) return false;
+            AppDebug.LogError("魔不足");
+            return false;
+        }
 
-            if (skillLevelEntity.SpendMP > m_CurrRoleCtrl.CurrRoleInfo.CurrMP)
+        if (m_CurrRoleCtrl.OnMPChange != null)
+        {
+            m_CurrRoleCtrl.OnMPChange(ValueChangeType.Subtrack);
+        }
+
+        m_EnemyList.Clear();
+
+        if (m_CurrRoleCtrl.CurrRoleType == RoleType.MainPlayer)
+        {
+            m_SearchList.Clear();
+            int attackTargetCnt = skillEntity.AttackTargetCount;
+            if (attackTargetCnt == 1)
             {
-                AppDebug.LogError("魔不足");
-                return false;
-            }
-
-            m_CurrRoleCtrl.CurrRoleInfo.CurrMP -= skillLevelEntity.SpendMP;
-            if(m_CurrRoleCtrl.CurrRoleInfo.CurrMP < 0)
-            {
-                m_CurrRoleCtrl.CurrRoleInfo.CurrMP = 0;
-            }
-
-            if (m_CurrRoleCtrl.OnMPChange != null)
-            {
-                m_CurrRoleCtrl.OnMPChange(ValueChangeType.Subtrack);
-            }
-
-            m_EnemyList.Clear();
-
-            if (m_CurrRoleCtrl.CurrRoleType == RoleType.MainPlayer)
-            {
-                m_SearchList.Clear();
-                int attackTargetCnt = skillEntity.AttackTargetCount;
-                if(attackTargetCnt == 1)
+                if (m_CurrRoleCtrl.LockEnemy != null)
                 {
-                    if(m_CurrRoleCtrl.LockEnemy != null)
-                    {
-                        m_EnemyList.Add(m_CurrRoleCtrl.LockEnemy);
-                    }
-                    else
-                    {
-                        Collider[] arr = Physics.OverlapSphere(m_CurrRoleCtrl.transform.position, skillEntity.AreaAttackRadius, 1 << LayerMask.NameToLayer("Role"));
-                        if(arr != null && arr.Length > 0)
-                        {
-                            for (int i = 0; i < arr.Length; i++)
-                            {
-                                if (arr[i].GetComponent<RoleCtrl>().CurrRoleInfo.RoleId == GlobalInit.Instance.MainPlayerInfo.RoleId) continue;
-                                m_SearchList.Add(arr[i].GetComponent<RoleCtrl>());
-                            }
- 
-                            m_SearchList.Sort((RoleCtrl r1, RoleCtrl r2) =>
-                            {
-                                int ret = 0;
-                                float dis1 = Vector3.Distance(r1.transform.position, m_CurrRoleCtrl.transform.position);
-                                float dis2 = Vector3.Distance(r1.transform.position, m_CurrRoleCtrl.transform.position);
-
-                                if (dis1 < dis2)
-                                {
-                                    ret = -1;
-                                }
-                                else
-                                {
-                                    ret = 1;
-                                }
-                                return ret;
-                            });
-
-                            m_EnemyList.Add(m_SearchList[0]);
-                        }
-                    }
+                    m_EnemyList.Add(m_CurrRoleCtrl.LockEnemy);
                 }
                 else
                 {
-
                     Collider[] arr = Physics.OverlapSphere(m_CurrRoleCtrl.transform.position, skillEntity.AreaAttackRadius, 1 << LayerMask.NameToLayer("Role"));
                     if (arr != null && arr.Length > 0)
                     {
@@ -177,86 +94,118 @@ public class RoleAttack
                             }
                             return ret;
                         });
-                    }
 
-                    int needAttack = attackTargetCnt;
-                    if (m_CurrRoleCtrl.LockEnemy != null)
-                    {
-                        m_EnemyList.Add(m_CurrRoleCtrl.LockEnemy);
-                        needAttack--;
-                    }
-                    else
-                    {
-                        if(m_SearchList.Count > 0)
-                        {
-                            m_CurrRoleCtrl.LockEnemy = m_SearchList[0];
-                            m_EnemyList.Add(m_CurrRoleCtrl.LockEnemy);
-                        }
-                    }
-
-                    for (int i = 0; i < m_SearchList.Count; i++)
-                    {
-                        if (m_CurrRoleCtrl.LockEnemy.CurrRoleInfo.RoleId == m_SearchList[i].CurrRoleInfo.RoleId)
-                        {
-                            needAttack++;
-                            continue;
-                        }
-                        if (i + 1 > needAttack) break;
-                        m_EnemyList.Add(m_SearchList[i]);
-                    }
-                }
-
-                if (SceneMgr.Instance.CurrPlayType == PlayType.PVP)
-                {
-                    //如果是PVP发送技能消息给服务器
-                    if (m_EnemyList.Count > 0)
-                    {
-                        WorldMap_CurrRoleUseSkillProto proto = new WorldMap_CurrRoleUseSkillProto();
-                        proto.BeAttackCount = m_EnemyList.Count;
-                        proto.RolePosX = m_CurrRoleCtrl.transform.position.x;
-                        proto.RolePosY = m_CurrRoleCtrl.transform.position.y;
-                        proto.RolePosZ = m_CurrRoleCtrl.transform.position.z;
-                        proto.RoleYAngle = m_CurrRoleCtrl.transform.eulerAngles.y;
-                        proto.SkillId = skillId;
-                        proto.SkillLevel = skillLevelEntity.Level;
-
-                        proto.ItemList = new List<WorldMap_CurrRoleUseSkillProto.BeAttackItem>();
-                        WorldMap_CurrRoleUseSkillProto.BeAttackItem item;
-                        for (int i = 0; i < m_EnemyList.Count; i++)
-                        {
-                            item = new WorldMap_CurrRoleUseSkillProto.BeAttackItem();
-                            item.BeAttackRoleId = m_EnemyList[i].CurrRoleInfo.RoleId;
-                            proto.ItemList.Add(item);
-
-                            //AppDebug.LogError(string.Format("发送角色攻击 : {0}, skillId : {1}", item.BeAttackRoleId, skillId));
-                        }
-                        NetWorkSocket.Instance.SendMsg(proto.ToArray());
+                        m_EnemyList.Add(m_SearchList[0]);
                     }
                 }
             }
-            else if(m_CurrRoleCtrl.CurrRoleType == RoleType.Monster)
+            else
             {
+
+                Collider[] arr = Physics.OverlapSphere(m_CurrRoleCtrl.transform.position, skillEntity.AreaAttackRadius, 1 << LayerMask.NameToLayer("Role"));
+                if (arr != null && arr.Length > 0)
+                {
+                    for (int i = 0; i < arr.Length; i++)
+                    {
+                        if (arr[i].GetComponent<RoleCtrl>().CurrRoleInfo.RoleId == GlobalInit.Instance.MainPlayerInfo.RoleId) continue;
+                        m_SearchList.Add(arr[i].GetComponent<RoleCtrl>());
+                    }
+
+                    m_SearchList.Sort((RoleCtrl r1, RoleCtrl r2) =>
+                    {
+                        int ret = 0;
+                        float dis1 = Vector3.Distance(r1.transform.position, m_CurrRoleCtrl.transform.position);
+                        float dis2 = Vector3.Distance(r1.transform.position, m_CurrRoleCtrl.transform.position);
+
+                        if (dis1 < dis2)
+                        {
+                            ret = -1;
+                        }
+                        else
+                        {
+                            ret = 1;
+                        }
+                        return ret;
+                    });
+                }
+
+                int needAttack = attackTargetCnt;
                 if (m_CurrRoleCtrl.LockEnemy != null)
                 {
                     m_EnemyList.Add(m_CurrRoleCtrl.LockEnemy);
+                    needAttack--;
                 }
-            }
-
-            if (m_EnemyList.Count == 0) return false;
-
-            #region 数值相关
-
-            if(SceneMgr.Instance.CurrPlayType == PlayType.PVE)
-            {
-                for (int i = 0; i < m_EnemyList.Count; i++)
+                else
                 {
-                    RoleTransferAttackInfo roleTransferAttackInfo = CalculateHurtValue(m_CurrRoleCtrl.LockEnemy, skillLevelEntity);
-                    m_EnemyList[i].ToHurt(roleTransferAttackInfo);
+                    if (m_SearchList.Count > 0)
+                    {
+                        m_CurrRoleCtrl.LockEnemy = m_SearchList[0];
+                        m_EnemyList.Add(m_CurrRoleCtrl.LockEnemy);
+                    }
+                }
+
+                for (int i = 0; i < m_SearchList.Count; i++)
+                {
+                    if (m_CurrRoleCtrl.LockEnemy.CurrRoleInfo.RoleId == m_SearchList[i].CurrRoleInfo.RoleId)
+                    {
+                        needAttack++;
+                        continue;
+                    }
+                    if (i + 1 > needAttack) break;
+                    m_EnemyList.Add(m_SearchList[i]);
                 }
             }
-            
-            #endregion
+
+            if (SceneMgr.Instance.CurrPlayType == PlayType.PVP)
+            {
+                //如果是PVP发送技能消息给服务器
+                if (m_EnemyList.Count > 0)
+                {
+                    WorldMap_CurrRoleUseSkillProto proto = new WorldMap_CurrRoleUseSkillProto();
+                    proto.BeAttackCount = m_EnemyList.Count;
+                    proto.RolePosX = m_CurrRoleCtrl.transform.position.x;
+                    proto.RolePosY = m_CurrRoleCtrl.transform.position.y;
+                    proto.RolePosZ = m_CurrRoleCtrl.transform.position.z;
+                    proto.RoleYAngle = m_CurrRoleCtrl.transform.eulerAngles.y;
+                    proto.SkillId = skillId;
+                    proto.SkillLevel = skillLevelEntity.Level;
+
+                    proto.ItemList = new List<WorldMap_CurrRoleUseSkillProto.BeAttackItem>();
+                    WorldMap_CurrRoleUseSkillProto.BeAttackItem item;
+                    for (int i = 0; i < m_EnemyList.Count; i++)
+                    {
+                        item = new WorldMap_CurrRoleUseSkillProto.BeAttackItem();
+                        item.BeAttackRoleId = m_EnemyList[i].CurrRoleInfo.RoleId;
+                        proto.ItemList.Add(item);
+
+                        //AppDebug.LogError(string.Format("发送角色攻击 : {0}, skillId : {1}", item.BeAttackRoleId, skillId));
+                    }
+                    NetWorkSocket.Instance.SendMsg(proto.ToArray());
+                }
+            }
         }
+        else if (m_CurrRoleCtrl.CurrRoleType == RoleType.Monster)
+        {
+            if (m_CurrRoleCtrl.LockEnemy != null)
+            {
+                m_EnemyList.Add(m_CurrRoleCtrl.LockEnemy);
+            }
+        }
+
+        if (m_EnemyList.Count == 0) return false;
+
+        #region 数值相关
+
+        if (SceneMgr.Instance.CurrPlayType == PlayType.PVE)
+        {
+            for (int i = 0; i < m_EnemyList.Count; i++)
+            {
+                RoleTransferAttackInfo roleTransferAttackInfo = CalculateHurtValue(m_CurrRoleCtrl.LockEnemy, skillLevelEntity);
+                m_EnemyList[i].ToHurt(roleTransferAttackInfo);
+            }
+        }
+
+        #endregion
 
         #endregion
 
@@ -264,91 +213,61 @@ public class RoleAttack
         bool isPlayAttack = true;
         if (SceneMgr.Instance.CurrPlayType == PlayType.PVE)
         {
-            isPlayAttack = PlayAttack(type, skillId);
+            isPlayAttack = PlayAttack(skillId);
         }
         #endregion
+
+        if (isPlayAttack)
+        {
+            m_CurrRoleCtrl.CurrRoleInfo.CurrMP -= skillLevelEntity.SpendMP;
+            if (m_CurrRoleCtrl.CurrRoleInfo.CurrMP < 0)
+            {
+                m_CurrRoleCtrl.CurrRoleInfo.CurrMP = 0;
+            }
+        }
 
         return isPlayAttack;
     }
 
-    public bool PlayAttack(RoleAttackType type, int skillId)
+    public bool PlayAttack(int skillId)
     {
         if (m_RoleStateAttack == null)
         {
             m_RoleStateAttack = m_CurrRoleFSMMgr.GetRoleState(RoleState.Attack) as RoleStateAttack;
         }
 
-        RoleAttackInfo info = GetRoleAttackInfo(type, skillId);
+        SkillEntity info = SkillDBModel.Instance.Get(skillId);
         if (info == null) return false;
 
-        m_CurrRoleFSMMgr.CurrRoleCtrl.CurrAttackInfo = info;
+        m_CurrRoleFSMMgr.CurrRoleCtrl.CurrSkillEntity = info;
 
-        Transform effectTransform = RecyclePoolMgr.Instance.Spawn(PoolType.Effect, ResourLoadType.AssetBundle, string.Format("Effect/{0}", info.EffectName));
-        effectTransform.position = m_CurrRoleFSMMgr.CurrRoleCtrl.transform.position;
-        effectTransform.rotation = m_CurrRoleFSMMgr.CurrRoleCtrl.transform.rotation;
-        RecyclePoolMgr.Instance.Despawn(PoolType.Effect, effectTransform, info.EffectLifeTime);
+        if (string.IsNullOrEmpty(info.EffectName)) return false;
 
-        if (info != null && info.IsDoCameraShake)
+         RecyclePoolMgr.Instance.SpawnOrLoadByAssetBundle(PoolType.Effect, string.Format("Download/Prefab/Effect/Role/{0}", info.EffectName), (Transform effectTransform) => 
+        {
+            effectTransform.position = m_CurrRoleFSMMgr.CurrRoleCtrl.transform.position;
+            effectTransform.rotation = m_CurrRoleFSMMgr.CurrRoleCtrl.transform.rotation;
+            RecyclePoolMgr.Instance.Despawn(PoolType.Effect, effectTransform, info.EffectLifeTime);
+        });
+
+        if (info.IsDoCameraShake == 1)
         {
             CameraShake(info.CameraShakeDelay);
         }
 
-        if (type == RoleAttackType.PhyAttack)
+        if (info.IsPhyAttack == 1)
         {
             m_RoleStateAttack.AnimatorConditionName = ToAnimatorCondition.ToPhyAttack;
         }
-        else if (type == RoleAttackType.SkillAttack)
+        else
         {
             m_RoleStateAttack.AnimatorConditionName = ToAnimatorCondition.ToSkill;
         }
-        m_RoleStateAttack.AnimatorConditionValue = info.Index;
-        m_RoleStateAttack.AnimatorState = ConvertToAnimatorState(type, info.Index);
+        m_RoleStateAttack.AnimatorConditionValue = info.AnimatorConditionValue;
+        m_RoleStateAttack.AnimatorState = ConvertUtil.ConvertToEnum<RoleAnimatorState>(info.AnimatorState);
         m_CurrRoleFSMMgr.ChangeState(RoleState.Attack);
+
         return true;
-    }
-
-    public RoleAttackInfo GetRoleAttackInfoByIndex(RoleAttackType type, int index)
-    {
-        List<RoleAttackInfo> list = null;
-        if(type == RoleAttackType.PhyAttack)
-        {
-            list = PhyAttackInfoList;
-        }
-        else
-        {
-            list = SkillAttackInfoList;
-        }
-
-        if(list != null)
-        {
-            for (int i = 0; i < list.Count; i++)
-            {
-                if (list[i].Index == index) return list[i];
-            }
-        }
-        return null;
-    }
-
-    public RoleAttackInfo GetRoleAttackInfo(RoleAttackType type, int skillId)
-    {
-        List<RoleAttackInfo> list = null;
-        if (type == RoleAttackType.PhyAttack)
-        {
-            list = PhyAttackInfoList;
-        }
-        else
-        {
-            list = SkillAttackInfoList;
-        }
-
-        if (list != null)
-        {
-            for (int i = 0; i < list.Count; i++)
-            {
-                if (list[i].SkillId == skillId) return list[i];
-            }
-        }
-        return null;
     }
 
     private RoleAnimatorState ConvertToAnimatorState(RoleAttackType type, int index)

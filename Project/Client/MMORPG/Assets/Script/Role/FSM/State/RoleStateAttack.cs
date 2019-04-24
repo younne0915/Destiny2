@@ -64,6 +64,9 @@ public class RoleStateAttack : RoleStateAbstract
             {
                 CurrRoleFSMMgr.CurrRoleCtrl.ToIdle(RoleIdleState.IdleFight);
                 CurrRoleFSMMgr.IsRigidty = false;
+
+                //Test
+                //EventDispatcher.Instance.Dispatch(ConstDefine.TestAttack);
             }
         }
         else

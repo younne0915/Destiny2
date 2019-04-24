@@ -44,31 +44,36 @@ public class UISceneCtrl: Singleton<UISceneCtrl>
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    public GameObject LoadSceneUI(SceneUIType type, Action OnLoadComplete = null)
+    public void LoadSceneUI(SceneUIType type, Action<GameObject> OnLoadComplete)
     {
-        GameObject obj = null;
+        string prefabName = string.Empty;
         switch (type)
         {
             case SceneUIType.LogOn:
-                obj = ResourcesMgr.Instance.Load(ResourcesMgr.ResourceType.UIScene, "UI Root_LogOn");
-                CurrentUIScene = obj.GetComponent<UISceneViewBase>();
+                prefabName = "UI_Root_LogOn";
                 break;
             case SceneUIType.SelectRole:
-                obj = ResourcesMgr.Instance.Load(ResourcesMgr.ResourceType.UIScene, "UI Root_SelectRole");
-                CurrentUIScene = obj.GetComponent<UISceneViewBase>();
+                prefabName = "UI_Root_SelectRole";
                 break;
             case SceneUIType.Loading:
                 break;
             case SceneUIType.MainCity:
-                obj = ResourcesMgr.Instance.Load(ResourcesMgr.ResourceType.UIScene, "UI Root_MainCity");
-                CurrentUIScene = obj.GetComponent<UISceneViewBase>();
+                prefabName = "UI_Root_MainCity";
                 break;
         }
-        if(CurrentUIScene != null)
+
+        LoaderMgr.Instance.LoadOrDownload("Download/Prefab/UIPrefab/UIScene/" + prefabName, prefabName, (GameObject obj)=> 
         {
-            CurrentUIScene.OnLoadComplete = OnLoadComplete;
-        }
-        return obj;
+            if(obj != null)
+            {
+                obj = UnityEngine.Object.Instantiate(obj);
+                CurrentUIScene = obj.GetComponent<UISceneViewBase>();
+                if (OnLoadComplete != null)
+                {
+                    OnLoadComplete(obj);
+                }
+            }
+        });
     }
     #endregion
 }

@@ -82,33 +82,39 @@ public class PlayerCtrl : SystemCtrlBase<PlayerCtrl>, ISystemCtrl
 
     public void OpenRoleInfoView()
     {
-        m_UIRoleInfoView = UIViewUtil.Instance.OpenWindow(WindowUIType.RoleInfo).GetComponent<UIRoleInfoView>();
-        RoleInfoMainPlayer roleInfo = GlobalInit.Instance.MainPlayerInfo;
-        TransferData data = new TransferData();
-        data.SetValue(ConstDefine.JobId, roleInfo.JobId);
-        data.SetValue(ConstDefine.NickName, roleInfo.RoleNickName);
-        data.SetValue(ConstDefine.Level, roleInfo.Level);
-        data.SetValue(ConstDefine.Fighting, roleInfo.Fighting);
+        UIViewUtil.Instance.LoadWindow(WindowUIType.RoleInfo,(GameObject obj)=> 
+        {
+            if(obj != null)
+            {
+                m_UIRoleInfoView = obj.GetComponent<UIRoleInfoView>();
+                RoleInfoMainPlayer roleInfo = GlobalInit.Instance.MainPlayerInfo;
+                TransferData data = new TransferData();
+                data.SetValue(ConstDefine.JobId, roleInfo.JobId);
+                data.SetValue(ConstDefine.NickName, roleInfo.RoleNickName);
+                data.SetValue(ConstDefine.Level, roleInfo.Level);
+                data.SetValue(ConstDefine.Fighting, roleInfo.Fighting);
 
-        data.SetValue(ConstDefine.Money, roleInfo.Fighting);
-        data.SetValue(ConstDefine.Gold, roleInfo.Fighting);
-        data.SetValue(ConstDefine.Attack, roleInfo.Fighting);
-        data.SetValue(ConstDefine.Defense, roleInfo.Fighting);
-        data.SetValue(ConstDefine.Hit, roleInfo.Fighting);
-        data.SetValue(ConstDefine.Dodge, roleInfo.Fighting);
-        data.SetValue(ConstDefine.Cri, roleInfo.Fighting);
-        data.SetValue(ConstDefine.Res, roleInfo.Fighting);
+                data.SetValue(ConstDefine.Money, roleInfo.Fighting);
+                data.SetValue(ConstDefine.Gold, roleInfo.Fighting);
+                data.SetValue(ConstDefine.Attack, roleInfo.Fighting);
+                data.SetValue(ConstDefine.Defense, roleInfo.Fighting);
+                data.SetValue(ConstDefine.Hit, roleInfo.Fighting);
+                data.SetValue(ConstDefine.Dodge, roleInfo.Fighting);
+                data.SetValue(ConstDefine.Cri, roleInfo.Fighting);
+                data.SetValue(ConstDefine.Res, roleInfo.Fighting);
 
 
-        data.SetValue(ConstDefine.CurrHP, roleInfo.Fighting);
-        data.SetValue(ConstDefine.MaxHP, roleInfo.Fighting);
+                data.SetValue(ConstDefine.CurrHP, roleInfo.Fighting);
+                data.SetValue(ConstDefine.MaxHP, roleInfo.Fighting);
 
-        data.SetValue(ConstDefine.CurrMP, roleInfo.Fighting);
-        data.SetValue(ConstDefine.MaxMP, roleInfo.Fighting);
+                data.SetValue(ConstDefine.CurrMP, roleInfo.Fighting);
+                data.SetValue(ConstDefine.MaxMP, roleInfo.Fighting);
 
-        data.SetValue(ConstDefine.CurrExp, roleInfo.Fighting);
-        data.SetValue(ConstDefine.MaxExp, roleInfo.Fighting);
+                data.SetValue(ConstDefine.CurrExp, roleInfo.Fighting);
+                data.SetValue(ConstDefine.MaxExp, roleInfo.Fighting);
 
-        m_UIRoleInfoView.SetRoleInfo(data);
+                m_UIRoleInfoView.SetRoleInfo(data);
+            }
+        });
     }
 }

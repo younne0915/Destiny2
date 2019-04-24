@@ -7,7 +7,7 @@ public class LogOnSceneCtrl : MonoBehaviour {
 
     void Awake()
     {
-        UISceneCtrl.Instance.LoadSceneUI(UISceneCtrl.SceneUIType.LogOn);
+        UISceneCtrl.Instance.LoadSceneUI(UISceneCtrl.SceneUIType.LogOn, (GameObject obj)=> { });
     }
 
 	// Use this for initialization

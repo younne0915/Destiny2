@@ -146,12 +146,24 @@ public class AccountCtrl : SystemCtrlBase<AccountCtrl>, ISystemCtrl
 
     public void OpenLogOnView()
     {
-        uiLogOnView = UIViewUtil.Instance.OpenWindow(WindowUIType.LogOn).GetComponent<UILogOnView>();
+        UIViewUtil.Instance.LoadWindow(WindowUIType.LogOn, (GameObject obj) =>
+        {
+            if (obj != null)
+            {
+                uiLogOnView = obj.GetComponent<UILogOnView>();
+            }
+        });
     }
 
     private void OpenRegWindow()
     {
-        uiRegView = UIViewUtil.Instance.OpenWindow(WindowUIType.Reg).GetComponent<UIRegView>();
+        UIViewUtil.Instance.LoadWindow(WindowUIType.Reg, (GameObject obj) =>
+        {
+            if (obj != null)
+            {
+                uiRegView = obj.GetComponent<UIRegView>();
+            }
+        });
     }
 
     public override void Dispose()
@@ -174,13 +186,27 @@ public class AccountCtrl : SystemCtrlBase<AccountCtrl>, ISystemCtrl
             case WindowUIType.Reg:
                 OpenRegWindow();
                 break;
+            case WindowUIType.Test:
+                OpenTestWindow();
+                break;
         }
+    }
+
+    private void OpenTestWindow()
+    {
+        UIViewUtil.Instance.LoadWindow(WindowUIType.Test, (GameObject obj) =>
+        {
+            if (obj != null)
+            {
+                AppDebug.LogError(obj.name);
+            }
+        });
     }
 
     public void QuickLogOn()
     {
         //if (!PlayerPrefs.HasKey(ConstDefine.LogOn_AccountID))
-        if(true)
+        if (true)
         {
             OpenView(WindowUIType.Reg);
         }

@@ -26,9 +26,7 @@ public class GameSceneCtrlBase : MonoBehaviour
 
     void Start ()
     {
-        m_MainCityView = UISceneCtrl.Instance.LoadSceneUI(UISceneCtrl.SceneUIType.MainCity, OnLoadUIMainCityView).GetComponent<UISceneMainCityView>();
-        m_MainCityView.OnSkillBtnClick = OnSkillBtnClick;
-        OnStart();
+        UISceneCtrl.Instance.LoadSceneUI(UISceneCtrl.SceneUIType.MainCity, OnLoadUIMainCityView);
 	}
 
     public void OnSkillBtnClick(int skillId)
@@ -57,7 +55,12 @@ public class GameSceneCtrlBase : MonoBehaviour
     protected virtual void OnStart() { }
     protected virtual void OnUpdate() { }
     protected virtual void BeforeOnDestroy() { }
-    protected virtual void OnLoadUIMainCityView() { }
+    protected virtual void OnLoadUIMainCityView(GameObject obj)
+    {
+        m_MainCityView = obj.GetComponent<UISceneMainCityView>();
+        m_MainCityView.OnSkillBtnClick = OnSkillBtnClick;
+        OnStart();
+    }
 
 
     #region OnZoom ÉãÏñ»úËõ·Å

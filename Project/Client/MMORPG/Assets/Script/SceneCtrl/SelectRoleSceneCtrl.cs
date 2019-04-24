@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class SelectRoleSceneCtrl : MonoBehaviour
 {
-    private List<JobEntity> m_Jobist;
+    private List<JobEntity> m_JobList;
 
     public Transform[] CreateRoleContainers;
     private Dictionary<int, RoleCtrl> m_JobRoleCtrl = new Dictionary<int, RoleCtrl>();
@@ -35,25 +35,31 @@ public class SelectRoleSceneCtrl : MonoBehaviour
         }
     }
 
+    private int m_JobIndex = 0;
+
     void Awake()
     {
-        GameObject obj = UISceneCtrl.Instance.LoadSceneUI(UISceneCtrl.SceneUIType.SelectRole);
-        if(obj != null)
+        UISceneCtrl.Instance.LoadSceneUI(UISceneCtrl.SceneUIType.SelectRole, (GameObject obj) => 
         {
-            m_SceneSelectRoleView = obj.GetComponent<UISceneSelectRoleView>();
-            if(m_SceneSelectRoleView != null)
+            if (obj != null)
             {
-                m_SceneSelectRoleView.SelectRoleDragView.OnSelectRoleDrag = OnSelectRoleDrag;
-
-                if(m_SceneSelectRoleView.JobItems != null && m_SceneSelectRoleView.JobItems.Length > 0)
+                m_SceneSelectRoleView = obj.GetComponent<UISceneSelectRoleView>();
+                if (m_SceneSelectRoleView != null)
                 {
-                    for (int i = 0; i < m_SceneSelectRoleView.JobItems.Length; i++)
+                    m_SceneSelectRoleView.SelectRoleDragView.OnSelectRoleDrag = OnSelectRoleDrag;
+
+                    if (m_SceneSelectRoleView.JobItems != null && m_SceneSelectRoleView.JobItems.Length > 0)
                     {
-                        m_SceneSelectRoleView.JobItems[i].OnSelectJob = OnSelectJob;
+                        for (int i = 0; i < m_SceneSelectRoleView.JobItems.Length; i++)
+                        {
+                            m_SceneSelectRoleView.JobItems[i].OnSelectJob = OnSelectJob;
+                        }
                     }
+                    LoadJobListObj();
+                    CurrentJobId = 1;
                 }
             }
-        }
+        });
     }
 
     // Use this for initialization
@@ -78,9 +84,32 @@ public class SelectRoleSceneCtrl : MonoBehaviour
         UIDispatcher.Instance.AddEventHandler(ConstDefine.SelectRole_Return, OnBtnSelectRole_BackClick);
         UIDispatcher.Instance.AddEventHandler(ConstDefine.SelectRole_CreateRole, OnBtnSelectRole_CreateRoleClick);
 
-        LogOnGameServer();
-        m_Jobist = JobDBModel.Instance.GetList();
-        CurrentJobId = 1;
+    }
+
+    private void LoadJobListObj()
+    {
+        m_JobList = JobDBModel.Instance.GetList();
+        if(m_JobList != null && m_JobList.Count > 0)
+        {
+            LoadJobObj(m_JobList[0]);
+        }
+    }
+
+    private void LoadJobObj(JobEntity jobEntity)
+    {
+        string path = string.Format("Download/Prefab/RolePrefab/Player/{0}", jobEntity.PrefabName);
+        LoaderMgr.Instance.LoadOrDownload(path, jobEntity.PrefabName, (GameObject obj)=> 
+        {
+            m_JobIndex++;
+            if(m_JobIndex >= m_JobList.Count)
+            {
+                LogOnGameServer();
+            }
+            else
+            {
+                LoadJobObj(m_JobList[m_JobIndex]);
+            }
+        });
     }
 
     private void OnSkillReturn(byte[] p)
@@ -90,7 +119,6 @@ public class SelectRoleSceneCtrl : MonoBehaviour
         for (int i = 0; i < proto.CurrSkillDataList.Count; i++)
         {
             skillData = proto.CurrSkillDataList[i];
-            AppDebug.LogError("skillId : " + skillData.SkillId);
             GlobalInit.Instance.MainPlayerInfo.SkillList.Add(new RoleInfoSkill(skillData.SkillId, skillData.SkillLevel, skillData.SlotsNo));
         }
         SceneMgr.Instance.LoadToWorldMap(GlobalInit.Instance.MainPlayerInfo.LastInWorldMapId);
@@ -320,9 +348,9 @@ public class SelectRoleSceneCtrl : MonoBehaviour
     {
         if (CreateRoleContainers == null || CreateRoleContainers.Length == 0) return;
 
-        for (int i = 0; i < m_Jobist.Count; i++)
+        for (int i = 0; i < m_JobList.Count; i++)
         {
-            GameObject objRole = RoleMgr.Instance.LoadPlayer(m_Jobist[i].Id);
+            GameObject objRole = RoleMgr.Instance.LoadPlayer(m_JobList[i].Id);
             objRole.transform.parent = CreateRoleContainers[i];
 
             objRole.transform.localScale = Vector3.one;
@@ -332,7 +360,7 @@ public class SelectRoleSceneCtrl : MonoBehaviour
             RoleCtrl roleCtrl = objRole.GetComponent<RoleCtrl>();
             if (roleCtrl != null)
             {
-                m_JobRoleCtrl[m_Jobist[i].Id] = roleCtrl;
+                m_JobRoleCtrl[m_JobList[i].Id] = roleCtrl;
             }
         }
     }
@@ -397,11 +425,11 @@ public class SelectRoleSceneCtrl : MonoBehaviour
 
     private void SetSelectJob()
     {
-        for (int i = 0; i < m_Jobist.Count; i++)
+        for (int i = 0; i < m_JobList.Count; i++)
         {
-            if(m_Jobist[i].Id == CurrentJobId)
+            if(m_JobList[i].Id == CurrentJobId)
             {
-                m_SceneSelectRoleView.SelectRoleJobDescView.SetUI(m_Jobist[i].Name, m_Jobist[i].Desc);
+                m_SceneSelectRoleView.SelectRoleJobDescView.SetUI(m_JobList[i].Name, m_JobList[i].Desc);
                 break;
             }
         }

@@ -17,7 +17,7 @@ public class UIGameLevelFailView : UIWindowViewBase
             case "btnReturn":
                 //Íæ¼Ò¸´»î
                 GlobalInit.Instance.CurrPlayer.ToResurgence(RoleIdleState.IdleNormal);
-                SceneMgr.Instance.LoadToWorldMap(SceneMgr.Instance.CurrWorldMapId);
+                SceneMgr.Instance.LoadToWorldMap(GlobalInit.Instance.MainPlayerInfo.LastInWorldMapId);
                 break;
             case "btnResurgence":
                 if (OnResurgence != null) OnResurgence();

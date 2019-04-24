@@ -136,7 +136,7 @@ public class RoleCtrl : MonoBehaviour
     public RoleAttack m_Attack;
 
     [HideInInspector]
-    public RoleAttackInfo CurrAttackInfo;
+    public SkillEntity CurrSkillEntity;
 
     [HideInInspector]
     public float PreIdleFightTime = 0;
@@ -161,6 +161,8 @@ public class RoleCtrl : MonoBehaviour
     public delegate void OnValueChangeHandler(ValueChangeType type);
     public OnValueChangeHandler OnHPChange;
     public OnValueChangeHandler OnMPChange;
+
+    private bool m_Init = false;
 
     #endregion
 
@@ -192,9 +194,11 @@ public class RoleCtrl : MonoBehaviour
         CurrRoleFSMMgr = new RoleFSMMgr(this, OnRoleDieCallback, OnRoleDestroyCallback);
         m_Hurt = new RoleHurt(CurrRoleFSMMgr);
         m_Hurt.OnRoleHurt = OnRoleHurtCallback;
-        //m_Attack = new RoleAttack(CurrRoleFSMMgr);
         m_Attack.SetRoleFSMMgr(CurrRoleFSMMgr);
+    }
 
+    private void ResetState()
+    {
         if (CurrRoleType == RoleType.Monster)
         {
             ToIdle(RoleIdleState.IdleFight);
@@ -210,70 +214,58 @@ public class RoleCtrl : MonoBehaviour
                 ToIdle(RoleIdleState.IdleNormal);
             }
         }
-    }
 
-    private void OnRoleDestroyCallback()
-    {
-        //AppDebug.LogError("OnRoleDestroyCallback");
-        //if (CharacterController != null)
-        //{
-        //    CharacterController.enabled = true;
-        //}
-
-        //if (CurrRoleType == RoleType.Monster)
-        //{
-        //    RecyclePoolMgr.Instance.Despawn(PoolType.Monster, transform);
-        //    ToIdle(RoleIdleState.IdleFight);
-        //}
-        //else if (CurrRoleType == RoleType.OtherPlayer)
-        //{
-        //    AppDebug.LogError("OnRoleDestroyCallback OtherPlayer");
-        //    RecyclePoolMgr.Instance.Despawn(PoolType.Player, transform);
-        //    ToIdle(RoleIdleState.IdleNormal);
-        //}
-
-        DespawnHeadBar();
-    }
-
-    public void RoleRecycle()
-    {
-        AppDebug.LogError("RoleRecycle");
         if (CharacterController != null)
         {
             CharacterController.enabled = true;
         }
+    }
 
+    private void OnRoleDestroyCallback()
+    {
         if (CurrRoleType == RoleType.Monster)
         {
             RecyclePoolMgr.Instance.Despawn(PoolType.Monster, transform);
             ToIdle(RoleIdleState.IdleFight);
         }
+
+        DespawnHeadBar();
+
+        if (CharacterController != null)
+        {
+            CharacterController.enabled = false;
+        }
+    }
+
+    public void RoleRecycle()
+    {
+        if (CurrRoleType == RoleType.Monster)
+        {
+            RecyclePoolMgr.Instance.Despawn(PoolType.Monster, transform);
+        }
         else if (CurrRoleType == RoleType.OtherPlayer)
         {
-            AppDebug.LogError("OnRoleDestroyCallback OtherPlayer");
             RecyclePoolMgr.Instance.Despawn(PoolType.Player, transform);
-            ToIdle(RoleIdleState.IdleNormal);
         }
 
         DespawnHeadBar();
+
+        if (CharacterController != null)
+        {
+            CharacterController.enabled = false;
+        }
     }
 
     public void DespawnHeadBar()
     {
         if (m_HeadBar != null)
         {
-            //Destroy(roleHeadBarView.gameObject);
             RecyclePoolMgr.Instance.Despawn(PoolType.UI, m_HeadBar.transform);
         }
     }
 
     private void OnRoleDieCallback()
     {
-        if(CharacterController != null)
-        {
-            CharacterController.enabled = false;
-        }
-
         LockEnemy = null;
 
         if(OnRoleDie != null)
@@ -286,7 +278,6 @@ public class RoleCtrl : MonoBehaviour
     {
         if(roleHeadBarView != null)
         {
-            AppDebug.LogError("OnRoleHurtCallback : " + (float)CurrRoleInfo.CurrHP / CurrRoleInfo.MaxHP);
             roleHeadBarView.Hurt(0, (float)CurrRoleInfo.CurrHP / CurrRoleInfo.MaxHP);
         }
 
@@ -306,6 +297,12 @@ public class RoleCtrl : MonoBehaviour
 
         if (CurrRoleFSMMgr.CurrRoleStateEnum == RoleState.Die) return;
 
+        if (!m_Init)
+        {
+            m_Init = true;
+            ResetState();
+        }
+
         //如果角色没有AI 直接返回
         if (CurrRoleAI == null) return;
         CurrRoleAI.DoAI();
@@ -313,28 +310,9 @@ public class RoleCtrl : MonoBehaviour
         if (CharacterController == null) return;
 
         //让角色贴着地面
-        if (!CharacterController.isGrounded)
+        if (CharacterController.enabled && !CharacterController.isGrounded)
         {
-            CharacterController.Move((transform.position + new Vector3(0, -1000, 0)) - transform.position);
-        }
-
-        if (Input.GetMouseButtonUp(1))
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, Mathf.Infinity, 1 << LayerMask.NameToLayer("Item")))
-            {
-                BoxCtrl boxCtrl = hit.collider.GetComponent<BoxCtrl>();
-                if (boxCtrl != null)
-                {
-                    boxCtrl.Hit();
-                }
-            }
-        }
-
-        //让角色贴着地面
-        if (!CharacterController.isGrounded)
-        {
+            Vector3 orginVect = transform.position;
             CharacterController.Move((transform.position + new Vector3(0, -1000, 0)) - transform.position);
         }
 
@@ -343,7 +321,6 @@ public class RoleCtrl : MonoBehaviour
             CameraAutoFollow();
             AutoSmallMap();
         }
-
     }
 
     private void AutoSmallMap()
@@ -360,6 +337,7 @@ public class RoleCtrl : MonoBehaviour
         BornPoint = pos;
         transform.position = pos;
         InitHeadBar();
+        m_Init = false;
     }
 
     /// <summary>
@@ -373,19 +351,18 @@ public class RoleCtrl : MonoBehaviour
 
         //克隆预设
         //m_HeadBar = ResourcesMgr.Instance.Load(ResourcesMgr.ResourceType.UIOther, "RoleHeadBar");
-        m_HeadBar = RecyclePoolMgr.Instance.Spawn( PoolType.UI, ResourLoadType.Resources, "UIPrefab/UIOther/RoleHeadBar").gameObject;
-        m_HeadBar.transform.parent = RoleHeadBarRoot.Instance.gameObject.transform;
-        m_HeadBar.transform.localScale = Vector3.one;
-        m_HeadBar.transform.localPosition = Vector3.zero;
-
-        roleHeadBarView = m_HeadBar.GetComponent<RoleHeadBarView>();
-
-        if(CurrRoleType == RoleType.OtherPlayer)
+        RecyclePoolMgr.Instance.SpawnOrLoadByAssetBundle(PoolType.UI, "Download/Prefab/UIPrefab/UIOther/RoleHeadBar", (Transform headBarTransform)=>
         {
-            AppDebug.LogError("CurrRoleInfo.MaxHP = " + CurrRoleInfo.MaxHP);
-        }
-        //给预设赋值
-        roleHeadBarView.Init(m_HeadBarPos, CurrRoleInfo.RoleNickName, (float)CurrRoleInfo.CurrHP / CurrRoleInfo.MaxHP, isShowHPBar: (CurrRoleType == RoleType.MainPlayer ? false : true));
+            m_HeadBar = headBarTransform.gameObject;
+            m_HeadBar.transform.parent = RoleHeadBarRoot.Instance.gameObject.transform;
+            m_HeadBar.transform.localScale = Vector3.one;
+            m_HeadBar.transform.localPosition = Vector3.zero;
+
+            roleHeadBarView = m_HeadBar.GetComponent<RoleHeadBarView>();
+            //给预设赋值
+            roleHeadBarView.Init(m_HeadBarPos, CurrRoleInfo.RoleNickName, (float)CurrRoleInfo.CurrHP / CurrRoleInfo.MaxHP, isShowHPBar: (CurrRoleType == RoleType.MainPlayer ? false : true));
+
+        });
     }
 
 
@@ -393,22 +370,16 @@ public class RoleCtrl : MonoBehaviour
 
     public void ToResurgence(RoleIdleState roleIdleState = RoleIdleState.IdleNormal)
     {
-        if (CharacterController != null)
-        {
-            CharacterController.enabled = true;
-        }
-
         CurrRoleInfo.CurrHP = CurrRoleInfo.MaxHP;
         CurrRoleInfo.CurrMP = CurrRoleInfo.MaxMP;
-
-        if (CurrRoleType == RoleType.OtherPlayer)
-        {
-            AppDebug.LogError("CurrRoleInfo.CurrHP = " + CurrRoleInfo.CurrHP);
-        }
 
         LockEnemy = null;
         ToIdle(roleIdleState);
         InitHeadBar();
+        if(CharacterController != null)
+        {
+            CharacterController.enabled = true;
+        }
     }
 
     public void ToIdle(RoleIdleState idleState = RoleIdleState.IdleNormal)
@@ -449,14 +420,7 @@ public class RoleCtrl : MonoBehaviour
             CurrRoleFSMMgr.ChangeState(RoleState.Idle);
             return;
         }
-        if (CurrRoleType == RoleType.OtherPlayer)
-        {
-            AppDebug.LogError(string.Format("想要 : {0}", targetPos));
-        }
 
-        //AppDebug.LogError(string.Format("寻路roleID :{0},角色名称:{1}", CurrRoleInfo.RoleId, CurrRoleInfo.RoleNickName));
-
-        //if (m_Path == null || m_Path.IsDone())
         if(m_Seeker.IsDone())
         {
             m_Seeker.StartPath(transform.position, TargetPos, (Path p) =>
@@ -472,10 +436,6 @@ public class RoleCtrl : MonoBehaviour
                     }
                     else
                     {
-                        if (CurrRoleType == RoleType.OtherPlayer)
-                        {
-                            AppDebug.LogError(string.Format("走到 : {0}", targetPos));
-                        }
                         AttemptSendPVPMove(TargetPos, AStarPath.vectorPath);
                         CurrRoleFSMMgr.ChangeState(RoleState.Run);
                     }
@@ -503,32 +463,11 @@ public class RoleCtrl : MonoBehaviour
             proto.TargetPosZ = targetPos.z;
             proto.NeedTime = (int)(pathTotalDis / Speed * 1000);
             NetWorkSocket.Instance.SendMsg(proto.ToArray());
-
-            //AppDebug.LogError(string.Format("pathTotalDis : {0}, ServerTime : {1}, NeedTime : {2}", pathTotalDis, proto.ServerTime, proto.NeedTime));
         }
-        //else
-        //{
-        //    AppDebug.LogError(string.Format("其他玩家移动到 : {0}", targetPos));
-        //}
-    }
-
-    public void ToAttackByIndex(RoleAttackType type, int index)
-    {
-        //if (LockEnemy == null) return;
-        //CurrRoleFSMMgr.ChangeState(RoleState.Attack);
-
-        ////暂时写死
-        //LockEnemy.ToHurt(100, 0.5f);
-        m_Attack.ToAttackByIndex(type, index);
     }
 
     public bool ToAttack(RoleAttackType type, int skillId)
     {
-        //if (LockEnemy == null) return;
-        //CurrRoleFSMMgr.ChangeState(RoleState.Attack);
-
-        ////暂时写死
-        //LockEnemy.ToHurt(100, 0.5f);
         return m_Attack.ToAttack(type, skillId);
     }
 

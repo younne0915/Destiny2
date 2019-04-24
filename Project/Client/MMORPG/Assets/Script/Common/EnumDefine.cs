@@ -49,7 +49,8 @@ public enum WindowUIType
     GameLevelVictory,
     GameLevelFail,
     WorldMap,
-    WorldMapFail
+    WorldMapFail,
+    Test
 }
 #endregion
 
@@ -302,4 +303,10 @@ public enum PlayType
 {
     PVE,
     PVP,
+}
+
+public enum AssetBundleResType
+{
+    GameObject,
+    Png,
 }

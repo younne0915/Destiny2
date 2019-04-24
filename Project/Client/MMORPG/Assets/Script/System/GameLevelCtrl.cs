@@ -63,7 +63,13 @@ public class GameLevelCtrl : SystemCtrlBase<GameLevelCtrl>, ISystemCtrl
 
     private void OpenGameLevelFail()
     {
-        m_UIGameLevelFailView = UIViewUtil.Instance.OpenWindow(WindowUIType.GameLevelFail).GetComponent<UIGameLevelFailView>();
+        UIViewUtil.Instance.LoadWindow(WindowUIType.GameLevelFail, (GameObject obj) =>
+        {
+            if(obj != null)
+            {
+                m_UIGameLevelFailView = obj.GetComponent<UIGameLevelFailView>();
+            }
+        });
         m_UIGameLevelFailView.OnResurgence = () => 
         {
             GameLevel_ResurgenceProto resurgenceProto = new GameLevel_ResurgenceProto();
@@ -81,7 +87,13 @@ public class GameLevelCtrl : SystemCtrlBase<GameLevelCtrl>, ISystemCtrl
 
     private void OpenGameLevelVictory()
     {
-        m_UIGameLevelVictoryView = UIViewUtil.Instance.OpenWindow(WindowUIType.GameLevelVictory).GetComponent<UIGameLevelVictoryView>();
+       UIViewUtil.Instance.LoadWindow(WindowUIType.GameLevelVictory, (GameObject obj) =>
+        {
+            if (obj != null)
+            {
+                m_UIGameLevelVictoryView = obj.GetComponent<UIGameLevelVictoryView>();
+            }
+        });
 
         GameLevelEntity gameLevelEntity = GameLevelDBModel.Instance.Get(m_GameLevelId);
         GameLevelGradeEntity gameLevelGradeEntity = GameLevelGradeDBModel.Instance.GetEntityByGameLevelIdAndGrade(m_GameLevelId, m_Grade);
@@ -132,46 +144,57 @@ public class GameLevelCtrl : SystemCtrlBase<GameLevelCtrl>, ISystemCtrl
 
     private void OpenGameLevelMapView()
     {
-        m_UIGameLevelMapView = UIViewUtil.Instance.OpenWindow(WindowUIType.GameLevelMap).GetComponent<UIGameLevelMapView>();
-
-        TransferData data = new TransferData();
-        ChapterEntity entity = ChapterDBModel.Instance.Get(1);
-        data.SetValue(ConstDefine.ChapterId, entity.Id);
-        data.SetValue(ConstDefine.ChapterName, entity.ChapterName);
-        data.SetValue(ConstDefine.ChapterBG, entity.BG_Pic);
-
-        //¹Ø¿¨
-        List<GameLevelEntity> gameLevelList = GameLevelDBModel.Instance.GetListByChapterId(entity.Id);
-        List<TransferData> list = new List<TransferData>();
-
-        GameLevelEntity gameLevelEntity;
-        TransferData levelData;
-        for (int i = 0; i < gameLevelList.Count; i++)
+        UIViewUtil.Instance.LoadWindow(WindowUIType.GameLevelMap, (GameObject obj) =>
         {
-            gameLevelEntity = gameLevelList[i];
-            levelData = new TransferData();
-            levelData.SetValue(ConstDefine.GameLevelId, gameLevelEntity.Id);
-            levelData.SetValue(ConstDefine.GameLevelName, gameLevelEntity.Name);
-            levelData.SetValue(ConstDefine.GameLevelPostion, gameLevelEntity.Position);
-            levelData.SetValue(ConstDefine.GameLevelisBoss, gameLevelEntity.isBoss);
-            levelData.SetValue(ConstDefine.GameLevelIco, gameLevelEntity.Ico);
-            list.Add(levelData);
-        }
-        data.SetValue(ConstDefine.GameLevelList, list);
-        m_UIGameLevelMapView.SetUI(data, OnGameLevelItemClick);
+            if (obj != null)
+            {
+                m_UIGameLevelMapView = obj.GetComponent<UIGameLevelMapView>();
+                TransferData data = new TransferData();
+                ChapterEntity entity = ChapterDBModel.Instance.Get(1);
+                data.SetValue(ConstDefine.ChapterId, entity.Id);
+                data.SetValue(ConstDefine.ChapterName, entity.ChapterName);
+                data.SetValue(ConstDefine.ChapterBG, entity.BG_Pic);
+
+                //¹Ø¿¨
+                List<GameLevelEntity> gameLevelList = GameLevelDBModel.Instance.GetListByChapterId(entity.Id);
+                List<TransferData> list = new List<TransferData>();
+
+                GameLevelEntity gameLevelEntity;
+                TransferData levelData;
+                for (int i = 0; i < gameLevelList.Count; i++)
+                {
+                    gameLevelEntity = gameLevelList[i];
+                    levelData = new TransferData();
+                    levelData.SetValue(ConstDefine.GameLevelId, gameLevelEntity.Id);
+                    levelData.SetValue(ConstDefine.GameLevelName, gameLevelEntity.Name);
+                    levelData.SetValue(ConstDefine.GameLevelPostion, gameLevelEntity.Position);
+                    levelData.SetValue(ConstDefine.GameLevelisBoss, gameLevelEntity.isBoss);
+                    levelData.SetValue(ConstDefine.GameLevelIco, gameLevelEntity.Ico);
+                    list.Add(levelData);
+                }
+                data.SetValue(ConstDefine.GameLevelList, list);
+                m_UIGameLevelMapView.SetUI(data, OnGameLevelItemClick);
+            }
+        });
     }
 
-    private void OnGameLevelItemClick(int obj)
+    private void OnGameLevelItemClick(int gradeLevelId)
     {
-        OpenGameLevelDetail();
-        SetGameLevelDetailData(obj, GameLevelGrade.Normal);
+        OpenGameLevelDetail(gradeLevelId);
     }
 
-    private void OpenGameLevelDetail()
+    private void OpenGameLevelDetail(int gradeLevelId)
     {
-        m_UIGameLevelDetailView = UIViewUtil.Instance.OpenWindow(WindowUIType.GameLevelDetail).GetComponent<UIGameLevelDetailView>();
-        m_UIGameLevelDetailView.OnBtnGradeChangeClick = OnBtnGradeChangeClick;
-        m_UIGameLevelDetailView.OnBtnEnterGameLevelClick = OnEnterGameLevelClick;
+        UIViewUtil.Instance.LoadWindow(WindowUIType.GameLevelDetail, (GameObject obj) =>
+        {
+            if(obj != null)
+            {
+                m_UIGameLevelDetailView = obj.GetComponent<UIGameLevelDetailView>();
+                m_UIGameLevelDetailView.OnBtnGradeChangeClick = OnBtnGradeChangeClick;
+                m_UIGameLevelDetailView.OnBtnEnterGameLevelClick = OnEnterGameLevelClick;
+                SetGameLevelDetailData(gradeLevelId, GameLevelGrade.Normal);
+            }
+        });
     }
 
     private void OnEnterGameLevelClick(int gameLevelId, GameLevelGrade grade)

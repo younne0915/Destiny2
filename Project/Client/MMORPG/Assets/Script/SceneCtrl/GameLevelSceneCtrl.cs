@@ -70,7 +70,6 @@ public class GameLevelSceneCtrl : GameSceneCtrlBase
         m_CurrGameLevelId = SceneMgr.Instance.CurrGameLevelId;
         m_CurrGrade = SceneMgr.Instance.CurrGameLevelGrade;
 
-
         m_CurrRegionLiveMonsterList = new List<RoleCtrl>();
         m_CurrRegionMonsterCountDic = new Dictionary<int, int>();
         m_CurrRegionMonsterIdList = new List<int>();
@@ -82,9 +81,9 @@ public class GameLevelSceneCtrl : GameSceneCtrlBase
         GameLevelCtrl.Instance.CurrGameLevelKillMonsterDic.Clear();
     }
 
-    protected override void OnLoadUIMainCityView()
+    protected override void OnLoadUIMainCityView(GameObject obj)
     {
-        base.OnLoadUIMainCityView();
+        base.OnLoadUIMainCityView(obj);
 
         PlayerCtrl.Instance.SetMainCityData();
         RoleMgr.Instance.InitMainPlayer();
@@ -205,7 +204,7 @@ public class GameLevelSceneCtrl : GameSceneCtrlBase
 
     private void CreateMonster()
     {
-        if (m_CurrRegionCreatedMonsterCnt >= 1) return;
+        //if (m_CurrRegionCreatedMonsterCnt >= 1) return;
 
         m_CurrRegionCreatedMonsterCnt++;
 
@@ -213,48 +212,52 @@ public class GameLevelSceneCtrl : GameSceneCtrlBase
         {
             int index = UnityEngine.Random.Range(0, m_CurrRegionMonsterIdList.Count);
             int spriteId = m_CurrRegionMonsterIdList[index];
-            
+           
             if (m_CurrRegionMonsterCountDic.ContainsKey(spriteId) && m_CurrRegionMonsterCountDic[spriteId] > 0)
             {
-
-                Transform monsterTransform = RecyclePoolMgr.Instance.Spawn(PoolType.Monster, ResourLoadType.AssetBundle, string.Format("Role/{0}", SpriteDBModel.Instance.Get(spriteId).PrefabName));
-                Transform monsterBornTransform = m_CurrGameLevelRegionCtrl.MonsterBornPos[UnityEngine.Random.Range(0, m_CurrGameLevelRegionCtrl.MonsterBornPos.Count)];
-                monsterTransform.localScale = Vector3.one;
-                RoleCtrl roleMonster = monsterTransform.GetComponent<RoleCtrl>();
-                if(roleMonster != null)
+                string monsterPath = string.Format("Download/Prefab/RolePrefab/Monster/{0}", SpriteDBModel.Instance.Get(spriteId).PrefabName);
+                RecyclePoolMgr.Instance.SpawnOrLoadByAssetBundle(PoolType.Monster, monsterPath, (Transform monsterTransform)=>
                 {
-                    SpriteEntity spriteEntity = SpriteDBModel.Instance.Get(spriteId);
-                    RoleInfoMonster infoMonster = new RoleInfoMonster();
-                    if (spriteEntity != null)
+                    Transform monsterBornTransform = m_CurrGameLevelRegionCtrl.MonsterBornPos[UnityEngine.Random.Range(0, m_CurrGameLevelRegionCtrl.MonsterBornPos.Count)];
+                    monsterTransform.localScale = Vector3.one;
+                    RoleCtrl roleMonster = monsterTransform.GetComponent<RoleCtrl>();
+                    if (roleMonster != null)
                     {
-                        infoMonster.RoleId = ++m_RoleMonsterId;
-                        infoMonster.RoleNickName = spriteEntity.Name;
-                        infoMonster.Level = spriteEntity.Level;
-                        infoMonster.Attack = spriteEntity.Attack;
-                        infoMonster.Defense = spriteEntity.Defense;
-                        infoMonster.Hit = spriteEntity.Hit;
-                        infoMonster.Dodge = spriteEntity.Dodge;
-                        infoMonster.Cri = spriteEntity.Cri;
-                        infoMonster.Res = spriteEntity.Res;
-                        infoMonster.Fighting = spriteEntity.Fighting;
-                        infoMonster.CurrHP = infoMonster.MaxHP = spriteEntity.HP;
-                        infoMonster.CurrMP = infoMonster.MaxMP = spriteEntity.MP;
-                        infoMonster.spriteEntity = spriteEntity;
+                        SpriteEntity spriteEntity = SpriteDBModel.Instance.Get(spriteId);
+                        RoleInfoMonster infoMonster = new RoleInfoMonster();
+                        if (spriteEntity != null)
+                        {
+                            infoMonster.RoleId = ++m_RoleMonsterId;
+                            infoMonster.RoleNickName = spriteEntity.Name;
+                            infoMonster.Level = spriteEntity.Level;
+                            infoMonster.Attack = spriteEntity.Attack;
+                            infoMonster.Defense = spriteEntity.Defense;
+                            infoMonster.Hit = spriteEntity.Hit;
+                            infoMonster.Dodge = spriteEntity.Dodge;
+                            infoMonster.Cri = spriteEntity.Cri;
+                            infoMonster.Res = spriteEntity.Res;
+                            infoMonster.Fighting = spriteEntity.Fighting;
+                            infoMonster.CurrHP = infoMonster.MaxHP = spriteEntity.HP;
+                            infoMonster.CurrMP = infoMonster.MaxMP = spriteEntity.MP;
+                            infoMonster.spriteEntity = spriteEntity;
 
-                        roleMonster.ViewRange = spriteEntity.Range_View;
-                        roleMonster.Speed = spriteEntity.MoveSpeed;
+                            roleMonster.ViewRange = spriteEntity.Range_View;
+                            roleMonster.Speed = spriteEntity.MoveSpeed;
+                        }
+                        roleMonster.Init(RoleType.Monster, infoMonster, new GameLevelRoleMonsterAI(roleMonster, infoMonster));
+                        Vector3 randomPos = monsterBornTransform.TransformPoint(new Vector3(UnityEngine.Random.Range(-0.5f, 0.5f), 0, UnityEngine.Random.Range(-0.5f, 0.5f)));
+                        roleMonster.Born(randomPos);
+                        //AppDebug.LogError(string.Format("monsterBornTransform = {0}, randomPos = {1}, name : {2}, position : {3}", monsterBornTransform.position, randomPos, roleMonster.gameObject.name, roleMonster.transform.position));
+                        roleMonster.OnRoleDie = OnMonsterDieCallback;
+                        m_CurrRegionLiveMonsterList.Add(roleMonster);
                     }
-                    roleMonster.Init(RoleType.Monster, infoMonster, new GameLevelRoleMonsterAI(roleMonster, infoMonster));
-                    roleMonster.Born(monsterBornTransform.TransformPoint(new Vector3(UnityEngine.Random.Range(-0.5f, 0.5f), 0, UnityEngine.Random.Range(-0.5f, 0.5f))));
-                    roleMonster.OnRoleDie = OnMonsterDieCallback;
-                    m_CurrRegionLiveMonsterList.Add(roleMonster);
-                }
 
-                m_CurrRegionMonsterCountDic[spriteId]--;
-                if(m_CurrRegionMonsterCountDic[spriteId] <= 0)
-                {
-                    m_CurrRegionMonsterCountDic.Remove(spriteId);
-                }
+                    m_CurrRegionMonsterCountDic[spriteId]--;
+                    if (m_CurrRegionMonsterCountDic[spriteId] <= 0)
+                    {
+                        m_CurrRegionMonsterCountDic.Remove(spriteId);
+                    }
+                });
             }
         }
     }

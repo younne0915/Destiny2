@@ -36,20 +36,23 @@ public class UITipView : UISubViewBase
                 m_PreShowTime = Time.time;
                 TipEntity entity = m_TipEntityQueue.Dequeue();
                 //GameObject obj = ResourcesMgr.Instance.Load( ResourcesMgr.ResourceType.UIOther, "UITipItem", true);
-                Transform obj = RecyclePoolMgr.Instance.Spawn(PoolType.UI, ResourLoadType.Resources, "UIPrefab/UIOther/UITipItem");
-                obj.gameObject.SetParent(transform);
-                UITipItemView itemView = obj.GetComponent<UITipItemView>();
-                if(itemView != null)
+                //Transform obj = RecyclePoolMgr.Instance.Spawn(PoolType.UI, ResourLoadType.Resources, "UIPrefab/UIOther/UITipItem");
+                RecyclePoolMgr.Instance.SpawnOrLoadByAssetBundle(PoolType.UI, "Download/Prefab/UIPrefab/UIOther/UITipItem", (Transform tipsTransorm)=> 
                 {
-                    if (entity.type >= 0 && entity.type < sprType.Length)
+                    tipsTransorm.gameObject.SetParent(transform);
+                    UITipItemView itemView = tipsTransorm.GetComponent<UITipItemView>();
+                    if (itemView != null)
                     {
-                        itemView.SetUI(sprType[entity.type], entity.content);
+                        if (entity.type >= 0 && entity.type < sprType.Length)
+                        {
+                            itemView.SetUI(sprType[entity.type], entity.content);
+                        }
                     }
-                }
 
-                obj.DOLocalMoveY(150, 0.8f).OnComplete(()=>
-                {
-                    RecyclePoolMgr.Instance.Despawn(PoolType.UI, obj);
+                    tipsTransorm.DOLocalMoveY(150, 0.8f).OnComplete(() =>
+                    {
+                        RecyclePoolMgr.Instance.Despawn(PoolType.UI, tipsTransorm);
+                    });
                 });
             }
         }

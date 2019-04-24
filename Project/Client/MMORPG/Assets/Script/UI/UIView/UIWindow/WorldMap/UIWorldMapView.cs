@@ -31,39 +31,41 @@ public class UIWorldMapView : UIWindowViewBase
 
         //LoadWorldMapItem(0, onWorldMapItemClick);
 
-        //AssetBundleMgr.Instance.LoadOrDownload("Download/Prefab/UIPrefab/UIWindowsChild/WorldMap/WorldMapItem.assetbundle", "WorldMapItem", (GameObject obj) =>
-        //{
-        //    //克隆了一个预设 只需要克隆一次
-        //    StartCoroutine(LoadWorldMapItem(obj, onWorldMapItemClick));
-        //});
-        m_TransformList.Clear();
-        for (int i = 0; i < m_lst.Count; i++)
+        LoaderMgr.Instance.LoadOrDownload("Download/Prefab/UIPrefab/UIWindowsChild/WorldMap/WorldMapItem", "WorldMapItem", (GameObject obj) =>
         {
-            //GameObject obj = Instantiate(ResourcesMgr.Instance.Load(ResourcesMgr.ResourceType.UIWindowChild, "WorldMap/WorldMapItem"));
-            Transform obj = RecyclePoolMgr.Instance.Spawn(PoolType.UI, ResourLoadType.Resources, "UIPrefab/UIWindowsChild/WorldMap/WorldMapItem");
-            obj.gameObject.SetParent(Container);
-            Vector2 pos = m_lst[i].GetValue<Vector2>(ConstDefine.WorldMapPostion);
-            obj.localPosition = new Vector3(pos.x, pos.y, 0);
+            //克隆了一个预设 只需要克隆一次
+            StartCoroutine(LoadWorldMapItem(obj, onWorldMapItemClick));
+        });
+        //m_TransformList.Clear();
+        //for (int i = 0; i < m_lst.Count; i++)
+        //{
+        //    //GameObject obj = Instantiate(ResourcesMgr.Instance.Load(ResourcesMgr.ResourceType.UIWindowChild, "WorldMap/WorldMapItem"));
+        //    Transform obj = RecyclePoolMgr.Instance.Spawn(PoolType.UI, ResourLoadType.Resources, "UIPrefab/UIWindowsChild/WorldMap/WorldMapItem");
+        //    obj.gameObject.SetParent(Container);
+        //    Vector2 pos = m_lst[i].GetValue<Vector2>(ConstDefine.WorldMapPostion);
+        //    obj.localPosition = new Vector3(pos.x, pos.y, 0);
 
-            UIWorldMapItemView view = obj.GetComponent<UIWorldMapItemView>();
-            if(view != null)
-            {
-                view.SetUI(m_lst[i], onWorldMapItemClick);
-            }
-            m_TransformList.Add(obj);
-        }
+        //    UIWorldMapItemView view = obj.GetComponent<UIWorldMapItemView>();
+        //    if(view != null)
+        //    {
+        //        view.SetUI(m_lst[i], onWorldMapItemClick);
+        //    }
+        //    m_TransformList.Add(obj);
+        //}
     }
 
     private IEnumerator LoadWorldMapItem(GameObject obj, Action<int> onWorldMapItemClick)
     {
+        m_TransformList.Clear();
         for (int i = 0; i < m_lst.Count; i++)
         {
-            obj = Instantiate(obj);
-            obj.SetParent(Container);
+            GameObject worldMapItemObj = RecyclePoolMgr.Instance.Spawn(PoolType.UI, obj.transform).gameObject;
+            worldMapItemObj.SetParent(Container);
             Vector2 pos = m_lst[i].GetValue<Vector2>(ConstDefine.WorldMapPostion);
-            obj.transform.localPosition = new Vector3(pos.x, pos.y, 0);
+            worldMapItemObj.transform.localPosition = new Vector3(pos.x, pos.y, 0);
+            m_TransformList.Add(worldMapItemObj.transform);
 
-            UIWorldMapItemView view = obj.GetComponent<UIWorldMapItemView>();
+            UIWorldMapItemView view = worldMapItemObj.GetComponent<UIWorldMapItemView>();
             view.SetUI(m_lst[i], onWorldMapItemClick);
 
             yield return null;
