@@ -3,7 +3,6 @@ guid: 75d657833539c41439173a8846c55f86
 timeCreated: 1494757771
 licenseType: Pro
 AudioImporter:
-  externalObjects: {}
   serializedVersion: 6
   defaultSettings:
     loadType: 0
@@ -17,8 +16,7 @@ AudioImporter:
   normalize: 1
   preloadAudioData: 1
   loadInBackground: 0
-  ambisonic: 0
   3D: 1
   userData: 
-  assetBundleName: download/audio/fight/jiakechong_role_die
-  assetBundleVariant: assetbundle
+  assetBundleName: 
+  assetBundleVariant: 

@@ -3,7 +3,6 @@ guid: 65122ea916dba414d8a77ac5c4633683
 timeCreated: 1493856882
 licenseType: Pro
 AudioImporter:
-  externalObjects: {}
   serializedVersion: 6
   defaultSettings:
     loadType: 2
@@ -17,8 +16,7 @@ AudioImporter:
   normalize: 1
   preloadAudioData: 1
   loadInBackground: 1
-  ambisonic: 0
   3D: 1
   userData: 
-  assetBundleName: download/audio/background/audio_bg_jiuquan
-  assetBundleVariant: assetbundle
+  assetBundleName: 
+  assetBundleVariant: 

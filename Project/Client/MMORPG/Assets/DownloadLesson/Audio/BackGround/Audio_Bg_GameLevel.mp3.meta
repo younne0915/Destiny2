@@ -3,7 +3,6 @@ guid: 0cc9416919edf0e4f894e2cd80cbe736
 timeCreated: 1493856840
 licenseType: Pro
 AudioImporter:
-  externalObjects: {}
   serializedVersion: 6
   defaultSettings:
     loadType: 2
@@ -17,8 +16,7 @@ AudioImporter:
   normalize: 1
   preloadAudioData: 1
   loadInBackground: 1
-  ambisonic: 0
   3D: 1
   userData: 
-  assetBundleName: download/audio/background/audio_bg_gamelevel
-  assetBundleVariant: assetbundle
+  assetBundleName: 
+  assetBundleVariant: 

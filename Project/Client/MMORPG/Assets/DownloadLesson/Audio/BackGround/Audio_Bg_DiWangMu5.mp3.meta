@@ -3,7 +3,6 @@ guid: 9cf75357be1bc4940a066312ac898b81
 timeCreated: 1493856940
 licenseType: Pro
 AudioImporter:
-  externalObjects: {}
   serializedVersion: 6
   defaultSettings:
     loadType: 2
@@ -17,8 +16,7 @@ AudioImporter:
   normalize: 1
   preloadAudioData: 1
   loadInBackground: 1
-  ambisonic: 0
   3D: 1
   userData: 
-  assetBundleName: download/audio/background/audio_bg_diwangmu5
-  assetBundleVariant: assetbundle
+  assetBundleName: 
+  assetBundleVariant: 

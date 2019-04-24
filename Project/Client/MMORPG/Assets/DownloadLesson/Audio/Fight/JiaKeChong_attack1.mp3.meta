@@ -3,7 +3,6 @@ guid: d31acd634d60569489bfe375e2e1d62e
 timeCreated: 1494757839
 licenseType: Pro
 AudioImporter:
-  externalObjects: {}
   serializedVersion: 6
   defaultSettings:
     loadType: 0
@@ -17,8 +16,7 @@ AudioImporter:
   normalize: 1
   preloadAudioData: 1
   loadInBackground: 0
-  ambisonic: 0
   3D: 1
   userData: 
-  assetBundleName: download/audio/fight/jiakechong_attack1
-  assetBundleVariant: assetbundle
+  assetBundleName: 
+  assetBundleVariant: 

@@ -3,7 +3,6 @@ guid: 2a0ab4ab198920a43a1f0fe6d765b92e
 timeCreated: 1494757268
 licenseType: Pro
 AudioImporter:
-  externalObjects: {}
   serializedVersion: 6
   defaultSettings:
     loadType: 0
@@ -17,8 +16,7 @@ AudioImporter:
   normalize: 1
   preloadAudioData: 1
   loadInBackground: 0
-  ambisonic: 0
   3D: 1
   userData: 
-  assetBundleName: download/audio/fight/ck_shengli
-  assetBundleVariant: assetbundle
+  assetBundleName: 
+  assetBundleVariant: 

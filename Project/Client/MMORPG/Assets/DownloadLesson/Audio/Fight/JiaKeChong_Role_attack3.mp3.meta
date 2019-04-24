@@ -3,7 +3,6 @@ guid: b0b074ed9cdcaaf4fb366fff5360eb05
 timeCreated: 1494757772
 licenseType: Pro
 AudioImporter:
-  externalObjects: {}
   serializedVersion: 6
   defaultSettings:
     loadType: 0
@@ -17,8 +16,7 @@ AudioImporter:
   normalize: 1
   preloadAudioData: 1
   loadInBackground: 0
-  ambisonic: 0
   3D: 1
   userData: 
-  assetBundleName: download/audio/fight/jiakechong_role_attack3
-  assetBundleVariant: assetbundle
+  assetBundleName: 
+  assetBundleVariant: 

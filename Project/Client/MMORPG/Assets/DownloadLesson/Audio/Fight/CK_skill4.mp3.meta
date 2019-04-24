@@ -3,7 +3,6 @@ guid: d770288ebe120974981b6b93b714bf79
 timeCreated: 1494755762
 licenseType: Pro
 AudioImporter:
-  externalObjects: {}
   serializedVersion: 6
   defaultSettings:
     loadType: 0
@@ -17,8 +16,7 @@ AudioImporter:
   normalize: 1
   preloadAudioData: 1
   loadInBackground: 0
-  ambisonic: 0
   3D: 1
   userData: 
-  assetBundleName: download/audio/fight/ck_skill4
-  assetBundleVariant: assetbundle
+  assetBundleName: 
+  assetBundleVariant: 

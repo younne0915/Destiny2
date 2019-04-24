@@ -3,7 +3,6 @@ guid: 64b99e243b0611c45a3e9a20d541c90f
 timeCreated: 1494758633
 licenseType: Pro
 AudioImporter:
-  externalObjects: {}
   serializedVersion: 6
   defaultSettings:
     loadType: 0
@@ -17,8 +16,7 @@ AudioImporter:
   normalize: 1
   preloadAudioData: 1
   loadInBackground: 0
-  ambisonic: 0
   3D: 1
   userData: 
-  assetBundleName: download/audio/fight/nvyao_die
-  assetBundleVariant: assetbundle
+  assetBundleName: 
+  assetBundleVariant: 

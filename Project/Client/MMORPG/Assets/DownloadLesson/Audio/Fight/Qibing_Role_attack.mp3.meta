@@ -3,7 +3,6 @@ guid: 0f4c0d07d34819d499cd2e2c2d702ac5
 timeCreated: 1494758313
 licenseType: Pro
 AudioImporter:
-  externalObjects: {}
   serializedVersion: 6
   defaultSettings:
     loadType: 0
@@ -17,8 +16,7 @@ AudioImporter:
   normalize: 1
   preloadAudioData: 1
   loadInBackground: 0
-  ambisonic: 0
   3D: 1
   userData: 
-  assetBundleName: download/audio/fight/qibing_role_attack
-  assetBundleVariant: assetbundle
+  assetBundleName: 
+  assetBundleVariant: 
