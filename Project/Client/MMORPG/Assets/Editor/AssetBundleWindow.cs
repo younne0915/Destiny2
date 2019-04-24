@@ -4,6 +4,7 @@ using UnityEditor;
 using System.Collections.Generic;
 using System;
 using System.IO;
+using System.Text;
 
 [ExecuteInEditMode]
 public class AssetBundleWindow : EditorWindow
@@ -12,7 +13,7 @@ public class AssetBundleWindow : EditorWindow
     private List<AssetBundleEntity> m_List;
     private Dictionary<string, bool> m_Dic;
 
-    private string[] arraTag = { "All", "Scene", "Role", "Effect", "Audio", "None" };
+    private string[] arraTag = { "All", "Scene", "Role", "Effect", "Audio", "UI", "None" };
     private int tagIndex = 0;
     private int selectTagIndex = -1;
 
@@ -31,11 +32,6 @@ public class AssetBundleWindow : EditorWindow
 #endif
 
     private Vector3 pos;
-
-    public AssetBundleWindow()
-    {
-
-    }
 
     private void OnEnable()
     {
@@ -58,33 +54,53 @@ public class AssetBundleWindow : EditorWindow
         #region 按钮行
         GUILayout.BeginHorizontal("Box");
 
-        selectTagIndex = EditorGUILayout.Popup(tagIndex, arraTag, GUILayout.Width(200));
+        selectTagIndex = EditorGUILayout.Popup(tagIndex, arraTag, GUILayout.Width(150));
         if(selectTagIndex != tagIndex)
         {
             tagIndex = selectTagIndex;
             EditorApplication.delayCall = OnSelectTagCallback;
         }
 
-        selectBuildTargetIndex = EditorGUILayout.Popup(buildTargetIndex, arrBuildTarget, GUILayout.Width(200));
+        selectBuildTargetIndex = EditorGUILayout.Popup(buildTargetIndex, arrBuildTarget, GUILayout.Width(150));
         if(selectBuildTargetIndex != buildTargetIndex)
         {
             buildTargetIndex = selectBuildTargetIndex;
             EditorApplication.delayCall = OnSelectTargetCallback;
         }
 
-        if (GUILayout.Button("保存设置", GUILayout.Width(200)))
+        if (GUILayout.Button("保存设置", GUILayout.Width(150)))
         {
             EditorApplication.delayCall = OnSaveAssetBundleCallBack;
         }
 
-        if (GUILayout.Button("build AssetBundle", GUILayout.Width(200)))
+        if (GUILayout.Button("build AssetBundle", GUILayout.Width(150)))
         {
             EditorApplication.delayCall = OnAssetBundleCallback;
         }
 
-        if (GUILayout.Button("Clear AssetBundle", GUILayout.Width(200)))
+        if (GUILayout.Button("Clear AssetBundle", GUILayout.Width(150)))
         {
             EditorApplication.delayCall = OnClearAssetBundleCallback;
+        }
+
+        if (GUILayout.Button("拷贝数据表", GUILayout.Width(150)))
+        {
+            EditorApplication.delayCall = OnCopyDataTableCallBack;
+        }
+
+        if (GUILayout.Button("生成版本文件", GUILayout.Width(150)))
+        {
+            EditorApplication.delayCall = OnCreateVersionFileCallBack;
+        }
+
+        if (GUILayout.Button("清除DownloadLession名称", GUILayout.Width(150)))
+        {
+            EditorApplication.delayCall = OnClearAssetbundleName;
+        }
+
+        if (GUILayout.Button("一键打包", GUILayout.Width(150)))
+        {
+            EditorApplication.delayCall = OnStepBundleCallback;
         }
 
         EditorGUILayout.Space();
@@ -125,6 +141,15 @@ public class AssetBundleWindow : EditorWindow
         EditorGUILayout.EndScrollView();
         GUILayout.EndVertical();
 
+    }
+
+    private void OnStepBundleCallback()
+    {
+        OnClearAssetBundleCallback();
+        OnSaveAssetBundleCallBack();
+        OnAssetBundleCallback();
+        OnCopyDataTableCallBack();
+        OnCreateVersionFileCallBack();
     }
 
     private void OnClearAssetBundleCallback()
@@ -173,6 +198,12 @@ public class AssetBundleWindow : EditorWindow
                 }
                 break;
             case 5:
+                foreach (AssetBundleEntity entity in m_List)
+                {
+                    m_Dic[entity.Key] = entity.Tag.Equals("UI", StringComparison.CurrentCultureIgnoreCase);
+                }
+                break;
+            case 6:
                 foreach (AssetBundleEntity entity in m_List)
                 {
                     m_Dic[entity.Key] = false;
@@ -307,9 +338,7 @@ public class AssetBundleWindow : EditorWindow
 
     private void OnAssetBundleCallback()
     {
-        Debug.LogError("AssetBundle callback");
-
-        string toPath = Application.dataPath + "/../AssetBundles" + arrBuildTarget[buildTargetIndex];
+        string toPath = Application.dataPath + "/../AssetBundles/" + arrBuildTarget[buildTargetIndex];
 
         if (!Directory.Exists(toPath))
         {
@@ -317,5 +346,164 @@ public class AssetBundleWindow : EditorWindow
         }
 
         BuildPipeline.BuildAssetBundles(toPath, BuildAssetBundleOptions.None, target);
+
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+
+        Debug.LogError("打包成功");
+    }
+
+    /// <summary>
+    /// 拷贝数据表
+    /// </summary>
+    private void OnCopyDataTableCallBack()
+    {
+        string fromPath = Application.dataPath + "/Download/DataTable";
+        string toPath = Application.dataPath + "/../AssetBundles/" + arrBuildTarget[buildTargetIndex] + "/Download/datatable";
+        IOUtil.CopyDirectory(fromPath, toPath);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+        Debug.Log("拷贝数据表完毕");
+    }
+
+    /// <summary>
+    /// 生成版本文件
+    /// </summary>
+    private void OnCreateVersionFileCallBack()
+    {
+        string path = Application.dataPath + "/../AssetBundles/" + arrBuildTarget[buildTargetIndex];
+        if (!Directory.Exists(path))
+        {
+            Directory.CreateDirectory(path);
+        }
+
+        string strVersionFilePath = path + "/VersionFile.txt"; //版本文件路径
+
+        //如果版本文件存在 则删除
+        IOUtil.DeleteFile(strVersionFilePath);
+
+        StringBuilder sbContent = new StringBuilder();
+
+        DirectoryInfo directory = new DirectoryInfo(path);
+
+        //拿到文件夹下所有文件
+        FileInfo[] arrFiles = directory.GetFiles("*", SearchOption.AllDirectories);
+
+        for (int i = 0; i < arrFiles.Length; i++)
+        {
+            FileInfo file = arrFiles[i];
+            string fullName = file.FullName; //全名 包含路径扩展名
+
+            //相对路径
+            string name = fullName.Substring(fullName.IndexOf(arrBuildTarget[buildTargetIndex]) + arrBuildTarget[buildTargetIndex].Length + 1);
+            //if (name.Equals(arrBuildTarget[buildTargetIndex], StringComparison.CurrentCultureIgnoreCase)) continue;
+
+            string md5 = EncryptUtil.GetFileMD5(fullName); //文件的MD5
+            if (md5 == null) continue;
+
+            string size = Math.Ceiling(file.Length / 1024f).ToString(); //文件大小
+
+            bool isFirstData = true; //是否初始数据
+            bool isBreak = false;
+
+            for (int j = 0; j < m_List.Count; j++)
+            {
+                foreach (string xmlPath in m_List[j].PathList)
+                {
+                    string tempPath = xmlPath;
+                    if (xmlPath.IndexOf(".") != -1)
+                    {
+                        tempPath = xmlPath.Substring(0, xmlPath.IndexOf("."));
+                    }
+                    if (name.IndexOf(tempPath, StringComparison.CurrentCultureIgnoreCase) != -1)
+                    {
+                        isFirstData = m_List[j].IsFirstData;
+                        isBreak = true;
+                        break;
+                    }
+                }
+                if (isBreak) break;
+            }
+
+            if (name.IndexOf("DataTable") != -1)
+            {
+                isFirstData = true;
+            }
+
+            string strLine = string.Format("{0} {1} {2} {3}", name, md5, size, isFirstData ? 1 : 0);
+            sbContent.AppendLine(strLine);
+        }
+
+        IOUtil.CreateTextFile(strVersionFilePath, sbContent.ToString());
+
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+
+        Debug.Log("创建版本文件成功");
+    }
+
+    private void OnClearAssetbundleName()
+    {
+        //string folderPath = Application.dataPath + "/DownloadLesson";
+        string folderPath = Application.dataPath + "/";
+
+        string[] arrFolder = Directory.GetFiles(folderPath, "*", SearchOption.AllDirectories);
+        for (int i = 0; i < arrFolder.Length; i++)
+        {
+            EditorUtility.DisplayProgressBar("OnClearAssetbundleName", "正在OnClearAssetbundleName中...", 1f * i / arrFolder.Length);
+            FileInfo file = new FileInfo(arrFolder[i]);
+            if (!file.Extension.Equals(".meta", StringComparison.CurrentCultureIgnoreCase))
+            {
+                //Debug.Log("filePath=" + filePath);
+                int index = arrFolder[i].IndexOf("Assets/", StringComparison.CurrentCultureIgnoreCase);
+                if (index > -1)
+                {
+                    //路径
+                    string newPath = arrFolder[i].Substring(index);
+                    Debug.Log("newPath=" + newPath);
+
+                    AssetImporter import = AssetImporter.GetAtPath(newPath);
+                    if (!string.IsNullOrEmpty(import.assetBundleName) || !string.IsNullOrEmpty(import.assetBundleVariant))
+                    {
+                        import.SetAssetBundleNameAndVariant(null, null);
+                        import.SaveAndReimport();
+                    }
+                }
+                else
+                {
+                    Debug.Log("arrFolder[i] =" + arrFolder[i]);
+                }
+            }
+        }
+        EditorUtility.ClearProgressBar();
+
+        string[] dirArr = Directory.GetDirectories(folderPath, "*", SearchOption.AllDirectories);
+        for (int i = 0; i < dirArr.Length; i++)
+        {
+            EditorUtility.DisplayProgressBar("OnClearAssetbundleName", "正在清理含有bundle name的文件夹中...", 1f * i / dirArr.Length);
+            int index = dirArr[i].IndexOf("Assets/", StringComparison.CurrentCultureIgnoreCase);
+            if (index > -1)
+            {
+                //路径
+                string newPath = dirArr[i].Substring(index);
+                Debug.Log("newPath=" + newPath);
+
+                AssetImporter import = AssetImporter.GetAtPath(newPath);
+                if (!string.IsNullOrEmpty(import.assetBundleName) || !string.IsNullOrEmpty(import.assetBundleVariant))
+                {
+                    import.SetAssetBundleNameAndVariant(null, null);
+                    import.SaveAndReimport();
+                }
+            }
+            else
+            {
+                Debug.Log("dirArr[i] =" + dirArr[i]);
+            }
+        }
+        EditorUtility.ClearProgressBar();
+
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+        Debug.Log("清除DownloadLession下面的AsstbundleName完毕");
     }
 }

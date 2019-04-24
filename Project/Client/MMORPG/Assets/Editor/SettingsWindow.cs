@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections;
 using UnityEditor;
 using System.Collections.Generic;
@@ -21,14 +21,15 @@ public class SettingsWindow : EditorWindow
     {
         m_Macor = PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android);
         m_List.Clear();
-        //m_List.Add(new MacorItem("DEBUG_MODEL", "µ÷ÊÔÄ£Ê½", true, false));
-        //m_List.Add(new MacorItem("DEBUG_LOG", "´òÓ¡ÈÕÖ¾", true, false));
-        //m_List.Add(new MacorItem("STAT_TD", "¿ªÆôÍ³¼Æ", false, true));
+        //m_List.Add(new MacorItem("DEBUG_MODEL", "è°ƒè¯•æ¨¡å¼", true, false));
+        //m_List.Add(new MacorItem("DEBUG_LOG", "æ‰“å°æ—¥å¿—", true, false));
+        //m_List.Add(new MacorItem("STAT_TD", "å¼€å¯ç»Ÿè®¡", false, true));
 
         m_List.Add(new MacorItem("DEBUG_MODEL", "DEBUG_MODEL", true, false));
         m_List.Add(new MacorItem("DEBUG_LOG", "DEBUG_LOG", true, false));
         m_List.Add(new MacorItem("STAT_TD", "STAT_TD", false, true));
         m_List.Add(new MacorItem("DEBUG_ROLESTATE", "DEBUG_ROLESTATE", false, false));
+        m_List.Add(new MacorItem("DISABLE_ASSETBUNDLE", "ç¦ç”¨AssetBundle", false, false));
 
         for (int i = 0; i < m_List.Count; i++)
         {
@@ -88,6 +89,19 @@ public class SettingsWindow : EditorWindow
             {
                 m_Macor += string.Format("{0};", item.Key);
             }
+
+            if (item.Key.IndexOf("DISABLE_ASSETBUNDLE") > -1)
+            {
+                EditorBuildSettingsScene[] scenes = EditorBuildSettings.scenes;
+                for (int i = 0; i < scenes.Length; i++)
+                {
+                    if (scenes[i].path.IndexOf("download", System.StringComparison.InvariantCultureIgnoreCase) > -1)
+                    {
+                        scenes[i].enabled = item.Value;
+                    }
+                }
+                EditorBuildSettings.scenes = scenes;
+            }
         }
         PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, m_Macor);
         PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.iOS, m_Macor);
@@ -96,17 +110,17 @@ public class SettingsWindow : EditorWindow
     }
 
     /// <summary>
-    /// ºêÏîÄ¿
+    /// å®é¡¹ç›®
     /// </summary>
     public class MacorItem
     {
         /// <summary>
-        /// Ãû³Æ
+        /// åç§°
         /// </summary>
         public string Name;
 
         /// <summary>
-        /// ÏÔÊ¾µÄÃû³Æ
+        /// æ˜¾ç¤ºçš„åç§°
         /// </summary>
         public string DisplayName;
 

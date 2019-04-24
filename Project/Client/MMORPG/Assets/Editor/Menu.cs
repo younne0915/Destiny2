@@ -22,7 +22,13 @@ public class Menu
         win.Show();
     }
 
-    [MenuItem("YouyouTools/AssetBundleCreate")]
+    [MenuItem("YouyouTools/ClearAllPlayerPrefs")]
+    public static void ClearPlayerPrefs()
+    {
+        PlayerPrefs.DeleteAll();
+    }
+
+    [MenuItem("YouyouTools/资源管理/AssetBundleCreate")]
     public static void AssetBundleCreate()
     {
         AssetBundleWindow win = EditorWindow.GetWindow<AssetBundleWindow>();
@@ -30,10 +36,18 @@ public class Menu
         win.Show(true);
     }
 
-    [MenuItem("YouyouTools/ClearAllPlayerPrefs")]
-    public static void ClearPlayerPrefs()
+    [MenuItem("YouyouTools/资源管理/拷贝Assetbundle")]
+    public static void CopyAssetBundle()
     {
-        PlayerPrefs.DeleteAll();
+        string streamPath = Application.streamingAssetsPath + "/AssetBundles/";
+        string sourcePath = Application.dataPath + "/../AssetBundles/Windows/";
+        if (Directory.Exists(streamPath))
+        {
+            Directory.Delete(streamPath, true);
+        }
+        IOUtil.CopyDirectory(sourcePath, streamPath);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+        Debug.Log("拷贝Assetbundle完毕");
     }
-
 }
