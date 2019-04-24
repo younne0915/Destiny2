@@ -1,7 +1,7 @@
 
 //===================================================
 //作    者：边涯  http://www.u3dol.com  QQ群：87481002
-//创建时间：2019-04-09 21:54:44
+//创建时间：2019-04-16 21:20:39
 //备    注：此代码为工具生成 请勿手工修改
 //===================================================
 using System.Collections;
@@ -43,6 +43,12 @@ public partial class SkillDBModel : AbstractDBModel<SkillDBModel, SkillEntity>
         entity.BuffTargetFilter = parse.GetFieldValue("BuffTargetFilter").ToInt();
         entity.BuffIsPercentage = parse.GetFieldValue("BuffIsPercentage").ToInt();
         entity.AnimationInterval = parse.GetFieldValue("AnimationInterval").ToFloat();
+        entity.AnimatorConditionValue = parse.GetFieldValue("AnimatorConditionValue").ToInt();
+        entity.AnimatorState = parse.GetFieldValue("AnimatorState").ToInt();
+        entity.IsDoCameraShake = parse.GetFieldValue("IsDoCameraShake").ToInt();
+        entity.EffectName = parse.GetFieldValue("EffectName");
+        entity.EffectLifeTime = parse.GetFieldValue("EffectLifeTime").ToFloat();
+        entity.CameraShakeDelay = parse.GetFieldValue("CameraShakeDelay").ToFloat();
         return entity;
     }
 }

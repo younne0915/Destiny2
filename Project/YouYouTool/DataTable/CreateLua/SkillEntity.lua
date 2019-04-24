@@ -1,9 +1,9 @@
-SkillEntity = { Id = 0, SkillName = "", SkillDesc = "", SkillPic = "", LevelLimit = 0, IsPhyAttack = 0, AttackTargetCount = 0, AttackRange = 0, AreaAttackRadius = 0, ShowHurtEffectDelaySecond = 0, RedScreen = 0, AttackState = 0, AbnormalState = 0, BuffInfoID = 0, BuffTargetFilter = 0, BuffIsPercentage = 0, AnimationInterval = 0 }
+SkillEntity = { Id = 0, SkillName = "", SkillDesc = "", SkillPic = "", LevelLimit = 0, IsPhyAttack = 0, AttackTargetCount = 0, AttackRange = 0, AreaAttackRadius = 0, ShowHurtEffectDelaySecond = 0, RedScreen = 0, AttackState = 0, AbnormalState = 0, BuffInfoID = 0, BuffTargetFilter = 0, BuffIsPercentage = 0, AnimationInterval = 0, AnimatorConditionValue = 0, AnimatorState = 0, IsDoCameraShake = 0, EffectName = "", EffectLifeTime = 0, CameraShakeDelay = 0 }
 
 --这句是重定义元表的索引，就是说有了这句，这个才是一个类
 SkillEntity.__index = SkillEntity;
 
-function SkillEntity.New(Id, SkillName, SkillDesc, SkillPic, LevelLimit, IsPhyAttack, AttackTargetCount, AttackRange, AreaAttackRadius, ShowHurtEffectDelaySecond, RedScreen, AttackState, AbnormalState, BuffInfoID, BuffTargetFilter, BuffIsPercentage, AnimationInterval)
+function SkillEntity.New(Id, SkillName, SkillDesc, SkillPic, LevelLimit, IsPhyAttack, AttackTargetCount, AttackRange, AreaAttackRadius, ShowHurtEffectDelaySecond, RedScreen, AttackState, AbnormalState, BuffInfoID, BuffTargetFilter, BuffIsPercentage, AnimationInterval, AnimatorConditionValue, AnimatorState, IsDoCameraShake, EffectName, EffectLifeTime, CameraShakeDelay)
     local self = { }; --初始化self
     setmetatable(self, SkillEntity); --将self的元表设定为Class
 
@@ -24,6 +24,12 @@ function SkillEntity.New(Id, SkillName, SkillDesc, SkillPic, LevelLimit, IsPhyAt
     self.BuffTargetFilter = BuffTargetFilter;
     self.BuffIsPercentage = BuffIsPercentage;
     self.AnimationInterval = AnimationInterval;
+    self.AnimatorConditionValue = AnimatorConditionValue;
+    self.AnimatorState = AnimatorState;
+    self.IsDoCameraShake = IsDoCameraShake;
+    self.EffectName = EffectName;
+    self.EffectLifeTime = EffectLifeTime;
+    self.CameraShakeDelay = CameraShakeDelay;
 
     return self;
 end

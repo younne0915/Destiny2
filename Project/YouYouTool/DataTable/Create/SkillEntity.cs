@@ -1,7 +1,7 @@
 
 //===================================================
 //作    者：边涯  http://www.u3dol.com  QQ群：87481002
-//创建时间：2019-04-09 21:54:44
+//创建时间：2019-04-16 21:20:39
 //备    注：此代码为工具生成 请勿手工修改
 //===================================================
 using System.Collections;
@@ -90,5 +90,35 @@ public partial class SkillEntity : AbstractEntity
     /// 动画时长
     /// </summary>
     public float AnimationInterval { get; set; }
+
+    /// <summary>
+    /// 动画状态机参数值
+    /// </summary>
+    public int AnimatorConditionValue { get; set; }
+
+    /// <summary>
+    /// 动画状态机参数CurrState值
+    /// </summary>
+    public int AnimatorState { get; set; }
+
+    /// <summary>
+    /// 是否震屏
+    /// </summary>
+    public int IsDoCameraShake { get; set; }
+
+    /// <summary>
+    /// 特效名称
+    /// </summary>
+    public string EffectName { get; set; }
+
+    /// <summary>
+    /// 技能特效存活时间
+    /// </summary>
+    public float EffectLifeTime { get; set; }
+
+    /// <summary>
+    /// 震屏延迟
+    /// </summary>
+    public float CameraShakeDelay { get; set; }
 
 }
