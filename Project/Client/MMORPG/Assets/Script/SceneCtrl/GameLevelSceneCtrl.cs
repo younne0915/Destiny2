@@ -79,6 +79,8 @@ public class GameLevelSceneCtrl : GameSceneCtrlBase
         GameLevelCtrl.Instance.CurrGameLevelTotalGold = 0;
         GameLevelCtrl.Instance.CurrGameLevelGetGoodsList.Clear();
         GameLevelCtrl.Instance.CurrGameLevelKillMonsterDic.Clear();
+
+        AudioBackGroundMgr.Instance.Play("Audio_Bg_GameLevel");
     }
 
     protected override void OnLoadUIMainCityView(GameObject obj)

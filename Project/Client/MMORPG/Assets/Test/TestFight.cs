@@ -139,13 +139,13 @@ public class TestFight : MonoBehaviour {
 
         if (GUI.Button(new Rect(1, posY, 80, 30), "物理攻击1"))
         {
-            TestAttack( RoleAttackType.PhyAttack, 114);
+            TestAttack( RoleAttackType.PhyAttack, 110);
         }
         posY += 30;
 
         if (GUI.Button(new Rect(1, posY, 80, 30), "物理攻击2"))
         {
-            TestAttack(RoleAttackType.PhyAttack, 115);
+            TestAttack(RoleAttackType.PhyAttack, 111);
         }
         posY += 30;
         if (GUI.Button(new Rect(1, posY, 80, 30), "物理攻击3"))
@@ -156,17 +156,17 @@ public class TestFight : MonoBehaviour {
 
         if (GUI.Button(new Rect(1, posY, 80, 30), "技能攻击1"))
         {
-            TestAttack(RoleAttackType.SkillAttack, 115);
+            TestAttack(RoleAttackType.SkillAttack, 104);
         }
         posY += 30;
         if (GUI.Button(new Rect(1, posY, 80, 30), "技能攻击2"))
         {
-            TestAttack(RoleAttackType.SkillAttack, 116);
+            TestAttack(RoleAttackType.SkillAttack, 105);
         }
         posY += 30;
         if (GUI.Button(new Rect(1, posY, 80, 30), "技能攻击3"))
         {
-            TestAttack(RoleAttackType.SkillAttack, 117);
+            TestAttack(RoleAttackType.SkillAttack, 106);
         }
         posY += 30;
         if (GUI.Button(new Rect(1, posY, 80, 30), "技能攻击4"))
@@ -203,10 +203,26 @@ public class TestFight : MonoBehaviour {
 
     private void TestAttack(RoleAttackType type,int skilId)
     {
+        #region 测试英雄
         //bool success = role.ToAttack(type, skilId);
+        //if (!success) return;
+
+        //if (testEnemy != null)
+        //{
+        //    testEnemy.transform.position = role.transform.position + role.transform.forward * role.CurrSkillEntity.AttackRange;
+        //    testEnemy.transform.LookAt(role.transform);
+        //    testEnemy.ToHurt(null);
+
+        //    AppDebug.Log(testEnemy.transform.position);
+        //}
+
+        //attackRange.localScale = new Vector3(role.CurrSkillEntity.AttackRange * 2, role.CurrSkillEntity.AttackRange * 2, role.CurrSkillEntity.AttackRange * 2);
+        #endregion
+
+        #region 测试怪物
         testEnemy.LockEnemy = role;
         bool success = testEnemy.ToAttack(type, skilId);
-        if (!success) return;
+        if (success) return;
 
         attackRange.localScale = new Vector3(testEnemy.CurrSkillEntity.AttackRange * 2, testEnemy.CurrSkillEntity.AttackRange * 2, testEnemy.CurrSkillEntity.AttackRange * 2);
 
@@ -218,15 +234,8 @@ public class TestFight : MonoBehaviour {
 
         role.transform.position = testEnemy.transform.position + testEnemy.transform.forward * testEnemy.CurrSkillEntity.AttackRange;
         role.transform.LookAt(testEnemy.transform);
+        #endregion
 
-        //if (testEnemy != null)
-        //{
-        //    testEnemy.transform.position = role.transform.position + role.transform.forward * role.CurrSkillEntity.AttackRange;
-        //    testEnemy.transform.LookAt(role.transform);
-        //    testEnemy.ToHurt(null);
-
-        //    AppDebug.Log(testEnemy.transform.position);
-        //}
 
         //if (role.CurrSkillEntity.IsDoCameraShake == 1)
         //{
@@ -235,5 +244,5 @@ public class TestFight : MonoBehaviour {
 
     }
 
-    
+
 }

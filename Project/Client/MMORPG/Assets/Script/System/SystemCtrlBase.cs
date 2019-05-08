@@ -25,12 +25,12 @@ public class SystemCtrlBase<T> : IDisposable where T : new()
     }
     #endregion
 
-    protected void AddEventHandler(string key, DispatcherBase<UIDispatcher, object[], string> .OnActionHandler handler)
+    protected void AddEventHandler(string key, UIDispatcher.OnActionHandler handler)
     {
         UIDispatcher.Instance.AddEventHandler(key, handler);
     }
 
-    protected void RemoveEventHandler(string key, DispatcherBase<UIDispatcher, object[], string>.OnActionHandler handler)
+    protected void RemoveEventHandler(string key, UIDispatcher.OnActionHandler handler)
     {
         UIDispatcher.Instance.RemoveEventHandler(key, handler);
     }

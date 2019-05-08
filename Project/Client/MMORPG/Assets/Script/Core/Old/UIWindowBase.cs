@@ -45,7 +45,7 @@ public class UIWindowBase : UIBase
     /// </summary>
     protected virtual void Close()
     {
-        UIViewUtil.Instance.CloseWindow(CurrentUIType);
+        //UIViewUtil.Instance.CloseWindow(CurrentUIType);
     }
 
     /// <summary>

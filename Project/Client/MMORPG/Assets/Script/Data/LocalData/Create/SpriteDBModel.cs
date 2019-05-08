@@ -1,7 +1,7 @@
 
 //===================================================
 //作    者：边涯  http://www.u3dol.com  QQ群：87481002
-//创建时间：2019-03-24 17:13:02
+//创建时间：2019-04-25 13:39:00
 //备    注：此代码为工具生成 请勿手工修改
 //===================================================
 using System.Collections;
@@ -55,6 +55,7 @@ public partial class SpriteDBModel : AbstractDBModel<SpriteDBModel, SpriteEntity
         entity.PhysicalAttackRate = parse.GetFieldValue("PhysicalAttackRate").ToInt();
         entity.DelaySec_Attack = parse.GetFieldValue("DelaySec_Attack").ToFloat();
         entity.RewardExp = parse.GetFieldValue("RewardExp").ToInt();
+        entity.DieAudioName = parse.GetFieldValue("DieAudioName");
         return entity;
     }
 }

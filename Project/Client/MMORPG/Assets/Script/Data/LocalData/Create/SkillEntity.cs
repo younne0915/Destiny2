@@ -1,7 +1,7 @@
 
 //===================================================
 //作    者：边涯  http://www.u3dol.com  QQ群：87481002
-//创建时间：2019-04-15 21:37:17
+//创建时间：2019-04-25 12:00:02
 //备    注：此代码为工具生成 请勿手工修改
 //===================================================
 using System.Collections;
@@ -120,5 +120,25 @@ public partial class SkillEntity : AbstractEntity
     /// 震屏延迟
     /// </summary>
     public float CameraShakeDelay { get; set; }
+
+    /// <summary>
+    /// 技能音效名称
+    /// </summary>
+    public string SkillAudioName { get; set; }
+
+    /// <summary>
+    /// 技能音效延迟时间
+    /// </summary>
+    public float SkillAudioDelayTime { get; set; }
+
+    /// <summary>
+    /// 方法技能时候喊叫音效名称
+    /// </summary>
+    public string HowlAudioName { get; set; }
+
+    /// <summary>
+    /// 放技能时候喊叫音效延迟时间
+    /// </summary>
+    public float HowlAudioDelay { get; set; }
 
 }

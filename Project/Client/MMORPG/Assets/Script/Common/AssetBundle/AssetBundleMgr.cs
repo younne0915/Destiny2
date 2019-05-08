@@ -206,7 +206,7 @@ string target = "Windows";
     //    #endregion
     //}
 
-    public void LoadOrDownload<T>(string path, string name, System.Action<T> onComplete) where T : UnityEngine.Object
+    public void LoadOrDownload<T>(string path, string name, System.Action<T> onComplete, xLuaCustomExport.OnCreate onCreate = null) where T : UnityEngine.Object
     {
         lock (this)
         {
@@ -219,7 +219,7 @@ string target = "Windows";
                 //=============下载主资源开始===================
                 string fullPath = (LocalFileMgr.Instance.LocalFilePath + path).ToLower();
 
-                //AppDebug.Log("fullPath=" + fullPath);
+                AppDebug.Log("fullPath=" + fullPath);
 
                 #region 下载或者加载主资源
                 if (!File.Exists(fullPath))
@@ -238,6 +238,10 @@ string target = "Windows";
                                         if (onComplete != null)
                                         {
                                             onComplete(m_AssetDic[fullPath] as T);
+                                        }
+                                        if(onCreate != null)
+                                        {
+                                            onCreate(m_AssetDic[fullPath] as GameObject);
                                         }
                                         return;
                                     }
@@ -265,6 +269,10 @@ string target = "Windows";
                                         }
 
                                         //todu 进行xlua的回调
+                                        if (onCreate != null)
+                                        {
+                                            onCreate(obj as GameObject);
+                                        }
                                     }
                                 }
                             });
@@ -278,6 +286,10 @@ string target = "Windows";
                         if (onComplete != null)
                         {
                             onComplete(m_AssetDic[fullPath] as T);
+                        }
+                        if (onCreate != null)
+                        {
+                            onCreate(m_AssetDic[fullPath] as GameObject);
                         }
                         return;
                     }
@@ -297,19 +309,24 @@ string target = "Windows";
                     //直接加载
                     using (AssetBundleLoader loader = new AssetBundleLoader(path))
                     {
+                        Object obj = loader.LoadAsset<T>(name);
+                        if (obj == null)
+                        {
+                            AppDebug.LogError(string.Format("Obj =  null : path :{0}, name : {1} type : {2}", path, name, typeof(T)));
+                        }
+                        m_AssetDic[fullPath] = obj;
+
                         if (onComplete != null)
                         {
-                            Object obj = loader.LoadAsset<T>(name);
-                            if(obj == null)
-                            {
-                                AppDebug.LogError(string.Format("Obj =  null : path :{0}, name : {1} type : {2}", path, name, typeof(T)));
-                            }
-                            m_AssetDic[fullPath] = obj;
                             //进行回调
                             onComplete(obj as T);
                         }
 
                         //todu 进行xlua的回调
+                        if(onCreate != null)
+                        {
+                            onCreate(obj as GameObject);
+                        }
                     }
                 }
                 #endregion
@@ -319,6 +336,10 @@ string target = "Windows";
         }
     }
 
+    public void LoadOrDownloadForLua(string path, string name, xLuaCustomExport.OnCreate onCreate)
+    {
+        LoadOrDownload<GameObject>(path, name, null, onCreate);
+    }
 
     public void LoadOrDownload(string path, string name, System.Action<GameObject> onComplete)
     {

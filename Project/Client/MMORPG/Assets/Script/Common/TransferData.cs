@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[XLua.LuaCallCSharp]
 public class TransferData
 {
 	public TransferData()
@@ -27,5 +28,14 @@ public class TransferData
             return (TM)m_PutValues[key];
         }
         return default(TM);
+    }
+
+    public object GetValue(string key)
+    {
+        if (m_PutValues.ContainsKey(key))
+        {
+            return m_PutValues[key];
+        }
+        return null;
     }
 }

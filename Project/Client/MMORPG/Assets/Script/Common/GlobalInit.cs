@@ -8,6 +8,7 @@ using System.Collections;
 using System.Net.NetworkInformation;
 using System;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class GlobalInit : MonoBehaviour 
 {
@@ -26,7 +27,7 @@ public class GlobalInit : MonoBehaviour
     /// </summary>
     public const string MMO_PWD = "MMO_PWD";
 
-    private const string m_Ip = "http://192.168.28.249";
+    private const string m_Ip = "http://192.168.216.8";
 
     private static string m_WebAccountUrl = "";
     /// <summary>
@@ -132,12 +133,17 @@ public class GlobalInit : MonoBehaviour
             string pos = string.Format("{0}_{1}_{2}_{3}", trans.position.x, trans.position.y, trans.position.z, trans.rotation.eulerAngles.y);
             AppDebug.Log("位置信息 = " + pos);
         }
-        
+
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            if (GlobalInit.Instance == null) return;
+            SceneManager.LoadScene("TestLua");
+        }
     }
 
     private void OnTimeCallback(RetValue obj)
     {
-        if (!obj.HasError)
+        if (obj != null && !obj.HasError)
         {
             m_StartServerTime = long.Parse(obj.Value.ToString());
         }

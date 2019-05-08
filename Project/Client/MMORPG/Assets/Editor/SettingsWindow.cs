@@ -30,6 +30,8 @@ public class SettingsWindow : EditorWindow
         m_List.Add(new MacorItem("STAT_TD", "STAT_TD", false, true));
         m_List.Add(new MacorItem("DEBUG_ROLESTATE", "DEBUG_ROLESTATE", false, false));
         m_List.Add(new MacorItem("DISABLE_ASSETBUNDLE", "禁用AssetBundle", false, false));
+        m_List.Add(new MacorItem("HOTFIX_ENABLE", "开启热补丁", false, true));
+
 
         for (int i = 0; i < m_List.Count; i++)
         {

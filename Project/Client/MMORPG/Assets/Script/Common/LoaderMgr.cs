@@ -16,16 +16,26 @@ public class LoaderMgr : Singleton<LoaderMgr>
 #endif
     }
 
-    public void LoadOrDownload(string path, string name, Action<GameObject> onComplete)
+    public void LoadOrDownloadForLua(string path, string name, xLuaCustomExport.OnCreate onCreate)
+    {
+        LoadOrDownload(path, name, null, onCreate);
+    }
+
+    public void LoadOrDownload(string path, string name, Action<GameObject> onComplete, xLuaCustomExport.OnCreate onCreate = null)
     {
 #if DISABLE_ASSETBUNDLE
         if (onComplete != null)
         {
             onComplete(AssetDatabaseLoad<GameObject>(path, 0));
         }
+
+        if(onCreate != null)
+        {
+            onCreate(AssetDatabaseLoad<GameObject>(path, 0));
+        }
 #else
         path = string.Format("{0}.assetbundle", path);
-        AssetBundleMgr.Instance.LoadOrDownload(path, name, onComplete);
+        AssetBundleMgr.Instance.LoadOrDownload(path, name, onComplete, onCreate);
 #endif
     }
 
@@ -52,6 +62,9 @@ public class LoaderMgr : Singleton<LoaderMgr>
                 break;
             case 1:
                 path = string.Format("Assets/{0}.png", path);
+                break;
+            case 2:
+                path = string.Format("Assets/{0}.mp3", path);
                 break;
         }
         //AppDebug.LogError("path  = " + path);

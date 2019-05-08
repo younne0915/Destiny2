@@ -84,6 +84,7 @@ public class SelectRoleSceneCtrl : MonoBehaviour
         UIDispatcher.Instance.AddEventHandler(ConstDefine.SelectRole_Return, OnBtnSelectRole_BackClick);
         UIDispatcher.Instance.AddEventHandler(ConstDefine.SelectRole_CreateRole, OnBtnSelectRole_CreateRoleClick);
 
+        AudioBackGroundMgr.Instance.Play("Audio_Bg_LogOn");
     }
 
     private void LoadJobListObj()

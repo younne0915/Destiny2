@@ -26,7 +26,7 @@ public class UIWindowViewBase : UIViewBase
     /// 当前窗口类型
     /// </summary>
     [HideInInspector]
-    public WindowUIType CurrentUIType;
+    public string CurrentUIName;
 
     /// <summary>
     /// 下一个打开窗口类型
@@ -48,7 +48,8 @@ public class UIWindowViewBase : UIViewBase
     /// </summary>
     public virtual void Close()
     {
-        UIViewUtil.Instance.CloseWindow(CurrentUIType);
+        AudioEffectMgr.Instance.PlayUIAudioEffect(UIAudioEffectType.UIClose);
+        UIViewUtil.Instance.CloseWindow(CurrentUIName);
     }
 
     public virtual void CloseAndOpenNext(WindowUIType nextWindowType)

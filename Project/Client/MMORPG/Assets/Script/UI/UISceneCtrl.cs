@@ -10,7 +10,7 @@ using System;
 /// <summary>
 /// 场景UI管理器
 /// </summary>
-public class UISceneCtrl: Singleton<UISceneCtrl>
+public class UISceneCtrl : Singleton<UISceneCtrl>
 {
 
     /// <summary>
@@ -30,7 +30,8 @@ public class UISceneCtrl: Singleton<UISceneCtrl>
         /// <summary>
         /// 主城
         /// </summary>
-        MainCity
+        MainCity,
+        None
     }
 
     /// <summary>
@@ -38,31 +39,45 @@ public class UISceneCtrl: Singleton<UISceneCtrl>
     /// </summary>
     public UISceneViewBase CurrentUIScene;
 
+    public void LoadSceneUI(xLuaCustomExport.OnCreate OnCreate, string path)
+    {
+        LoadSceneUI(UISceneCtrl.SceneUIType.None, null, OnCreate, path);
+    }
+
     #region LoadSceneUI 加载场景UI
     /// <summary>
     /// 加载场景UI
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    public void LoadSceneUI(SceneUIType type, Action<GameObject> OnLoadComplete)
+    public void LoadSceneUI(SceneUIType type, Action<GameObject> OnLoadComplete, xLuaCustomExport.OnCreate OnCreate = null, string path = null)
     {
+        string newPath = string.Empty;
         string prefabName = string.Empty;
-        switch (type)
+        if(type != SceneUIType.None)
         {
-            case SceneUIType.LogOn:
-                prefabName = "UI_Root_LogOn";
-                break;
-            case SceneUIType.SelectRole:
-                prefabName = "UI_Root_SelectRole";
-                break;
-            case SceneUIType.Loading:
-                break;
-            case SceneUIType.MainCity:
-                prefabName = "UI_Root_MainCity";
-                break;
+            switch (type)
+            {
+                case SceneUIType.LogOn:
+                    prefabName = "UI_Root_LogOn";
+                    break;
+                case SceneUIType.SelectRole:
+                    prefabName = "UI_Root_SelectRole";
+                    break;
+                case SceneUIType.Loading:
+                    break;
+                case SceneUIType.MainCity:
+                    prefabName = "UI_Root_MainCity";
+                    break;
+            }
+            newPath = "Download/Prefab/UIPrefab/UIScene/" + prefabName;
+        }
+        else
+        {
+            newPath = path;
         }
 
-        LoaderMgr.Instance.LoadOrDownload("Download/Prefab/UIPrefab/UIScene/" + prefabName, prefabName, (GameObject obj)=> 
+        LoaderMgr.Instance.LoadOrDownload(newPath , prefabName, (GameObject obj)=> 
         {
             if(obj != null)
             {
@@ -71,6 +86,12 @@ public class UISceneCtrl: Singleton<UISceneCtrl>
                 if (OnLoadComplete != null)
                 {
                     OnLoadComplete(obj);
+                }
+                
+                if(OnCreate != null)
+                {
+                    obj.GetOrCreatComponent<LuaViewBehaviour>();
+                    OnCreate(obj);
                 }
             }
         });

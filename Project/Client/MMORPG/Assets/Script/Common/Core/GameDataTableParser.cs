@@ -71,11 +71,19 @@ public class GameDataTableParser : IDisposable
     /// 行数
     /// </summary>
     private int m_Row;
+    public int Row
+    {
+        get { return m_Row; }
+    }
 
     /// <summary>
     /// 列数
     /// </summary>
     private int m_Column;
+    public int Column
+    {
+        get { return m_Column; }
+    }
 
     /// <summary>
     /// 字段名称
@@ -94,6 +102,10 @@ public class GameDataTableParser : IDisposable
     /// 游戏数据
     /// </summary>
     private string[,] m_GameData;
+    public string[,] GameData
+    {
+        get { return m_GameData; }
+    }
 
     /// <summary>
     /// 当前行号

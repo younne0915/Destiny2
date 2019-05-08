@@ -267,6 +267,36 @@ public class RoleAttack
         m_RoleStateAttack.AnimatorState = ConvertUtil.ConvertToEnum<RoleAnimatorState>(info.AnimatorState);
         m_CurrRoleFSMMgr.ChangeState(RoleState.Attack);
 
+        if (!string.IsNullOrEmpty(info.SkillAudioName))
+        {
+            if(info.SkillAudioDelayTime > 0)
+            {
+                AccurateTimerMgr.Instance.CreateTimer((long)info.SkillAudioDelayTime * 1000, () =>
+                {
+                    AudioEffectMgr.Instance.Play(info.SkillAudioName, m_CurrRoleCtrl.transform.position, true);
+                });
+            }
+            else
+            {
+                AudioEffectMgr.Instance.Play(info.SkillAudioName, m_CurrRoleCtrl.transform.position, true);
+            }
+        }
+
+        if (!string.IsNullOrEmpty(info.HowlAudioName))
+        {
+            if (info.HowlAudioDelay > 0)
+            {
+                AccurateTimerMgr.Instance.CreateTimer((long)info.HowlAudioDelay * 1000, () =>
+                {
+                    AudioEffectMgr.Instance.Play(info.HowlAudioName, m_CurrRoleCtrl.transform.position, true);
+                });
+            }
+            else
+            {
+                AudioEffectMgr.Instance.Play(info.HowlAudioName, m_CurrRoleCtrl.transform.position, true);
+            }
+        }
+
         return true;
     }
 

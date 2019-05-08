@@ -1,7 +1,7 @@
 
 //===================================================
 //作    者：边涯  http://www.u3dol.com  QQ群：87481002
-//创建时间：2019-03-24 17:13:02
+//创建时间：2019-04-25 13:39:00
 //备    注：此代码为工具生成 请勿手工修改
 //===================================================
 using System.Collections;
@@ -150,5 +150,10 @@ public partial class SpriteEntity : AbstractEntity
     /// 当这个精灵死亡后，玩家获取的经验数
     /// </summary>
     public int RewardExp { get; set; }
+
+    /// <summary>
+    /// 死亡音效名称
+    /// </summary>
+    public string DieAudioName { get; set; }
 
 }

@@ -484,6 +484,32 @@ public class RoleCtrl : MonoBehaviour
     public void ToDie(bool isDied = false)
     {
         AlreadyDied = isDied;
+        if (!AlreadyDied)
+        {
+            string name = string.Empty;
+            if (CurrRoleType == RoleType.Monster)
+            {
+                RoleInfoMonster roleInfoMonster = CurrRoleInfo as RoleInfoMonster;
+                if(roleInfoMonster != null && roleInfoMonster.spriteEntity != null)
+                {
+                    name = roleInfoMonster.spriteEntity.DieAudioName;
+                }
+            }
+            else
+            {
+                RoleInfoMainPlayer roleInfoMainPlayer = CurrRoleInfo as RoleInfoMainPlayer;
+                if (roleInfoMainPlayer != null)
+                {
+                    JobEntity jobEntity = JobDBModel.Instance.Get(roleInfoMainPlayer.JobId);
+                    if(jobEntity != null)
+                    {
+                        name = jobEntity.DieAudioName;
+                    }
+                }
+            }
+            AudioEffectMgr.Instance.Play(name, transform.position, true);
+        }
+
         CurrRoleInfo.CurrHP = 0;
         CurrRoleFSMMgr.ChangeState(RoleState.Die);
     }
@@ -507,7 +533,7 @@ public class RoleCtrl : MonoBehaviour
     private void CameraAutoFollow()
     {
         if (CameraCtrl.Instance == null) return;
-
+        AudioBackGroundMgr.Instance.transform.position = transform.position;
         CameraCtrl.Instance.transform.position = gameObject.transform.position;
         CameraCtrl.Instance.AutoLookAt(gameObject.transform.position);
     }

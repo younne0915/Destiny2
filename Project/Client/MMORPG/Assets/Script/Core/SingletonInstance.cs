@@ -9,5 +9,11 @@ public class SingletonInstance <T> : MonoBehaviour where T : MonoBehaviour
     private void Awake()
     {
         Instance = this as T;
+        OnAwake();
+    }
+
+    protected virtual void OnAwake()
+    {
+
     }
 }

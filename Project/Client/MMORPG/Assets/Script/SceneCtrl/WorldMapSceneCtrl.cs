@@ -240,6 +240,7 @@ public class WorldMapSceneCtrl : GameSceneCtrlBase
             {
                 m_AllRoleDic.Add(GlobalInit.Instance.MainPlayerInfo.RoleId, GlobalInit.Instance.CurrPlayer);
                 CurrWorldMapEntity = WorldMapDBModel.Instance.Get(SceneMgr.Instance.CurrWorldMapId);
+                AudioBackGroundMgr.Instance.Play(CurrWorldMapEntity.Audio_BG);
                 if (CurrWorldMapEntity != null)
                 {
                     InitTransPos();

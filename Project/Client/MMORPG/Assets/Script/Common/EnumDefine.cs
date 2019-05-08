@@ -310,3 +310,9 @@ public enum AssetBundleResType
     GameObject,
     Png,
 }
+
+public enum UIAudioEffectType
+{
+    ButtonClick,
+    UIClose
+}

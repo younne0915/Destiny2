@@ -14,7 +14,7 @@ using System;
 /// </summary>
 public class UIViewUtil : Singleton<UIViewUtil> 
 {
-    private Dictionary<WindowUIType, UIWindowViewBase> m_DicWindow = new Dictionary<WindowUIType, UIWindowViewBase>();
+    private Dictionary<string, UIWindowViewBase> m_DicWindow = new Dictionary<string, UIWindowViewBase>();
 
     /// <summary>
     /// 已经打开的窗口数量
@@ -40,28 +40,44 @@ public class UIViewUtil : Singleton<UIViewUtil>
     }
 
     #region OpenWindow 打开窗口
+
+    public void LoadWindowForLua(string viewName, xLuaCustomExport.OnCreate OnCreate = null, string path = null)
+    {
+        LoadWindow(viewName, null, null, OnCreate, path);
+    }
+
     /// <summary>
     /// 打开窗口
     /// </summary>
-    /// <param name="type">窗口类型</param>
+    /// <param name="viewName">窗口类型</param>
     /// <returns></returns>
-    public void LoadWindow(WindowUIType type, Action<GameObject> OnComplete, Action OnShow = null)
+    public void LoadWindow(string viewName, Action<GameObject> OnComplete, Action OnShow = null, xLuaCustomExport.OnCreate OnCreate = null, string path = null)
     {
-        if (type == WindowUIType.None) return;
+        if (string.IsNullOrEmpty(viewName)) return;
 
         //如果窗口不存在 则
-        if (!m_DicWindow.ContainsKey(type) || m_DicWindow[type] == null)
+        if (!m_DicWindow.ContainsKey(viewName) || m_DicWindow[viewName] == null)
         {
-            LoaderMgr.Instance.LoadOrDownload("Download/Prefab/UIPrefab/UIWindows/" + string.Format("pan_{0}", type.ToString()), string.Format("pan_{0}", type.ToString()), (GameObject obj)=>
+            string newPath = string.Empty;
+            if (string.IsNullOrEmpty(path))
+            {
+                newPath = string.Format("Download/Prefab/UIPrefab/UIWindows/pan_{0}", viewName);
+            }
+            else
+            {
+                newPath = path;
+            }
+
+            LoaderMgr.Instance.LoadOrDownload(newPath, string.Format("pan_{0}", viewName), (GameObject obj)=>
             {
                 if (obj != null)
                 {
                     obj = UnityEngine.Object.Instantiate(obj);
                     UIWindowViewBase windowBase = obj.GetComponent<UIWindowViewBase>();
                     if (windowBase == null) return;
-                    m_DicWindow[type] = windowBase;
+                    m_DicWindow[viewName] = windowBase;
 
-                    windowBase.CurrentUIType = type;
+                    windowBase.CurrentUIName = viewName;
                     windowBase.OnShow = OnShow;
                     Transform transParent = null;
 
@@ -84,29 +100,39 @@ public class UIViewUtil : Singleton<UIViewUtil>
                 {
                     OnComplete(obj);
                 }
+
+                if(OnCreate != null)
+                {
+                    OnCreate(obj);
+                }
             });
         }
         else
         {
-            LayerUIMgr.Instance.SetLayer(m_DicWindow[type].gameObject);
+            LayerUIMgr.Instance.SetLayer(m_DicWindow[viewName].gameObject);
             if (OnComplete != null)
             {
-                OnComplete(m_DicWindow[type].gameObject);
+                OnComplete(m_DicWindow[viewName].gameObject);
             }
         }
     }
     #endregion
+
+    public void LoadWindow(WindowUIType type, Action<GameObject> OnComplete, Action OnShow = null)
+    {
+        LoadWindow(type.ToString(), OnComplete, OnShow);
+    }
 
     #region CloseWindow 关闭窗口
     /// <summary>
     /// 关闭窗口
     /// </summary>
     /// <param name="type"></param>
-    public void CloseWindow(WindowUIType type)
+    public void CloseWindow(string viewName)
     {
-        if (m_DicWindow.ContainsKey(type))
+        if (m_DicWindow.ContainsKey(viewName))
         {
-            StartShowWindow(m_DicWindow[type], false);
+            StartShowWindow(m_DicWindow[viewName], false);
         }
     }
     #endregion
@@ -237,7 +263,7 @@ public class UIViewUtil : Singleton<UIViewUtil>
     /// <param name="obj"></param>
     private void DestroyWindow(UIWindowViewBase windowBase)
     {
-        m_DicWindow.Remove(windowBase.CurrentUIType);
+        m_DicWindow.Remove(windowBase.CurrentUIName);
         UnityEngine.Object.Destroy(windowBase.gameObject);
     }
     #endregion

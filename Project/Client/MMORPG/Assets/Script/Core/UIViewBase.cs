@@ -37,6 +37,10 @@ public class UIViewBase : MonoBehaviour
 
     private void BtnClick(GameObject go)
     {
+        if(AudioEffectMgr.Instance != null)
+        {
+            AudioEffectMgr.Instance.PlayUIAudioEffect(UIAudioEffectType.ButtonClick);
+        }
         OnBtnClick(go);
     }
 

@@ -2,22 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using XLua;
 
+[Hotfix]
 public class UIRoleEquipView : UISubViewBase {
 
     [SerializeField]
     private Transform RoleModelContainer;
 
     [SerializeField]
-    private Text lblNickName;
+    public Text lblNickName;
 
     [SerializeField]
-    private Text lblLevel;
+    public Text lblLevel;
 
     [SerializeField]
-    private Text lblFighting;
+    public Text lblFighting;
 
-    private int m_JobId;
+    public int m_JobId;
 
 	protected override void OnStart()
     {

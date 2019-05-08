@@ -1,7 +1,7 @@
 
 //===================================================
 //作    者：边涯  http://www.u3dol.com  QQ群：87481002
-//创建时间：2019-04-15 21:37:17
+//创建时间：2019-04-25 12:00:02
 //备    注：此代码为工具生成 请勿手工修改
 //===================================================
 using System.Collections;
@@ -49,6 +49,10 @@ public partial class SkillDBModel : AbstractDBModel<SkillDBModel, SkillEntity>
         entity.EffectName = parse.GetFieldValue("EffectName");
         entity.EffectLifeTime = parse.GetFieldValue("EffectLifeTime").ToFloat();
         entity.CameraShakeDelay = parse.GetFieldValue("CameraShakeDelay").ToFloat();
+        entity.SkillAudioName = parse.GetFieldValue("SkillAudioName");
+        entity.SkillAudioDelayTime = parse.GetFieldValue("SkillAudioDelayTime").ToFloat();
+        entity.HowlAudioName = parse.GetFieldValue("HowlAudioName");
+        entity.HowlAudioDelay = parse.GetFieldValue("HowlAudioDelay").ToFloat();
         return entity;
     }
 }
