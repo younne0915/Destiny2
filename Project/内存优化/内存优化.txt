@@ -1,3 +1,41 @@
 1.根据不同区域获取该区域下的怪物Id以及数量的字典，因为每次传进来的条件不一样，如果只用一个字典Clear后每次赋值的方法，
 每次查新的怪物都会改变上次查询的结果，所以我优化成每次查询传进来一个字典，对这个字典进行赋值。
 2.for循环或者foreach临时变量放在for外面
+3.Update组件优化
+4.字典优化：
+            if (dic.ContainsKey(key))
+            {
+                List<OnActionHandler> list = dic[key];
+                if (list != null && list.Count > 0)
+                {
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        if (list[i] != null && list[i].Target != null)
+                        {
+                            list[i](param);
+                        }
+                    }
+                }
+            }
+
+改为：
+ List<OnActionHandler> list = null;
+            dic.TryGetValue(key, out list);
+
+            if (list != null)
+            {
+                int count = list.Count;
+                OnActionHandler onActionHandler = null;
+
+                for (int i = 0; i < count; i++)
+                {
+                    onActionHandler = list[i];
+                    if (onActionHandler != null && onActionHandler.Target != null)
+                    {
+                        onActionHandler(param);
+                    }
+                }
+            }
+
+5.延迟多少秒的协程，改用定时器。
+6.音效保留5个，而不是随时销毁。
