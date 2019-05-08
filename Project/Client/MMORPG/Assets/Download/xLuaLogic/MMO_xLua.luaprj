@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<Project Name="MMO_xLua.luaprj" Cmd="" Arg="" Dir="" Toggle="false" >
+    <Filter RelativePath=".\Common" Toggle="false" >
+        <LuaFile RelativePath=".\Define.lua" />
+    </Filter>
+    <Filter RelativePath=".\Core" Toggle="true" >
+        <LuaFile RelativePath=".\CtrlMgr.lua" />
+        <LuaFile RelativePath=".\GameInit.lua" />
+        <LuaFile RelativePath=".\Main.lua" />
+    </Filter>
+    <Filter RelativePath=".\Modules" Toggle="true" >
+        <Filter RelativePath=".\UIRoot" Toggle="true" >
+            <LuaFile RelativePath=".\UIRootCtrl.lua" />
+            <LuaFile RelativePath=".\UIRootView.lua" />
+        </Filter>
+        <Filter RelativePath=".\Template" Toggle="true" >
+            <LuaFile RelativePath=".\ViewTemplate.lua" />
+            <LuaFile RelativePath=".\CtrlTemplate.lua" />
+        </Filter>
+        <Filter RelativePath=".\Task" Toggle="false" >
+            <LuaFile RelativePath=".\TaskCtrl.lua" />
+            <LuaFile RelativePath=".\TaskView.lua" />
+            <LuaFile RelativePath=".\Test.lua" />
+        </Filter>
+    </Filter>
+    <Filter RelativePath=".\Data" Toggle="true" >
+        <Filter RelativePath=".\Create" Toggle="false" >
+            <LuaFile RelativePath=".\TaskDBModel.lua" />
+            <LuaFile RelativePath=".\TaskEntity.lua" />
+        </Filter>
+        <LuaFile RelativePath=".\DBModelMgr.lua" />
+        <LuaFile RelativePath=".\TaskDBModelExt.lua" />
+    </Filter>
+    <Filter RelativePath=".\Proto" Toggle="true" >
+        <LuaFile RelativePath=".\Task_SearchTaskReturnProto.lua" />
+        <LuaFile RelativePath=".\Task_SearchTaskProto.lua" />
+        <LuaFile RelativePath=".\Backpack_GoodsChangeReturnProto.lua" />
+        <LuaFile RelativePath=".\Backpack_SearchProto.lua" />
+        <LuaFile RelativePath=".\Backpack_SearchReturnProto.lua" />
+        <LuaFile RelativePath=".\GameLevel_EnterProto.lua" />
+        <LuaFile RelativePath=".\GameLevel_EnterReturnProto.lua" />
+        <LuaFile RelativePath=".\GameLevel_FailProto.lua" />
+        <LuaFile RelativePath=".\GameLevel_FailReturnProto.lua" />
+        <LuaFile RelativePath=".\GameLevel_ResurgenceProto.lua" />
+        <LuaFile RelativePath=".\GameLevel_ResurgenceReturnProto.lua" />
+        <LuaFile RelativePath=".\GameLevel_VictoryProto.lua" />
+        <LuaFile RelativePath=".\GameLevel_VictoryReturnProto.lua" />
+        <LuaFile RelativePath=".\Goods_EquipPutProto.lua" />
+        <LuaFile RelativePath=".\Goods_EquipPutReturnProto.lua" />
+        <LuaFile RelativePath=".\Goods_SearchEquipDetailProto.lua" />
+        <LuaFile RelativePath=".\Goods_SearchEquipDetailReturnProto.lua" />
+        <LuaFile RelativePath=".\Goods_SellToSysProto.lua" />
+        <LuaFile RelativePath=".\Goods_SellToSysReturnProto.lua" />
+        <LuaFile RelativePath=".\Goods_UseItemProto.lua" />
+        <LuaFile RelativePath=".\Goods_UseItemReturnProto.lua" />
+        <LuaFile RelativePath=".\ProtoCodeDef.lua" />
+        <LuaFile RelativePath=".\RoleData_GoldChangeReturnProto.lua" />
+        <LuaFile RelativePath=".\RoleData_MondeyChangeReturnProto.lua" />
+        <LuaFile RelativePath=".\RoleData_RechargeProductReturnProto.lua" />
+        <LuaFile RelativePath=".\RoleData_RechargeReturnProto.lua" />
+        <LuaFile RelativePath=".\RoleData_SkillReturnProto.lua" />
+        <LuaFile RelativePath=".\RoleOperation_CreateRoleProto.lua" />
+        <LuaFile RelativePath=".\RoleOperation_CreateRoleReturnProto.lua" />
+        <LuaFile RelativePath=".\RoleOperation_DeleteRoleProto.lua" />
+        <LuaFile RelativePath=".\RoleOperation_DeleteRoleReturnProto.lua" />
+        <LuaFile RelativePath=".\RoleOperation_EnterGameProto.lua" />
+        <LuaFile RelativePath=".\RoleOperation_EnterGameReturnProto.lua" />
+        <LuaFile RelativePath=".\RoleOperation_LogOnGameServerProto.lua" />
+        <LuaFile RelativePath=".\RoleOperation_LogOnGameServerReturnProto.lua" />
+        <LuaFile RelativePath=".\RoleOperation_SelectRoleInfoProto.lua" />
+        <LuaFile RelativePath=".\RoleOperation_SelectRoleInfoReturnProto.lua" />
+        <LuaFile RelativePath=".\Shop_BuyProductProto.lua" />
+        <LuaFile RelativePath=".\Shop_BuyProductReturnProto.lua" />
+        <LuaFile RelativePath=".\System_GameServerConfigReturnProto.lua" />
+        <LuaFile RelativePath=".\System_SendLocalTimeProto.lua" />
+        <LuaFile RelativePath=".\System_ServerTimeReturnProto.lua" />
+        <LuaFile RelativePath=".\WorldMap_CurrRoleMoveProto.lua" />
+        <LuaFile RelativePath=".\WorldMap_CurrRoleResurgenceProto.lua" />
+        <LuaFile RelativePath=".\WorldMap_CurrRoleUpdateInfoProto.lua" />
+        <LuaFile RelativePath=".\WorldMap_CurrRoleUseSkillProto.lua" />
+        <LuaFile RelativePath=".\WorldMap_InitRoleProto.lua" />
+        <LuaFile RelativePath=".\WorldMap_OtherRoleDieProto.lua" />
+        <LuaFile RelativePath=".\WorldMap_OtherRoleEnterProto.lua" />
+        <LuaFile RelativePath=".\WorldMap_OtherRoleLeaveProto.lua" />
+        <LuaFile RelativePath=".\WorldMap_OtherRoleMoveProto.lua" />
+        <LuaFile RelativePath=".\WorldMap_OtherRoleResurgenceProto.lua" />
+        <LuaFile RelativePath=".\WorldMap_OtherRoleUpdateInfoProto.lua" />
+        <LuaFile RelativePath=".\WorldMap_OtherRoleUseSkillProto.lua" />
+        <LuaFile RelativePath=".\WorldMap_PosProto.lua" />
+        <LuaFile RelativePath=".\WorldMap_RoleAlreadyEnterProto.lua" />
+        <LuaFile RelativePath=".\WorldMap_RoleEnterProto.lua" />
+        <LuaFile RelativePath=".\WorldMap_RoleEnterReturnProto.lua" />
+    </Filter>
+    <Filter RelativePath=".\Hotfix" Toggle="false" >
+        <LuaFile RelativePath=".\UIRoleEquipView.lua" />
+    </Filter>
+</Project>
